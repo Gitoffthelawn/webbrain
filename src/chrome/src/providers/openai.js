@@ -150,7 +150,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
    * `supportsVision` getter above.
    */
   _modelNameSniffedVision(model) {
-    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
+    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|gpt-6-luna-pro(?:$|[-_.:/])|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
   }
 
   get useCompactPrompt() {

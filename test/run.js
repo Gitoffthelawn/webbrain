@@ -71308,6 +71308,22 @@ test('built-in catalog defaults opt into vision when the model name is multimoda
   }
 });
 
+test('GPT-6 Luna Pro vision capability is mirrored for direct and routed OpenAI models', () => {
+  for (const Provider of [OpenAIProviderCh, OpenAIProviderFx]) {
+    for (const config of [
+      { providerName: 'openai', baseUrl: 'https://api.openai.com/v1', model: 'gpt-6-luna-pro' },
+      { providerName: 'openrouter', baseUrl: 'https://openrouter.ai/api/v1', model: 'openai/gpt-6-luna-pro' },
+    ]) {
+      assert.equal(new Provider(config).supportsVision, true, `${config.model} should receive screenshots`);
+    }
+    assert.equal(
+      new Provider({ providerName: 'openai', baseUrl: 'https://api.openai.com/v1', model: 'gpt-6-luna' }).supportsVision,
+      false,
+      'unlisted GPT-6 variants must not inherit Luna Pro vision capability',
+    );
+  }
+});
+
 test('OpenAI settings list GPT-6 Luna Pro, the GPT-5.6 family, and current dated models', () => {
   const expectedModels = [
     'gpt-6-luna-pro',
