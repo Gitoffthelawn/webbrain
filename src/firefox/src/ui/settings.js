@@ -2626,6 +2626,7 @@ function renderProviders() {
         { key: 'apiKey', labelKey: 'st.provider.field.api_key', type: 'password', placeholder: 'sk-...' },
         { key: 'model', labelKey: 'st.provider.field.model', type: 'text', placeholder: 'gpt-5.6-terra',
           suggestions: [
+            'gpt-6-luna-pro',
             'gpt-5.6-terra',
             'gpt-5.6-sol',
             'gpt-5.6-luna',
