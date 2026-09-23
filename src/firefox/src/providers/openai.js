@@ -151,7 +151,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
    * `supportsVision` getter above.
    */
   _modelNameSniffedVision(model) {
-    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|gpt-6-luna-pro(?:$|[-_.:/])|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
+    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|gpt-6-(?:luna-pro|sol|astra)(?:$|[-_.:/])|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
   }
 
   get useCompactPrompt() {
@@ -304,7 +304,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
   }
 
   _addTemperature(body, options) {
-    // GPT-5, GPT-6 Luna Pro, and o-series models only accept the default
+    // GPT-5, supported GPT-6, and o-series models only accept the default
     // temperature. Provider configs can impose
     // the same omission for fixed-temperature models such as Kimi K2.5/K3.
     // In both cases, let the API apply its required default.
