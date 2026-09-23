@@ -4,6 +4,7 @@ import {
   isNewOpenAIContractConfig,
   isOfficialOpenAIConfig,
   isOpenCodeZenConfig,
+  requiresOpenAIDefaultTemperature,
   shouldUseOpenAIResponsesApi,
   supportsOpenAIAskStreaming,
   applyOpenRouterRoutingVariant,
@@ -149,7 +150,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
    * `supportsVision` getter above.
    */
   _modelNameSniffedVision(model) {
-    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
+    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|gpt-6-luna-pro(?:$|[-_.:/])|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3/.test(String(model || ''));
   }
 
   get useCompactPrompt() {
@@ -293,11 +294,16 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
   }
 
   _addTemperature(body, options) {
-    // GPT-5 / o-series only accept the default temperature (1). Sending
-    // anything else returns 400. Provider configs can impose
+    // GPT-5, GPT-6 Luna Pro, and o-series models only accept the default
+    // temperature. Provider configs can impose
     // the same omission for fixed-temperature models such as Kimi K2.5/K3.
     // In both cases, let the API apply its required default.
-    if (this._isNewOpenAIContract() || this.config.omitTemperature) return;
+    if (requiresOpenAIDefaultTemperature({
+      ...this.config,
+      providerName: this.config.providerName || this.name,
+      baseUrl: this.baseUrl,
+      model: this.model,
+    }) || this.config.omitTemperature) return;
     body.temperature = options.temperature ?? 0.7;
   }
 
