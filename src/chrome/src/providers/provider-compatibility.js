@@ -265,7 +265,7 @@ export function isNewOpenAIContractConfig(config = {}) {
 }
 
 /**
- * GPT-6 Luna Pro uses Chat Completions with `max_tokens`, but rejects an
+ * Supported GPT-6 models use Chat Completions with `max_tokens`, but reject an
  * explicit temperature. Keep this separate from the GPT-5/o-series contract,
  * whose token-field migration is different.
  */
@@ -274,9 +274,9 @@ export function requiresOpenAIDefaultTemperature(config = {}) {
   const providerName = clean(config.providerName);
   const model = clean(config.model);
   if (providerName === 'openrouter') {
-    return /(?:^|\/)openai\/gpt-6-luna-pro(?:$|[-_.\/:])/.test(model);
+    return /(?:^|\/)openai\/gpt-6-(?:luna-pro|sol|astra)(?:$|[-_.\/:])/.test(model);
   }
-  return isOfficialOpenAIConfig(config) && /^gpt-6-luna-pro(?:$|[-_.:])/.test(model);
+  return isOfficialOpenAIConfig(config) && /^gpt-6-(?:luna-pro|sol|astra)(?:$|[-_.:])/.test(model);
 }
 
 export function supportsOpenAIAskStreaming(config = {}) {
