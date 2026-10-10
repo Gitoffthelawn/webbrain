@@ -27266,7 +27266,7 @@ test('offscreen cloud bridge reconnects with backoff and rejects remote control 
   assert.equal(sockets[0].sent[0].protocolVersion, 2);
   assert.deepEqual(
     JSON.parse(JSON.stringify(sockets[0].sent[0].capabilities)),
-    ['saved_workflows_v1', 'run_modes_v1', 'scheduled_jobs_v1'],
+    ['saved_workflows_v1', 'run_modes_v1', 'scheduled_jobs_v1', 'run_provider_v1', 'private_results_v1'],
   );
   sockets[0].close();
   assert.equal(timers[0].delay, 500);
@@ -28775,6 +28775,33 @@ test('delivery recovery keeps generated credential delivery in loose mode only',
     const strictDone = agent._deliveryRecoveryDoneTool();
     assert.match(strictDone?.function?.description || '', /Never include passwords/i);
     assert.doesNotMatch(strictDone?.function?.description || '', /generated a new credential for this task/i);
+  }
+});
+
+test('encrypted final delivery is scoped to its Cloud tab and leaves ordinary strict prompts intact', () => {
+  for (const AgentClass of [AgentCh, AgentFx]) {
+    const agent = new AgentClass({});
+    agent.strictSecretMode = true;
+    agent.cloudRunContexts.set(7, { privateFinalResult: true });
+    const privatePrompt = agent._buildSystemPrompt('act', 7);
+    assert.match(privatePrompt, /PRIVATE FINAL DELIVERY/);
+    assert.doesNotMatch(privatePrompt, /STRICT SECRET HANDLING IS ON/);
+    assert.match(agent._buildSystemPrompt('act', 8), /STRICT SECRET HANDLING IS ON/);
+    const privateDone = agent._deliveryRecoveryDoneTool('delivery_recovery', null, 'en', 7);
+    assert.match(privateDone.function.description, /generated a new credential/);
+    const ordinaryDone = agent._deliveryRecoveryDoneTool('delivery_recovery', null, 'en', 8);
+    assert.match(ordinaryDone.function.description, /Never include passwords/);
+    const field = {actual: 'not-published', fieldMeta: {type: 'password'}};
+    agent._annotateCredentialField('set_field', field, 7);
+    assert.equal(field.actual, undefined);
+    assert.match(field.note, /PRIVATE FINAL DELIVERY/);
+    assert.equal(field.strictSecretMode, true);
+    const ordinary = {actual: 'not-published', fieldMeta: {type: 'password'}};
+    agent._annotateCredentialField('set_field', ordinary, 8);
+    assert.match(ordinary.note, /STRICT MODE IS ON/);
+    assert.equal(agent.strictSecretMode, true);
+    agent.cloudRunContexts.delete(7);
+    assert.match(agent._buildSystemPrompt('act', 7), /STRICT SECRET HANDLING IS ON/);
   }
 });
 
@@ -65242,7 +65269,7 @@ test('failed sensitive field-tool readbacks are annotated and redacted', () => {
     ['firefox', 'src/firefox/src/agent/agent.js', isCredentialFieldFx, CREDENTIAL_NOTE_STRICT_FX],
   ]) {
     const source = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-    const start = source.indexOf('_annotateCredentialField(toolName, response) {');
+    const start = source.indexOf('_annotateCredentialField(toolName, response, tabId = null) {');
     const end = source.indexOf('\n  }\n\n', start);
     assert.ok(start >= 0 && end > start, `${label}: credential result annotator should remain independently testable`);
     const method = vm.runInNewContext(`({${source.slice(start, end + 4)}})._annotateCredentialField`, {
@@ -71018,30 +71045,6 @@ test('extended provider catalog is complete, mirrored, safe, and excluded-provid
     ProviderCatalogCh.ADDITIONAL_PROVIDER_UI.nearai.suggestions,
     ['z-ai/glm-5.3-flash', 'Qwen/Qwen3.8-27B'],
   );
-  // assert.deepEqual(
-  //   {
-  //     baseUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.baseUrl,
-  //     model: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.model,
-  //     contextWindow: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.contextWindow,
-  //     supportsVision: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.supportsVision,
-  //     supportsTools: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.supportsTools,
-  //     supportsAskStreaming: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.supportsAskStreaming,
-  //     apiKeyUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.demonroute.apiKeyUrl,
-  //   },
-  //   {
-  //     baseUrl: 'https://api.demonroute.com/v1',
-  //     model: 'dphn/Dolphin3.0-Llama3.1-8B',
-  //     contextWindow: 131072,
-  //     supportsVision: false,
-  //     supportsTools: true,
-  //     supportsAskStreaming: true,
-  //     apiKeyUrl: 'https://demonroute.com',
-  //   },
-  // );
-  // assert.deepEqual(
-  //   ProviderCatalogCh.ADDITIONAL_PROVIDER_UI.demonroute.suggestions,
-  //   ['dphn/Dolphin3.0-Llama3.1-8B', 'NousResearch/Hermes-3-Llama-3.1-8B'],
-  // );
   assert.deepEqual(
     ProviderCatalogCh.ADDITIONAL_PROVIDER_UI['kimi-for-coding'].suggestions,
     ['kimi-for-coding', 'kimi-for-coding-highspeed', 'k3'],
@@ -92526,7 +92529,7 @@ test('download evidence recognizes completed core, screenshot, social, and skill
   }
 });
 
-test('planner-bypassed managed cloud runs never enable the execution guard', () => {
+test('planner-bypassed managed cloud Act runs retain the execution guard', () => {
   for (const [index, AgentClass] of [AgentCh, AgentFx].entries()) {
     const agent = new AgentClass({});
     const guard = agent._startPlanExecutionGuard(
@@ -92535,7 +92538,12 @@ test('planner-bypassed managed cloud runs never enable the execution guard', () 
       { proceed: true, requestKind: 'execute', requiresStateChange: false },
       { cloudRun: true, outputSchema: null },
     );
-    assert.equal(guard.enabled, false, `${AgentClass.name}: planner-bypassed cloud run enabled the guard`);
+    assert.equal(guard.enabled, true, `${AgentClass.name}: planner-bypassed cloud run disabled the guard`);
+    assert.equal(
+      agent._planOnlyTerminalDecision(8637 + index, "I'll navigate to the page now.")?.retry,
+      true,
+      `${AgentClass.name}: Cloud Act accepted a promise as completion`,
+    );
   }
 });
 

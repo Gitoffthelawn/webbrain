@@ -20,7 +20,6 @@ This changelog was generated from the repository Git history and release tags. V
 - feat(providers): add Claude Sonnet 5.5 and Haiku 5.5 support to Anthropic provider
 - docs(faq): localize subscription-unrecognized, emergency-box and offline-licensing in all locales
 - docs(faq): add paid-but-asks-again subscription entry, promote workflow-editor to locale sources
-- removed demonroute
 
 ## [39.2.0] - 2026-10-10
 
@@ -118,9 +117,7 @@ This changelog was generated from the repository Git history and release tags. V
 - Announce SafeSocial on Google Play
 - Run release fixtures and finish portable browser test support
 - feat(providers): add Freebuff2API integration
-- fix(providers): correct DemonRoute card, ordering, tests and docs
 - Keep Cloud continuations tracked and report actual completion outcomes
-- Add DemonRoute as a built-in provider card
 - Address review regressions in text targeting and LinkedIn guards
 - Preserve guarded key dispatch and portable browser regression checks
 - Fix composer detection and eligible text click preference
