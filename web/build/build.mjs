@@ -12,6 +12,7 @@
  *   web/websites/index.html              WebBrain for websites (English)
  *   web/docs/faq/index.html
  *   web/docs/{es,fr,tr,zh,...}/faq/index.html
+ *   web/privacy.html                     (footer only; the page is hand-written)
  *   web/sitemap.xml
  *   web/robots.txt
  *
@@ -30,6 +31,9 @@
  *   {{faq_language_routes}} safe locale-to-FAQ route map for the selector
  *   {{faq_jsonld}}       FAQPage schema block generated from faq.* keys
  *   {{plausible_analytics}} shared privacy-friendly analytics partial
+ *   {{site_footer_styles}} / {{site_footer}} the footer every page shares
+ *                        (web/build/site-footer.mjs)
+ *   {{sites_demo_site_id}} the site the homepage's live demo loads
  *
  * {{t:key}} → plain-text substitution, HTML-escaped.
  * {{t-html:key}} → raw substitution (value is expected to be HTML-ready).
@@ -44,6 +48,14 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PLAUSIBLE_ANALYTICS } from './plausible.mjs';
+import {
+  BLUESKY_PROFILE_URL,
+  HUGGINGFACE_PROFILE_URL,
+  MASTODON_PROFILE_URL,
+  SITE_FOOTER_STYLES,
+  siteFooter,
+  withSiteFooter,
+} from './site-footer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');           // web/
@@ -59,6 +71,9 @@ const SOCIAL_IMAGE_URL = `${SITE_ORIGIN}/og-image.png`;
 const WEBSITES_PATH = '/websites/';
 // WebBrain for websites: the private dashboard that issues embed scripts.
 const SITES_DASHBOARD_URL = 'https://sites.webbrain.one';
+// The dashboard site the homepage's "Demo" button loads, so visitors try the
+// real assistant on webbrain.one itself. The dashboard creates it on first run.
+const SITES_DEMO_SITE_ID = 'site_webbrain_one';
 const LOGO_IMAGE_URL = `${SITE_ORIGIN}/logo-github.png`;
 
 // Locale config. The default locale (en) renders to web/index.html;
@@ -227,10 +242,6 @@ const FAQ_PAGE_KEYS = [
 ];
 
 const STRIPE_SUBSCRIBE_URL = 'https://buy.stripe.com/bJebJ13at2kc5XP7eY8g00a';
-const MASTODON_PROFILE_URL = 'https://mastoturk.org/@webbrain';
-const BLUESKY_PROFILE_URL = 'https://bsky.app/profile/webbrain-one.bsky.social';
-const DISCORD_INVITE_URL = 'https://discord.gg/cgC325ssfw';
-const HUGGINGFACE_PROFILE_URL = 'https://huggingface.co/webbrain-one';
 
 function escHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
@@ -253,6 +264,10 @@ function escJson(s) {
 
 function homeUrlFor(locale) {
   return locale.isDefault ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/${locale.code}/`;
+}
+
+function homePathFor(locale) {
+  return locale.isDefault ? '/' : `/${locale.code}/`;
 }
 
 function browserPathFor(locale) {
@@ -279,6 +294,37 @@ function faqUrlFor(locale) {
 
 function docsPathFor(locale) {
   return locale.code === 'zh' ? '/docs/zh/' : '/docs/';
+}
+
+// The footer's no-JavaScript language list, in the language picker's order.
+const FOOTER_LANGUAGE_ORDER = ['en', 'zh', 'ar', 'bn', 'nl', 'tl', 'fr', 'de', 'he', 'hi', 'id', 'ja', 'ko', 'ms', 'fa', 'pt', 'ru', 'es', 'th', 'tr', 'uk', 'vi'];
+
+function validateFooterLanguageOrder() {
+  const codes = LOCALES.map((l) => l.code);
+  const unlisted = codes.filter((code) => !FOOTER_LANGUAGE_ORDER.includes(code));
+  const unknown = FOOTER_LANGUAGE_ORDER.filter((code) => !codes.includes(code));
+  if (unlisted.length || unknown.length) {
+    throw new Error(`FOOTER_LANGUAGE_ORDER is out of date (unlisted: ${unlisted.join(', ') || 'none'}; unknown: ${unknown.join(', ') || 'none'})`);
+  }
+}
+
+function siteFooterFor(dict, locale, page) {
+  // The homepage and the browser extension page exist in every language, so
+  // their footers also list the other languages for visitors without JS.
+  const languagePathFor = page === 'browser' ? browserPathFor : page === 'home' ? homePathFor : null;
+  const languages = languagePathFor
+    ? FOOTER_LANGUAGE_ORDER.map((code) => {
+        const target = LOCALES.find((l) => l.code === code);
+        return { code, label: target.label, href: languagePathFor(target) };
+      })
+    : [];
+  return siteFooter(dict, {
+    browserPath: browserPathFor(locale),
+    websitesPath: WEBSITES_PATH,
+    docsPath: docsPathFor(locale),
+    faqPath: faqPathFor(locale),
+    languages,
+  });
 }
 
 function buildHreflangBlock(urlFor = homeUrlFor) {
@@ -580,12 +626,15 @@ function applyTemplate(template, dict, locale, page = 'home') {
     .replace(/\{\{browser_path\}\}/g, browserPathFor(locale))
     .replace(/\{\{websites_path\}\}/g, WEBSITES_PATH)
     .replace(/\{\{sites_dashboard_url\}\}/g, SITES_DASHBOARD_URL)
+    .replace(/\{\{sites_demo_site_id\}\}/g, SITES_DEMO_SITE_ID)
     .replace(/\{\{home_title_size\}\}/g, homeTitleSize(dict))
     .replace(/\{\{docs_url\}\}/g, docsUrl)
     .replace(/\{\{docs_language_label\}\}/g, locale.code === 'zh' ? '中文' : 'EN')
     .replace(/\{\{faq_url\}\}/g, faqPathFor(locale))
     .replace(/\{\{faq_canonical\}\}/g, faqUrlFor(locale))
     .replace(/\{\{plausible_analytics\}\}/g, PLAUSIBLE_ANALYTICS)
+    .replace(/\{\{site_footer_styles\}\}/g, () => SITE_FOOTER_STYLES)
+    .replace(/\{\{site_footer\}\}/g, () => siteFooterFor(dict, locale, page))
     .replace(/\{\{hreflang_links\}\}/g, () => hreflangBlockFor(page))
     .replace(/\{\{faq_hreflang_links\}\}/g, buildFaqHreflangBlock())
     .replace(/\{\{faq_language_options\}\}/g, buildFaqLanguageOptions(locale))
@@ -630,6 +679,7 @@ async function main() {
   const websitesTemplate = await readFile(WEBSITES_TEMPLATE_PATH, 'utf8');
   const faqTemplate = await readFile(FAQ_TEMPLATE_PATH, 'utf8');
   validateFaqRegistry();
+  validateFooterLanguageOrder();
   await syncLanguageFlagAssets();
   await syncProviderIconAssets();
   // Keep the published Companion download page in sync with the standalone app.
@@ -669,10 +719,6 @@ async function main() {
       'share.linkedin_intent_url': `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
       'share.mastodon_intent_url': `https://mastoturk.org/share?text=${encodeURIComponent(shareTextWithUrl)}`,
       'share.bluesky_intent_url': `https://bsky.app/intent/compose?text=${encodeURIComponent(shareTextWithUrl)}`,
-      'social.mastodon_url': MASTODON_PROFILE_URL,
-      'social.bluesky_url': BLUESKY_PROFILE_URL,
-      'social.discord_url': DISCORD_INVITE_URL,
-      'social.huggingface_url': HUGGINGFACE_PROFILE_URL,
     };
 
     const localeDir = locale.isDefault ? ROOT : path.join(ROOT, locale.code);
@@ -695,7 +741,7 @@ async function main() {
       console.log(`✓ wrote ${path.relative(process.cwd(), outPath)} (${html.length.toLocaleString()} bytes)`);
     }
 
-    const { html: faqHtml, missing: faqMissing } = applyTemplate(faqTemplate, dict, locale);
+    const { html: faqHtml, missing: faqMissing } = applyTemplate(faqTemplate, dict, locale, 'faq');
     if (faqMissing.size) {
       totalMissing += faqMissing.size;
       console.warn(`[${locale.code}] ${faqMissing.size} missing FAQ page keys:`, [...faqMissing].join(', '));
@@ -704,6 +750,16 @@ async function main() {
     await mkdir(path.dirname(faqOutPath), { recursive: true });
     await writeFile(faqOutPath, faqHtml, 'utf8');
     console.log(`✓ wrote ${path.relative(process.cwd(), faqOutPath)} (${faqHtml.length.toLocaleString()} bytes)`);
+  }
+
+  // The privacy policy is written by hand; keep its footer the same as every
+  // other page's.
+  const privacyPath = path.join(ROOT, 'privacy.html');
+  const privacy = await readFile(privacyPath, 'utf8');
+  const privacyWithFooter = withSiteFooter(privacy, en);
+  if (privacyWithFooter !== privacy) {
+    await writeFile(privacyPath, privacyWithFooter, 'utf8');
+    console.log('✓ updated privacy.html footer');
   }
 
   // sitemap.xml — localized homes and browser pages, the websites page, plus

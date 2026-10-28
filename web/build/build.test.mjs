@@ -28,6 +28,7 @@ before(async () => {
   sandbox = await mkdtemp(path.join(os.tmpdir(), 'webbrain-build-import-'));
   await copyFile(new URL('./build.mjs', import.meta.url), path.join(sandbox, 'build.mjs'));
   await copyFile(new URL('./plausible.mjs', import.meta.url), path.join(sandbox, 'plausible.mjs'));
+  await copyFile(new URL('./site-footer.mjs', import.meta.url), path.join(sandbox, 'site-footer.mjs'));
   await copyFile(new URL('./languages.json', import.meta.url), path.join(sandbox, 'languages.json'));
   const script = 'const module = await import(' +
     JSON.stringify(pathToFileURL(path.join(sandbox, 'build.mjs')).href) +
@@ -38,7 +39,7 @@ before(async () => {
   assert.equal(result.stderr, '');
   isolatedExports = JSON.parse(result.stdout);
   assert.deepEqual(isolatedExports, exportNames);
-  assert.deepEqual((await readdir(sandbox)).sort(), ['build.mjs', 'languages.json', 'plausible.mjs']);
+  assert.deepEqual((await readdir(sandbox)).sort(), ['build.mjs', 'languages.json', 'plausible.mjs', 'site-footer.mjs']);
   builder = await import('./build.mjs');
 });
 

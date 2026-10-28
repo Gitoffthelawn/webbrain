@@ -44212,36 +44212,37 @@ test('demo proof cards carry the security safeguards beside the comparison', () 
 });
 
 test('web footer includes the Discord invite beside its other social icons', () => {
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const footerModule = fs.readFileSync(path.join(ROOT, 'web/build/site-footer.mjs'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
   const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   const english = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
 
   assert.match(
-    build,
-    /const DISCORD_INVITE_URL = 'https:\/\/discord\.gg\/cgC325ssfw';[\s\S]*?'social\.discord_url': DISCORD_INVITE_URL/,
-    'web build: Discord invite should be a shared generated-page URL',
+    footerModule,
+    /export const DISCORD_INVITE_URL = 'https:\/\/discord\.gg\/cgC325ssfw';/,
+    'site footer: Discord invite should be one shared URL',
+  );
+  assert.match(build, /from '\.\/site-footer\.mjs'/, 'web build: pages should render the shared site footer');
+  assert.match(
+    footerModule,
+    /socialLink\(MASTODON_PROFILE_URL[\s\S]*?socialLink\(BLUESKY_PROFILE_URL[\s\S]*?socialLink\(DISCORD_INVITE_URL[\s\S]*?socialLink\(HUGGINGFACE_PROFILE_URL/,
+    'site footer: Discord should sit beside Mastodon and Bluesky',
   );
   assert.match(
-    template,
-    /social\.mastodon_url[\s\S]*?social\.bluesky_url[\s\S]*?social\.discord_url/,
-    'web footer: Discord should sit beside Mastodon and Bluesky',
+    footerModule,
+    /\.wb-footer-links \{[^}]*align-items: center;[^}]*\}/,
+    'site footer: social icons and text links should share one vertical center',
   );
   assert.match(
-    template,
-    /\.footer-links \{[\s\S]*?align-items: center;[\s\S]*?\}/,
-    'web footer: social icons and text links should share one vertical center',
-  );
-  assert.match(
-    template,
-    /href="\{\{t:social\.discord_url\}\}"[^>]*rel="noopener"[^>]*aria-label="\{\{t:social\.discord_label\}\}"[^>]*class="footer-icon"[\s\S]*?<svg viewBox="0 0 16 16"/,
-    'web footer: Discord invite should use the established accessible icon-link pattern',
+    footerModule,
+    /discord: '<svg viewBox="0 0 16 16"/,
+    'site footer: Discord invite should use the established icon',
   );
   assert.equal(english['social.discord_label'], 'WebBrain on Discord');
   assert.match(
     generated,
-    /href="https:\/\/discord\.gg\/cgC325ssfw"[^>]*aria-label="WebBrain on Discord"[^>]*class="footer-icon"/,
-    'web build: generated English footer should include the Discord invite icon',
+    /href="https:\/\/discord\.gg\/cgC325ssfw"[^>]*rel="noopener"[^>]*aria-label="WebBrain on Discord"[^>]*class="wb-footer-icon"/,
+    'web build: generated English footer should include the accessible Discord invite icon',
   );
 });
 
@@ -45012,6 +45013,47 @@ test('homepage offers the browser extension and WebBrain for websites side by si
   assert.match(build, /SITES_DASHBOARD_URL = 'https:\/\/sites\.webbrain\.one'/);
 });
 
+test('homepage cards show each product clearly, play the video and load a live demo', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/home-template.html'), 'utf8');
+  const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const strings = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
+
+  // The browser card shows a browser with WebBrain's side panel; the website
+  // card shows the script tag a site owner pastes, so the audience is clear.
+  const siteIllustration = template.match(/<div class="illo illo-site"[\s\S]*?<div class="path-copy">/);
+  assert.ok(siteIllustration, 'web home: website card illustration missing');
+  assert.match(siteIllustration[0], /&lt;script<\/span> <span class="tk-attr">src<\/span>=<span class="tk-str">"…\/embed\.js"/, 'web home: website card shows the embed script tag');
+  assert.match(template, /<div class="illo illo-browser"[\s\S]*?class="bw-panel"/, 'web home: browser card shows the side panel');
+  assert.match(template, /class="path-badge path-badge-open">\{\{t:home\.browser\.badge\}\}/, 'web home: browser card has an Open Source pill');
+  assert.equal(strings['home.browser.badge'], 'Open Source');
+
+  // Watch it in action: the product video in a dialog, with a no-JS fallback.
+  assert.match(template, /<a href="\{\{browser_path\}\}#demo" class="path-action" id="home-video-open" aria-haspopup="dialog">/);
+  assert.match(template, /<dialog class="video-dialog" id="home-video-dialog"[\s\S]*?<video id="home-video" data-desktop-src="\/assets\/webbrain-home-demo\.mp4" data-mobile-src="\/assets\/webbrain-home-demo-vertical\.mp4"/);
+  for (const asset of ['webbrain-home-demo.mp4', 'webbrain-home-demo-vertical.mp4', 'webbrain-home-demo-poster.jpg', 'webbrain-home-demo-poster-vertical.jpg']) {
+    assert.ok(fs.existsSync(path.join(ROOT, 'web/assets', asset)), `web home: ${asset} missing`);
+  }
+  assert.equal(strings['home.browser.watch'], 'Watch it in action');
+
+  // Demo: loads WebBrain for websites on the homepage, only when asked.
+  assert.match(build, /const SITES_DEMO_SITE_ID = 'site_webbrain_one';/);
+  assert.match(english, /id="home-demo-open" data-embed-src="https:\/\/sites\.webbrain\.one\/embed\.js" data-site-id="site_webbrain_one"/);
+  assert.doesNotMatch(english, /<script[^>]+src="https:\/\/sites\.webbrain\.one\/embed\.js"/, 'web home: the demo script must not load until the visitor asks');
+  assert.match(english, /<p class="path-status" id="home-demo-status" role="status"><\/p>/);
+  assert.equal(strings['home.websites.demo'], 'Demo');
+
+  // Features and Info replace "See what it can do" and "How it works".
+  assert.match(template, /href="\{\{browser_path\}\}#features" class="path-link">\{\{t:home\.browser\.features\}\}/);
+  assert.match(template, /href="\{\{websites_path\}\}#how-it-works" class="path-link">\{\{t:home\.websites\.info\}\}/);
+  assert.equal(strings['home.browser.features'], 'Features');
+  assert.equal(strings['home.websites.info'], 'Info');
+  assert.ok(!('home.browser.more' in strings) && !('home.websites.more' in strings), 'web home: retired link labels removed');
+
+  // Word on the web: headshots at 60px.
+  assert.equal((english.match(/src="\/assets\/voices\/[^"]+" alt="[^"]+" width="60" height="60"/g) || []).length, 3);
+});
+
 test('homepage forwards anchors that moved to the browser extension page', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/home-template.html'), 'utf8');
   const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
@@ -45062,25 +45104,73 @@ test('site footers carry the mission line in every language', () => {
     assert.ok(String(dict['footer.tagline'] || '').trim(), `${file}: footer.tagline missing`);
     if (file !== 'en.json') assert.notEqual(dict['footer.tagline'], english['footer.tagline'], `${file}: footer.tagline is untranslated`);
   }
-  for (const name of ['home-template.html', 'template.html', 'websites-template.html']) {
-    const template = fs.readFileSync(path.join(ROOT, 'web/build', name), 'utf8');
-    assert.match(
-      template,
-      /<div class="footer-brand">\s*<p class="footer-tagline">\{\{t:footer\.tagline\}\}<\/p>\s*<span[^>]*>\{\{t-html:footer\.copyright_html\}\}<\/span>/,
-      `${name}: the mission line should sit above the copyright`,
-    );
-  }
+  const footerModule = fs.readFileSync(path.join(ROOT, 'web/build/site-footer.mjs'), 'utf8');
+  assert.match(
+    footerModule,
+    /<div class="wb-footer-brand">\s*<p class="wb-footer-tagline">\$\{t\('footer\.tagline'\)\}<\/p>\s*<p class="wb-footer-copy">/,
+    'site footer: the mission line should sit above the copyright',
+  );
   const turkish = JSON.parse(fs.readFileSync(path.join(localesDir, 'tr.json'), 'utf8'));
+  const chinese = JSON.parse(fs.readFileSync(path.join(localesDir, 'zh.json'), 'utf8'));
   for (const [page, line] of [
     ['web/index.html', english['footer.tagline']],
     ['web/browser/index.html', english['footer.tagline']],
     ['web/websites/index.html', english['footer.tagline']],
     ['web/tr/index.html', turkish['footer.tagline']],
     ['web/tr/browser/index.html', turkish['footer.tagline']],
+    ['web/docs/tr/faq/index.html', turkish['footer.tagline']],
+    ['web/docs/zh/index.html', chinese['footer.tagline']],
+    ['web/blog/index.html', english['footer.tagline']],
+    ['web/privacy.html', english['footer.tagline']],
   ]) {
     const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
-    assert.ok(html.includes(`<p class="footer-tagline">${line}</p>`), `${page}: footer mission line missing`);
+    assert.ok(html.includes(`<p class="wb-footer-tagline">${line}</p>`), `${page}: footer mission line missing`);
   }
+});
+
+test('every webbrain.one page shares one footer', () => {
+  const footerOf = (rel) => {
+    const html = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.equal((html.match(/<footer\b/g) || []).length, 1, `${rel}: should have exactly one footer`);
+    assert.match(html, /<!-- Site footer styles: start -->[\s\S]*?<\/head>/, `${rel}: footer styles belong in <head>`);
+    const block = html.match(/<!-- Site footer: start -->[\s\S]*?<!-- Site footer: end -->/);
+    assert.ok(block, `${rel}: should render the shared site footer`);
+    // The homepage and browser page add a no-JavaScript language list.
+    return block[0].replace(/\n\s*<div class="wb-footer-languages">[\s\S]*?<\/div>/, '');
+  };
+  const blogPosts = fs.readdirSync(path.join(ROOT, 'web/blog'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(ROOT, 'web/blog', entry.name, 'index.html')))
+    .map((entry) => `web/blog/${entry.name}/index.html`);
+  const docsPages = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+      const rel = `${dir}/${entry.name}`;
+      if (entry.isDirectory() && entry.name !== 'assets') walk(rel);
+      else if (entry.name === 'index.html' && !rel.startsWith('web/docs/zh/') && !/\/faq\/index\.html$/.test(rel)) docsPages.push(rel);
+    }
+  };
+  walk('web/docs');
+  assert.ok(blogPosts.length > 10 && docsPages.length > 5, 'blog posts and docs pages should be found');
+
+  const reference = footerOf('web/index.html');
+  for (const rel of [
+    'web/browser/index.html',
+    'web/websites/index.html',
+    'web/docs/faq/index.html',
+    'web/privacy.html',
+    'web/blog/index.html',
+    ...blogPosts,
+    ...docsPages,
+  ]) {
+    assert.equal(footerOf(rel), reference, `${rel}: footer differs from the homepage footer`);
+  }
+  assert.match(footerOf('web/tr/index.html'), /href="\/tr\/browser\/"/, 'localized footers link to their own browser page');
+  assert.match(footerOf('web/docs/zh/index.html'), /href="\/docs\/zh\/faq\/"/, 'Chinese docs link to the Chinese FAQ');
+  assert.match(
+    fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8'),
+    /<div class="wb-footer-languages">[\s\S]*?href="\/tr\/browser\/" hreflang="tr"/,
+    'browser page: the no-JavaScript language list points at the browser page in each language',
+  );
 });
 
 test('download FAQ bridge is a single block-level link', () => {

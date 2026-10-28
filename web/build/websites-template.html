@@ -338,15 +338,6 @@
     .closing h2 { max-width: 640px; font-size: clamp(26px, 2.8vw, 38px); line-height: 1.12; letter-spacing: -0.04em; text-wrap: balance; }
     .closing-actions { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
 
-    /* ----- Footer ----- */
-    .site-footer { border-top: 1px solid var(--border); }
-    .footer-inner { width: var(--site-width); margin: 0 auto; padding: 26px 0 30px; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px 32px; flex-wrap: wrap; color: var(--text-dim); font-size: 13px; }
-    .footer-brand { display: flex; flex-direction: column; gap: 5px; }
-    .footer-tagline { margin: 0; color: var(--text); font-size: 15px; font-weight: 700; }
-    .footer-copy a { color: var(--text); font-weight: 650; }
-    .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
-    .footer-links a { color: var(--text-dim); font-weight: 600; }
-    .footer-links a:hover { color: var(--text); text-decoration: none; }
 
     @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     .hero-copy, .code-console { animation: rise 0.5s ease-out both; }
@@ -388,6 +379,7 @@
     }
   </style>
 
+{{site_footer_styles}}
 {{plausible_analytics}}
 </head>
 <body>
@@ -594,23 +586,7 @@ WebBrain.<span class="tok-attr">reloadConfig</span>();</pre>
   </section>
 </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <p class="footer-tagline">{{t:footer.tagline}}</p>
-      <span class="footer-copy">{{t-html:footer.copyright_html}}</span>
-    </div>
-    <div class="footer-links">
-      <a href="/browser/">{{t:nav.browser_extension}}</a>
-      <a href="{{websites_path}}">{{t:nav.for_websites}}</a>
-      <a href="/docs/">{{t:nav.docs}}</a>
-      <a href="/blog/">{{t:nav.blog}}</a>
-      <a href="/privacy">{{t:footer.link_privacy}}</a>
-      <a href="{{t:social.discord_url}}" target="_blank" rel="noopener">Discord</a>
-      <a href="https://github.com/webbrain-one/webbrain" target="_blank" rel="noopener">GitHub</a>
-    </div>
-  </div>
-</footer>
+{{site_footer}}
 
 <!-- "Get your script": hand the address to the dashboard, which pre-fills it. -->
 <script>

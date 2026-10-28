@@ -143,6 +143,10 @@
       --illo-bg: #0f1522;
       --illo-line: rgba(255,255,255,0.10);
       --illo-panel: #161f33;
+      --illo-chrome: #0b101b;
+      --code-bg: #0a0d16;
+      --code-border: rgba(255,255,255,0.08);
+      --danger: #ff8d9b;
       --site-width: min(calc(100% - 48px), 1100px);
       --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -178,6 +182,10 @@
       --illo-bg: #f4ead7;
       --illo-line: rgba(89,55,25,0.16);
       --illo-panel: #fbf3e2;
+      --illo-chrome: #ebdfc8;
+      --code-bg: #211812;
+      --code-border: #211812;
+      --danger: #a43b32;
       color-scheme: light;
     }
 
@@ -579,9 +587,9 @@
     }
     .path-actions {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px 18px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
       margin-top: auto;
       padding-top: 24px;
     }
@@ -621,98 +629,282 @@
       text-underline-offset: 4px;
     }
     .path-link:hover { color: var(--accent-text); text-decoration-color: currentColor; }
+    .path-badge-open { background: var(--accent-glow); color: var(--accent-text); }
+    .path-more { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+    .path-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .path-action:hover { color: var(--text); text-decoration: none; }
+    .path-action-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--border-strong);
+      border-radius: 50%;
+      color: var(--accent-text);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .path-action:hover .path-action-icon { border-color: var(--accent); background: var(--accent-glow); }
+    .path-action-icon svg { width: 12px; height: 12px; }
+    .path-action-meta { color: var(--text-dim); font-weight: 500; font-variant-numeric: tabular-nums; }
+    .path-action[aria-busy="true"] { cursor: progress; }
+    .path-action[aria-busy="true"] .path-action-icon svg { display: none; }
+    .path-action[aria-busy="true"] .path-action-icon::after {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--accent-glow);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .path-status { flex-basis: 100%; color: var(--danger); font-size: 13px; }
+    .path-status:empty { display: none; }
 
-    /* ----- Mini illustrations: what each product looks like in use ----- */
+    /* ----- "Watch it in action": the product video in a dialog ----- */
+    .video-dialog {
+      width: min(1040px, calc(100vw - 32px));
+      max-width: none;
+      max-height: calc(100vh - 32px);
+      margin: auto;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      background: var(--bg-card);
+      color: var(--text);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.5);
+    }
+    .video-dialog::backdrop { background: rgba(8,10,18,0.74); backdrop-filter: blur(4px); }
+    .video-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px 12px 20px; }
+    .video-dialog-head h2 { font-size: 16px; font-weight: 750; letter-spacing: -0.02em; }
+    .video-dialog-close {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .video-dialog-close:hover { background: var(--tint-soft); }
+    .video-dialog-close svg { width: 16px; height: 16px; }
+    .video-dialog video { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: calc(100vh - 110px); background: #000; }
+    @media (max-width: 768px) {
+      .video-dialog { width: min(440px, calc(100vw - 24px)); }
+      .video-dialog video { aspect-ratio: 9 / 16; }
+    }
+
+    /* ----- Mini illustrations: what each product looks like in use -----
+       The browser card shows a browser window with WebBrain's side panel
+       open; the website card shows the script tag a site owner pastes and
+       the assistant it puts on their site. */
     .illo {
       position: relative;
-      height: 150px;
+      height: 190px;
       overflow: hidden;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--illo-bg);
       direction: ltr;
     }
-    .illo-bar {
-      height: 22px;
+    .ln { display: block; height: 6px; border-radius: 3px; background: var(--illo-line); }
+    .ln.title { height: 9px; width: 46%; background: var(--text-dim); opacity: 0.45; }
+    .w95 { width: 95%; } .w85 { width: 85%; } .w75 { width: 75%; } .w60 { width: 60%; } .w45 { width: 45%; } .w30 { width: 30%; }
+
+    /* Browser window */
+    .bw-tabs {
+      height: 27px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 0 10px;
+      background: var(--illo-chrome);
+    }
+    .bw-dots { display: flex; gap: 5px; align-self: center; margin-right: 10px; }
+    .bw-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--illo-line); }
+    .bw-tab {
+      width: 96px;
+      height: 20px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      padding: 0 9px;
+      border-radius: 7px 7px 0 0;
+    }
+    .bw-tab.is-active { background: var(--illo-bg); }
+    .bw-tab .ln { flex: 1; height: 5px; }
+    .bw-fav { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 3px; background: var(--fav); }
+    .bw-toolbar {
+      height: 29px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
       padding: 0 10px;
       border-bottom: 1px solid var(--border);
     }
-    .illo-bar i { width: 6px; height: 6px; border-radius: 50%; background: var(--illo-line); }
-    .illo-bar .illo-url { height: 8px; width: 46%; margin-left: 10px; border-radius: 4px; background: var(--tint-medium); }
-    .illo-body { position: absolute; inset: 22px 0 0; display: flex; }
-    .illo-page { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; }
-    .ln { display: block; height: 6px; border-radius: 3px; background: var(--illo-line); }
-    .ln.title { height: 10px; width: 52%; margin-bottom: 4px; background: var(--text-dim); opacity: 0.5; }
-    .w95 { width: 95%; } .w85 { width: 85%; } .w75 { width: 75%; } .w60 { width: 60%; } .w45 { width: 45%; }
-    .illo-blocks { display: flex; gap: 8px; margin-top: 4px; }
-    .illo-blocks i { flex: 1; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); }
-    .illo-row { display: flex; align-items: center; gap: 8px; }
-    .illo-row .ln { flex: 1; }
-    .illo-panel {
+    .bw-nav { display: flex; gap: 5px; color: var(--text-dim); opacity: 0.6; }
+    .bw-nav svg { width: 10px; height: 10px; }
+    .bw-omnibox {
+      flex: 1;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 9px;
+      border-radius: 9px;
+      background: var(--tint-medium);
+      color: var(--text-dim);
+    }
+    .bw-omnibox svg { width: 8px; height: 8px; flex: 0 0 auto; }
+    .bw-omnibox .ln { width: 42%; height: 5px; }
+    .bw-ext {
+      width: 21px;
+      height: 21px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--accent-glow);
+      box-shadow: 0 0 0 1px rgba(124,108,230,0.5);
+    }
+    .bw-ext img { width: 13px; height: 13px; }
+    .bw-viewport { position: absolute; inset: 56px 0 0; display: flex; }
+    .bw-page { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 11px; padding: 14px 16px; }
+    .bw-products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .bw-product {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-card);
+    }
+    .bw-product i { height: 34px; border-radius: 4px; background: var(--tint-medium); }
+    .bw-product .ln { height: 4px; }
+    .bw-product .price { width: 45%; background: var(--accent); opacity: 0.6; }
+    /* The product WebBrain is reading right now, outlined like the agent's
+       on-page activity glow. */
+    .bw-product.is-reading { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .bw-panel > * { flex-shrink: 0; }
+    .bw-panel {
       width: 40%;
       display: flex;
       flex-direction: column;
       gap: 7px;
-      padding: 10px 10px 9px;
+      padding: 9px 10px 10px;
       border-left: 1px solid var(--border);
       background: var(--illo-panel);
     }
-    .illo-panel-head { display: flex; align-items: center; gap: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-    .illo-panel-head b { width: 10px; height: 10px; border-radius: 3px; background: #ec4899; opacity: 0.8; }
-    .illo-panel-head .ln { flex: 0 0 40%; height: 5px; }
-    .bubble { display: block; border-radius: 7px; }
-    .bubble-user { align-self: flex-end; width: 64%; height: 14px; background: var(--accent); }
-    .bubble-reply {
-      width: 92%;
+    .bw-panel-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font: 700 9px/1 var(--font);
+    }
+    .bw-panel-head img { width: 12px; height: 12px; }
+    .bw-ask { align-self: flex-end; width: 72%; height: 15px; border-radius: 8px 8px 2px 8px; background: var(--accent); }
+    .bw-steps { display: flex; flex-direction: column; gap: 6px; list-style: none; }
+    .bw-steps > span { display: flex; align-items: center; gap: 6px; }
+    .bw-steps .ln { flex: 1; height: 5px; }
+    .bw-check { flex: 0 0 auto; width: 10px; height: 10px; color: var(--success); }
+    .bw-spin { flex: 0 0 auto; width: 10px; height: 10px; border: 2px solid var(--accent-glow); border-top-color: var(--accent); border-radius: 50%; }
+    .bw-input { margin-top: auto; height: 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-card); }
+
+    /* Website: the snippet in the site's HTML, and the site it lands on */
+    .illo-site { border-color: var(--code-border); background: var(--code-bg); }
+    .code-pane { position: absolute; inset: 0 auto 0 0; width: 62%; color: #e9e1d6; }
+    .code-tabbar {
+      height: 27px;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .code-tab {
+      padding: 5px 10px 6px;
+      border-radius: 6px 6px 0 0;
+      background: rgba(255,255,255,0.07);
+      color: #d8cfc3;
+      font: 600 9.5px/1 var(--mono);
+    }
+    .code-lines { display: block; padding: 9px 0; font: 500 10.5px/1.8 var(--mono); }
+    .code-line { display: block; padding-right: 12px; white-space: pre; }
+    .code-line::before {
+      content: attr(data-n);
+      display: inline-block;
+      width: 28px;
+      padding-right: 10px;
+      color: #6f655c;
+      text-align: right;
+    }
+    .code-line.is-added { background: rgba(143,224,176,0.11); }
+    .code-line.is-added::before { content: '+'; color: #8fe0b0; }
+    .tk-tag { color: #ffa877; }
+    .tk-attr { color: #b3c2ff; }
+    .tk-str { color: #8fe0b0; }
+    .tk-dim { color: #8a7f75; }
+    .sp-pane {
+      position: absolute;
+      top: 16px;
+      right: 14px;
+      bottom: -1px;
+      width: 41%;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-bottom: 0;
+      border-radius: 10px 10px 0 0;
+      background: var(--bg-card);
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.28);
+    }
+    .sp-nav { height: 22px; display: flex; align-items: center; gap: 6px; padding: 0 9px; border-bottom: 1px solid var(--border); }
+    .sp-logo { width: 9px; height: 9px; border-radius: 3px; background: #e5784c; }
+    .sp-nav .ln { width: 16%; height: 4px; }
+    .sp-nav .ln:first-of-type { margin-left: auto; }
+    .sp-body { display: flex; flex-direction: column; gap: 7px; padding: 12px 11px; }
+    .sp-drawer {
+      position: absolute;
+      right: 9px;
+      bottom: 38px;
+      width: 66%;
       display: flex;
       flex-direction: column;
       gap: 5px;
-      padding: 7px;
-      background: var(--bg-card);
+      padding: 8px;
       border: 1px solid var(--border);
-    }
-    .bubble-reply .ln { height: 5px; }
-    .illo-input { margin-top: auto; height: 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); }
-    .illo-chip {
-      flex: 0 0 auto;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(124,108,230,0.45);
-      background: var(--accent-glow);
-      color: var(--accent-text);
-      font: 700 9px/1 var(--font);
-    }
-    .illo-drawer {
-      position: absolute;
-      right: 12px;
-      bottom: 40px;
-      width: 38%;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 9px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--bg-card);
-      box-shadow: 0 12px 26px var(--shadow-strong);
+      box-shadow: 0 10px 24px var(--shadow-strong);
     }
-    .illo-drawer .bubble-user { width: 58%; height: 12px; margin-bottom: 2px; }
-    .illo-drawer .ln { height: 5px; }
-    .illo-launcher {
+    .sp-drawer .ln { height: 4px; }
+    .sp-chip { width: 82%; height: 11px; border: 1px solid rgba(124,108,230,0.45); border-radius: 999px; background: var(--accent-glow); }
+    .sp-launcher {
       position: absolute;
-      right: 12px;
-      bottom: 10px;
+      right: 9px;
+      bottom: 9px;
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 6px 11px;
+      padding: 6px 10px;
       border-radius: 999px;
       background: linear-gradient(135deg, #5b52e8, #7c6ce6 55%, #b94db3);
       color: #fff;
-      font: 700 10px/1 var(--font);
+      font: 700 9.5px/1 var(--font);
       box-shadow: 0 6px 16px rgba(91,82,232,0.35);
     }
 
@@ -760,8 +952,8 @@
     }
     .voice figcaption { display: flex; align-items: center; gap: 12px; margin-top: auto; }
     .voice img {
-      width: 48px;
-      height: 48px;
+      width: 60px;
+      height: 60px;
       flex: 0 0 auto;
       border-radius: 50%;
       object-fit: cover;
@@ -771,31 +963,6 @@
     .voice-name { display: block; color: var(--text); font-size: 14px; font-weight: 700; }
     .voice-source { font-size: 13px; color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
     .voice-source:hover { color: var(--accent-text); }
-
-    /* ================================================================
-       FOOTER
-       ================================================================ */
-    .site-footer { border-top: 1px solid var(--border); }
-    .footer-inner {
-      width: var(--site-width);
-      margin: 0 auto;
-      padding: 26px 0 30px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px 32px;
-      flex-wrap: wrap;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
-    .footer-brand { display: flex; flex-direction: column; gap: 5px; }
-    .footer-tagline { margin: 0; color: var(--text); font-size: 15px; font-weight: 700; }
-    .footer-copy a { color: var(--text); font-weight: 650; }
-    .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
-    .footer-links a { color: var(--text-dim); font-weight: 600; }
-    .footer-links a:hover { color: var(--text); text-decoration: none; }
-    .footer-icon { display: inline-flex; align-items: center; }
-    .lang-noscript { display: none; flex-wrap: wrap; gap: 6px 12px; width: 100%; }
 
     /* ================================================================
        ENTRANCE + RESPONSIVE
@@ -822,13 +989,19 @@
       .nav-links { display: none; }
       .nav-tools { margin-inline-start: auto; }
       .gh-stars, .theme-toggle { display: none; }
-      .illo { height: 120px; }
-      .illo-blocks { display: none; }
+      .illo { height: 172px; }
+      .bw-tab:nth-of-type(n+3), .bw-product:nth-child(3) { display: none; }
+      .bw-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bw-panel { width: 46%; }
+      .code-pane { width: 59%; }
+      .code-lines { font-size: 9px; }
+      .code-line::before { width: 22px; padding-right: 7px; }
+      .sp-pane { right: 10px; width: 37%; }
       .path-copy { padding-inline: 10px; }
       .path h2 { font-size: 23px; }
       .path-actions { flex-direction: column; align-items: stretch; }
       .btn { width: 100%; }
-      .path-link { align-self: flex-start; }
+      .path-more { align-self: flex-start; }
       .voice blockquote { font-size: 18px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -841,10 +1014,54 @@
   <noscript>
     <style>
       .language-picker { display: none !important; }
-      .lang-noscript { display: flex !important; }
+      .wb-footer-languages { display: flex !important; }
     </style>
   </noscript>
 
+  <!-- Site footer styles: start -->
+  <style>
+    .wb-footer {
+      --wb-footer-text: var(--text, var(--ink, #2c1810));
+      --wb-footer-dim: var(--text-dim, var(--muted, #6b5b47));
+      --wb-footer-line: var(--border, var(--line, rgba(89, 55, 25, 0.15)));
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--wb-footer-line);
+      background: var(--wb-footer-bg, none);
+      color: var(--wb-footer-dim);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: start;
+    }
+    .wb-footer-inner {
+      width: var(--wb-footer-width, min(calc(100% - 48px), 1100px));
+      margin: 0 auto;
+      padding: 26px 0 30px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px 32px;
+    }
+    .wb-footer-brand { display: flex; flex-direction: column; gap: 5px; }
+    .wb-footer-tagline { margin: 0; color: var(--wb-footer-text); font-size: 15px; font-weight: 700; line-height: 1.4; }
+    .wb-footer-copy { margin: 0; }
+    .wb-footer-copy a { color: var(--wb-footer-text); font-weight: 650; text-decoration: none; }
+    .wb-footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+    .wb-footer-links a { color: var(--wb-footer-dim); font-weight: 600; text-decoration: none; }
+    .wb-footer a:hover { color: var(--wb-footer-text); text-decoration: none; }
+    .wb-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
+    .wb-footer-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin: -4px 0; border-radius: 6px; }
+    .wb-footer-icon:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+    .wb-footer-icon svg { display: block; width: 15px; height: 15px; }
+    /* Only shown without JavaScript, when the language picker can't run. */
+    .wb-footer-languages { display: none; flex-wrap: wrap; gap: 6px 12px; width: 100%; direction: ltr; }
+    .wb-footer-languages span { color: var(--wb-footer-text); font-weight: 700; }
+    @media (max-width: 860px) {
+      .wb-footer-inner { width: var(--wb-footer-width, calc(100% - 32px)); }
+    }
+  </style>
+  <!-- Site footer styles: end -->
   <!-- Plausible analytics: start -->
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://157.230.3.9.sslip.io/js/pa-omp0F7DsOXM4sGKR50l7S.js"></script>
@@ -934,27 +1151,44 @@
     <div class="paths">
       <section class="path" aria-labelledby="path-browser-title">
         <div class="illo illo-browser" aria-hidden="true">
-          <div class="illo-bar"><i></i><i></i><i></i><span class="illo-url"></span></div>
-          <div class="illo-body">
-            <div class="illo-page">
+          <div class="bw-tabs">
+            <span class="bw-dots"><i></i><i></i><i></i></span>
+            <span class="bw-tab is-active"><b class="bw-fav" style="--fav: #e5784c"></b><span class="ln"></span></span>
+            <span class="bw-tab"><b class="bw-fav" style="--fav: #3b82f6"></b><span class="ln"></span></span>
+            <span class="bw-tab"><b class="bw-fav" style="--fav: #22a06b"></b><span class="ln"></span></span>
+          </div>
+          <div class="bw-toolbar">
+            <span class="bw-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+            <span class="bw-omnibox"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3z"/></svg><span class="ln"></span></span>
+            <span class="bw-ext"><img src="/favicon.png" alt="" width="13" height="13"></span>
+          </div>
+          <div class="bw-viewport">
+            <div class="bw-page">
               <span class="ln title"></span>
-              <span class="ln w95"></span>
-              <span class="ln w85"></span>
+              <span class="bw-products">
+                <span class="bw-product"><i></i><span class="ln w85"></span><span class="ln price"></span></span>
+                <span class="bw-product is-reading"><i></i><span class="ln w75"></span><span class="ln price"></span></span>
+                <span class="bw-product"><i></i><span class="ln w85"></span><span class="ln price"></span></span>
+              </span>
               <span class="ln w95"></span>
               <span class="ln w60"></span>
-              <span class="illo-blocks"><i></i><i></i><i></i></span>
             </div>
-            <div class="illo-panel">
-              <span class="illo-panel-head"><b></b><span class="ln w45"></span></span>
-              <span class="bubble bubble-user"></span>
-              <span class="bubble bubble-reply"><span class="ln w95"></span><span class="ln w85"></span><span class="ln w60"></span></span>
-              <span class="illo-input"></span>
+            <div class="bw-panel">
+              <span class="bw-panel-head"><img src="/favicon.png" alt="" width="12" height="12">WebBrain</span>
+              <span class="bw-ask"></span>
+              <span class="bw-steps">
+                <span><svg class="bw-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="ln w85"></span></span>
+                <span><svg class="bw-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="ln w75"></span></span>
+                <span><span class="bw-spin"></span><span class="ln w45"></span></span>
+              </span>
+              <span class="bw-input"></span>
             </div>
           </div>
         </div>
         <div class="path-copy">
           <div class="path-head">
             <h2 id="path-browser-title">在您的浏览器中</h2>
+            <span class="path-badge path-badge-open">开源</span>
           </div>
           <p>适用于 Chrome、Edge 和 Firefox 的开源 AI 侧边栏。与任何页面对话、提取数据、自动完成重复性工作——可使用任何模型，包括本地模型。</p>
           <div class="path-actions">
@@ -962,28 +1196,46 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               <span id="hero-install-label">安装扩展</span>
             </a>
-            <a href="/zh/browser/" class="path-link">了解它能做什么</a>
+            <span class="path-more">
+              <a href="/zh/browser/#demo" class="path-action" id="home-video-open" aria-haspopup="dialog">
+                <span class="path-action-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14z"/></svg></span>
+                <span>观看实际效果</span>
+                <span class="path-action-meta">1:21</span>
+              </a>
+              <a href="/zh/browser/#features" class="path-link">功能</a>
+            </span>
           </div>
         </div>
       </section>
 
       <section class="path" aria-labelledby="path-websites-title">
         <div class="illo illo-site" aria-hidden="true">
-          <div class="illo-bar"><i></i><i></i><i></i><span class="illo-url"></span></div>
-          <div class="illo-body">
-            <div class="illo-page">
+          <div class="code-pane">
+            <div class="code-tabbar"><span class="code-tab">index.html</span></div>
+            <code class="code-lines">
+              <span class="code-line" data-n="40"><span class="tk-tag">&lt;body&gt;</span></span>
+              <span class="code-line" data-n="41">  <span class="tk-tag">&lt;main&gt;</span><span class="tk-dim">…</span><span class="tk-tag">&lt;/main&gt;</span></span>
+              <span class="code-line is-added">  <span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"…/embed.js"</span></span>
+              <span class="code-line is-added">    <span class="tk-attr">data-site-id</span>=<span class="tk-str">"…"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></span>
+              <span class="code-line" data-n="44"><span class="tk-tag">&lt;/body&gt;</span></span>
+              <span class="code-line" data-n="45"><span class="tk-tag">&lt;/html&gt;</span></span>
+            </code>
+          </div>
+          <div class="sp-pane">
+            <div class="sp-nav"><b class="sp-logo"></b><span class="ln"></span><span class="ln"></span><span class="ln"></span></div>
+            <div class="sp-body">
               <span class="ln title"></span>
+              <span class="ln w95"></span>
               <span class="ln w75"></span>
-              <span class="ln w60"></span>
-              <span class="illo-row"><span class="illo-chip">✦ AI</span><span class="ln w45"></span></span>
-              <span class="illo-blocks"><i></i><i></i><i></i></span>
             </div>
+            <div class="sp-drawer">
+              <span class="ln w85"></span>
+              <span class="ln w60"></span>
+              <span class="sp-chip"></span>
+              <span class="sp-chip w60"></span>
+            </div>
+            <span class="sp-launcher">✦ Ask AI</span>
           </div>
-          <div class="illo-drawer">
-            <span class="bubble bubble-user"></span>
-            <span class="ln w95"></span><span class="ln w85"></span><span class="ln w60"></span>
-          </div>
-          <span class="illo-launcher">✦ AI</span>
         </div>
         <div class="path-copy">
           <div class="path-head">
@@ -996,7 +1248,14 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               <span>将 WebBrain 添加到您的网站</span>
             </a>
-            <a href="/websites/#how-it-works" class="path-link">工作原理</a>
+            <span class="path-more">
+              <a href="https://sites.webbrain.one/playground" class="path-action" id="home-demo-open" data-embed-src="https://sites.webbrain.one/embed.js" data-site-id="site_webbrain_one" data-error="演示加载失败，请稍后再试。">
+                <span class="path-action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                <span>演示</span>
+              </a>
+              <a href="/websites/#how-it-works" class="path-link">详情</a>
+            </span>
+            <p class="path-status" id="home-demo-status" role="status"></p>
           </div>
         </div>
       </section>
@@ -1024,7 +1283,7 @@
       <figure class="voice">
         <blockquote cite="https://www.producthunt.com/products/webbrain">“The power of this approach is that the assistant has access to your sessions, cookies, and context — <em>intact</em>.”</blockquote>
         <figcaption>
-          <img src="/assets/voices/chris-messina.png" alt="Illustrated portrait of Chris Messina" width="48" height="48" loading="lazy" decoding="async">
+          <img src="/assets/voices/chris-messina.png" alt="Illustrated portrait of Chris Messina" width="60" height="60" loading="lazy" decoding="async">
           <span>
             <span class="voice-name">Chris Messina</span>
             <a class="voice-source" href="https://www.producthunt.com/products/webbrain" target="_blank" rel="noopener noreferrer">Product Hunt</a>
@@ -1034,7 +1293,7 @@
       <figure class="voice">
         <blockquote cite="https://x.com/Scobleizer/status/2098481418687123967">“Makes Google Chrome a lot more useful.”</blockquote>
         <figcaption>
-          <img src="/assets/voices/robert-scoble.png" alt="Illustrated portrait of Robert Scoble" width="48" height="48" loading="lazy" decoding="async">
+          <img src="/assets/voices/robert-scoble.png" alt="Illustrated portrait of Robert Scoble" width="60" height="60" loading="lazy" decoding="async">
           <span>
             <span class="voice-name">Robert Scoble</span>
             <a class="voice-source" href="https://x.com/Scobleizer/status/2098481418687123967" target="_blank" rel="noopener noreferrer">X / Scobleizer</a>
@@ -1044,7 +1303,7 @@
       <figure class="voice">
         <blockquote cite="https://www.marktechpost.com/2026/07/02/meet-webbrain-an-open-source-local-first-ai-browser-agent-that-reads-pages-and-automates-tasks-in-chrome-and-firefox/">“Run the agent against a local model, and no page data leaves your machine.”</blockquote>
         <figcaption>
-          <img src="/assets/voices/asif-razzaq.png" alt="Illustrated portrait of Asif Razzaq" width="48" height="48" loading="lazy" decoding="async">
+          <img src="/assets/voices/asif-razzaq.png" alt="Illustrated portrait of Asif Razzaq" width="60" height="60" loading="lazy" decoding="async">
           <span>
             <span class="voice-name">Asif Razzaq</span>
             <a class="voice-source" href="https://www.marktechpost.com/2026/07/02/meet-webbrain-an-open-source-local-first-ai-browser-agent-that-reads-pages-and-automates-tasks-in-chrome-and-firefox/" target="_blank" rel="noopener noreferrer">MarkTechPost</a>
@@ -1055,25 +1314,28 @@
   </section>
 </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <p class="footer-tagline">我们的使命：让网络更智能。</p>
-      <span class="footer-copy">© 2026 WebBrain。由 <a href="https://emresokullu.com" target="_blank">Emre Sokullu</a> 与<a href="https://github.com/webbrain-one/webbrain/graphs/contributors" target="_blank">贡献者</a>共同构建。</span>
+<dialog class="video-dialog" id="home-video-dialog" aria-labelledby="home-video-title">
+  <div class="video-dialog-head">
+    <h2 id="home-video-title">观看 WebBrain 实战</h2>
+    <button class="video-dialog-close" id="home-video-close" type="button" aria-label="关闭视频">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <video id="home-video" data-desktop-src="/assets/webbrain-home-demo.mp4" data-mobile-src="/assets/webbrain-home-demo-vertical.mp4" data-desktop-poster="/assets/webbrain-home-demo-poster.jpg" data-mobile-poster="/assets/webbrain-home-demo-poster-vertical.jpg" controls preload="none" playsinline></video>
+</dialog>
+
+<!-- Site footer: start -->
+<footer class="wb-footer">
+  <div class="wb-footer-inner">
+    <div class="wb-footer-brand">
+      <p class="wb-footer-tagline">我们的使命：让网络更智能。</p>
+      <p class="wb-footer-copy">© 2026 WebBrain。由 <a href="https://emresokullu.com" target="_blank">Emre Sokullu</a> 与<a href="https://github.com/webbrain-one/webbrain/graphs/contributors" target="_blank">贡献者</a>共同构建。</p>
     </div>
-    <div class="footer-links">
-      <a href="https://mastoturk.org/@webbrain" target="_blank" rel="me noopener" aria-label="Mastodon 上的 WebBrain" title="Mastodon 上的 WebBrain" class="footer-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.327 8.566c0-5.035-3.298-6.511-3.298-6.511C16.366 1.292 13.508.971 12.04.947h-.036c-1.468.024-4.326.345-5.989 1.108 0 0-3.298 1.476-3.298 6.511 0 1.153-.022 2.535.014 4.001.12 4.935.907 9.799 5.478 11.007 2.106.557 3.916.674 5.374.594 2.645-.147 4.128-.943 4.128-.943l-.087-1.918s-1.888.595-4.012.523c-2.104-.072-4.326-.227-4.668-2.809a5.289 5.289 0 0 1-.047-.724s2.066.505 4.686.625c1.603.073 3.107-.094 4.632-.276 2.925-.349 5.474-2.149 5.794-3.793.503-2.591.462-6.287.462-6.287ZM8.545 15.023H6.09V8.996c0-2.534 1.627-3.829 3.424-3.829 1.963 0 2.909 1.268 3.35 2.257.44-.989 1.386-2.257 3.349-2.257 1.797 0 3.424 1.295 3.424 3.829v6.027h-2.454V9.174c0-1.233-.519-1.859-1.557-1.859-1.148 0-1.724.742-1.724 2.207v3.203h-2.454V9.522c0-1.465-.576-2.207-1.724-2.207-1.038 0-1.557.626-1.557 1.859v5.849Z"/></svg>
-      </a>
-      <a href="https://bsky.app/profile/webbrain-one.bsky.social" target="_blank" rel="me noopener" aria-label="Bluesky 上的 WebBrain" title="Bluesky 上的 WebBrain" class="footer-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12 10.8c-1.1-2.1-4-6-6.8-8C2.6.9 1.6 1.3.9 1.6.1 1.9 0 3.1 0 3.8c0 .7.4 5.7.6 6.5.8 2.7 3.7 3.7 5.6 3.4-3.5.6-6.5 2-2.5 6.5 4.3 4.5 5.9-1 6.3-2.8.1-.5.2-.8.3-.8.1 0 .2.3.3.8.4 1.8 2 7.3 6.3 2.8 4-4.5 1-5.9-2.5-6.5 1.9.3 4.8-.7 5.6-3.4.2-.8.6-5.8.6-6.5 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.6-4.3 1.2-2.8 2-5.7 5.9-6.8 8Z"/></svg>
-      </a>
-      <a href="https://discord.gg/cgC325ssfw" target="_blank" rel="noopener" aria-label="Discord 上的 WebBrain" title="Discord 上的 WebBrain" class="footer-icon">
-        <svg viewBox="0 0 16 16" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011c.05.069.098.137.142.207a12.471 12.471 0 0 0-3.616 0c.044-.07.093-.138.143-.207A13.207 13.207 0 0 0 3.7 2.907 13.136 13.136 0 0 0 .931 13.362a13.667 13.667 0 0 0 4.022 2.018c.33-.442.623-.907.87-1.396a8.95 8.95 0 0 1-1.37-.652c.114-.083.225-.171.33-.269a9.6 9.6 0 0 0 8.243 0c.108.09.218.18.33.269a8.923 8.923 0 0 1-1.37.652c.248.489.54.954.87 1.396a13.667 13.667 0 0 0 4.022-2.018 13.136 13.136 0 0 0-2.769-10.455zM5.106 11.275c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608zm5.788 0c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608z"/></svg>
-      </a>
-      <a href="https://huggingface.co/webbrain-one" target="_blank" rel="me noopener" aria-label="Hugging Face 上的 WebBrain" title="Hugging Face 上的 WebBrain" class="footer-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/></svg>
-      </a>
+    <div class="wb-footer-links">
+      <a href="https://mastoturk.org/@webbrain" target="_blank" rel="me noopener" aria-label="Mastodon 上的 WebBrain" title="Mastodon 上的 WebBrain" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.327 8.566c0-5.035-3.298-6.511-3.298-6.511C16.366 1.292 13.508.971 12.04.947h-.036c-1.468.024-4.326.345-5.989 1.108 0 0-3.298 1.476-3.298 6.511 0 1.153-.022 2.535.014 4.001.12 4.935.907 9.799 5.478 11.007 2.106.557 3.916.674 5.374.594 2.645-.147 4.128-.943 4.128-.943l-.087-1.918s-1.888.595-4.012.523c-2.104-.072-4.326-.227-4.668-2.809a5.289 5.289 0 0 1-.047-.724s2.066.505 4.686.625c1.603.073 3.107-.094 4.632-.276 2.925-.349 5.474-2.149 5.794-3.793.503-2.591.462-6.287.462-6.287ZM8.545 15.023H6.09V8.996c0-2.534 1.627-3.829 3.424-3.829 1.963 0 2.909 1.268 3.35 2.257.44-.989 1.386-2.257 3.349-2.257 1.797 0 3.424 1.295 3.424 3.829v6.027h-2.454V9.174c0-1.233-.519-1.859-1.557-1.859-1.148 0-1.724.742-1.724 2.207v3.203h-2.454V9.522c0-1.465-.576-2.207-1.724-2.207-1.038 0-1.557.626-1.557 1.859v5.849Z"/></svg></a>
+      <a href="https://bsky.app/profile/webbrain-one.bsky.social" target="_blank" rel="me noopener" aria-label="Bluesky 上的 WebBrain" title="Bluesky 上的 WebBrain" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12 10.8c-1.1-2.1-4-6-6.8-8C2.6.9 1.6 1.3.9 1.6.1 1.9 0 3.1 0 3.8c0 .7.4 5.7.6 6.5.8 2.7 3.7 3.7 5.6 3.4-3.5.6-6.5 2-2.5 6.5 4.3 4.5 5.9-1 6.3-2.8.1-.5.2-.8.3-.8.1 0 .2.3.3.8.4 1.8 2 7.3 6.3 2.8 4-4.5 1-5.9-2.5-6.5 1.9.3 4.8-.7 5.6-3.4.2-.8.6-5.8.6-6.5 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.6-4.3 1.2-2.8 2-5.7 5.9-6.8 8Z"/></svg></a>
+      <a href="https://discord.gg/cgC325ssfw" target="_blank" rel="noopener" aria-label="Discord 上的 WebBrain" title="Discord 上的 WebBrain" class="wb-footer-icon"><svg viewBox="0 0 16 16" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011c.05.069.098.137.142.207a12.471 12.471 0 0 0-3.616 0c.044-.07.093-.138.143-.207A13.207 13.207 0 0 0 3.7 2.907 13.136 13.136 0 0 0 .931 13.362a13.667 13.667 0 0 0 4.022 2.018c.33-.442.623-.907.87-1.396a8.95 8.95 0 0 1-1.37-.652c.114-.083.225-.171.33-.269a9.6 9.6 0 0 0 8.243 0c.108.09.218.18.33.269a8.923 8.923 0 0 1-1.37.652c.248.489.54.954.87 1.396a13.667 13.667 0 0 0 4.022-2.018 13.136 13.136 0 0 0-2.769-10.455zM5.106 11.275c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608zm5.788 0c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608z"/></svg></a>
+      <a href="https://huggingface.co/webbrain-one" target="_blank" rel="me noopener" aria-label="Hugging Face 上的 WebBrain" title="Hugging Face 上的 WebBrain" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/></svg></a>
       <a href="/zh/browser/">浏览器扩展</a>
       <a href="/websites/">面向网站</a>
       <a href="/docs/zh/">文档</a>
@@ -1085,33 +1347,34 @@
       <a href="https://pressreleases.online/org/webbrain.one" target="_blank" rel="noopener">媒体</a>
       <a href="https://api.webbrain.one/account" target="_blank" rel="noopener">Compass 订阅</a>
     </div>
-    <div class="lang-noscript">
+    <div class="wb-footer-languages">
       <span>选择语言</span>
-      <a href="/" hreflang="en">English</a>
-      <a href="/zh/" hreflang="zh">中文</a>
-      <a href="/ar/" hreflang="ar">العربية</a>
-      <a href="/bn/" hreflang="bn">বাংলা</a>
-      <a href="/nl/" hreflang="nl">Nederlands</a>
-      <a href="/tl/" hreflang="tl">Filipino</a>
-      <a href="/fr/" hreflang="fr">Français</a>
-      <a href="/de/" hreflang="de">Deutsch</a>
-      <a href="/he/" hreflang="he">עברית</a>
-      <a href="/hi/" hreflang="hi">हिन्दी</a>
-      <a href="/id/" hreflang="id">Bahasa Indonesia</a>
-      <a href="/ja/" hreflang="ja">日本語</a>
-      <a href="/ko/" hreflang="ko">한국어</a>
-      <a href="/ms/" hreflang="ms">Bahasa Melayu</a>
-      <a href="/fa/" hreflang="fa">فارسی</a>
-      <a href="/pt/" hreflang="pt">Português</a>
-      <a href="/ru/" hreflang="ru">Русский</a>
-      <a href="/es/" hreflang="es">Español</a>
-      <a href="/th/" hreflang="th">ไทย</a>
-      <a href="/tr/" hreflang="tr">Türkçe</a>
-      <a href="/uk/" hreflang="uk">Українська</a>
-      <a href="/vi/" hreflang="vi">Tiếng Việt</a>
+      <a href="/" hreflang="en" lang="en">English</a>
+      <a href="/zh/" hreflang="zh" lang="zh">中文</a>
+      <a href="/ar/" hreflang="ar" lang="ar">العربية</a>
+      <a href="/bn/" hreflang="bn" lang="bn">বাংলা</a>
+      <a href="/nl/" hreflang="nl" lang="nl">Nederlands</a>
+      <a href="/tl/" hreflang="tl" lang="tl">Filipino</a>
+      <a href="/fr/" hreflang="fr" lang="fr">Français</a>
+      <a href="/de/" hreflang="de" lang="de">Deutsch</a>
+      <a href="/he/" hreflang="he" lang="he">עברית</a>
+      <a href="/hi/" hreflang="hi" lang="hi">हिन्दी</a>
+      <a href="/id/" hreflang="id" lang="id">Bahasa Indonesia</a>
+      <a href="/ja/" hreflang="ja" lang="ja">日本語</a>
+      <a href="/ko/" hreflang="ko" lang="ko">한국어</a>
+      <a href="/ms/" hreflang="ms" lang="ms">Bahasa Melayu</a>
+      <a href="/fa/" hreflang="fa" lang="fa">فارسی</a>
+      <a href="/pt/" hreflang="pt" lang="pt">Português</a>
+      <a href="/ru/" hreflang="ru" lang="ru">Русский</a>
+      <a href="/es/" hreflang="es" lang="es">Español</a>
+      <a href="/th/" hreflang="th" lang="th">ไทย</a>
+      <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a>
+      <a href="/uk/" hreflang="uk" lang="uk">Українська</a>
+      <a href="/vi/" hreflang="vi" lang="vi">Tiếng Việt</a>
     </div>
   </div>
 </footer>
+<!-- Site footer: end -->
 
 <!-- Point the install button at the visitor's own browser store. Edge add-ons
      only work on Windows, so Edge elsewhere goes to the full install section. -->
@@ -1139,6 +1402,95 @@
       btn.removeAttribute('target');
       btn.removeAttribute('rel');
     }
+  })();
+</script>
+
+<!-- "Watch it in action": play the product video in a dialog. Without
+     JavaScript the link goes to the video on the browser extension page. -->
+<script>
+  (function () {
+    var trigger = document.getElementById('home-video-open');
+    var dialog = document.getElementById('home-video-dialog');
+    var closeButton = document.getElementById('home-video-close');
+    var video = document.getElementById('home-video');
+    if (!trigger || !dialog || !closeButton || !video || typeof dialog.showModal !== 'function') return;
+    var portrait = window.matchMedia('(max-width: 768px)');
+    var previousOverflow = '';
+
+    function chooseSource() {
+      var src = portrait.matches ? video.dataset.mobileSrc : video.dataset.desktopSrc;
+      var poster = portrait.matches ? video.dataset.mobilePoster : video.dataset.desktopPoster;
+      if (poster && video.getAttribute('poster') !== poster) video.setAttribute('poster', poster);
+      if (video.getAttribute('src') !== src) video.setAttribute('src', src);
+    }
+
+    trigger.addEventListener('click', function (event) {
+      event.preventDefault();
+      chooseSource();
+      previousOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
+      dialog.showModal();
+      var playback = video.play();
+      if (playback && typeof playback.catch === 'function') playback.catch(function () {});
+    });
+    closeButton.addEventListener('click', function () { dialog.close(); });
+    dialog.addEventListener('click', function (event) {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', function () {
+      video.pause();
+      document.documentElement.style.overflow = previousOverflow;
+      trigger.focus();
+    });
+  })();
+</script>
+
+<!-- "Demo": load WebBrain for websites on this page and open it, so visitors
+     try the real assistant here. The script only loads on the first click.
+     Without JavaScript the link goes to the dashboard's playground. -->
+<script>
+  (function () {
+    var trigger = document.getElementById('home-demo-open');
+    var status = document.getElementById('home-demo-status');
+    if (!trigger || !status) return;
+    var loading = null;
+
+    function assistant() {
+      return window.WebBrain && typeof window.WebBrain.open === 'function' ? window.WebBrain : null;
+    }
+
+    function loadAssistant() {
+      if (!loading) {
+        loading = new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = trigger.getAttribute('data-embed-src');
+          script.async = true;
+          script.setAttribute('data-site-id', trigger.getAttribute('data-site-id'));
+          script.onload = function () { assistant() ? resolve() : reject(new Error('WebBrain did not start')); };
+          script.onerror = function () { script.remove(); reject(new Error('WebBrain could not load')); };
+          document.body.appendChild(script);
+        }).catch(function (error) {
+          loading = null;
+          throw error;
+        });
+      }
+      return loading;
+    }
+
+    trigger.addEventListener('click', function (event) {
+      event.preventDefault();
+      status.textContent = '';
+      if (assistant()) {
+        assistant().open();
+        return;
+      }
+      if (trigger.getAttribute('aria-busy') === 'true') return;
+      trigger.setAttribute('aria-busy', 'true');
+      loadAssistant()
+        .then(function () { assistant().open(); })
+        .catch(function () { status.textContent = trigger.getAttribute('data-error'); })
+        .then(function () { trigger.removeAttribute('aria-busy'); });
+    });
   })();
 </script>
 
