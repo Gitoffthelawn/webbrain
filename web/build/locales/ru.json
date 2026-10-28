@@ -359,6 +359,7 @@
   "social.bluesky_label": "WebBrain в Bluesky",
   "social.discord_label": "WebBrain в Discord",
   "social.huggingface_label": "WebBrain в Hugging Face",
+  "footer.tagline": "Наша миссия — сделать интернет умнее.",
   "footer.copyright_html": "© 2026 WebBrain. Сделано <a href=\"https://emresokullu.com\" target=\"_blank\">Emre Sokullu</a> и <a href=\"https://github.com/webbrain-one/webbrain/graphs/contributors\" target=\"_blank\">участниками</a>.",
   "footer.link_github": "GitHub",
   "footer.link_privacy": "Политика конфиденциальности",

@@ -45053,6 +45053,36 @@ test('new website routes are rewritten on Vercel and listed in the sitemap', () 
   }
 });
 
+test('site footers carry the mission line in every language', () => {
+  const localesDir = path.join(ROOT, 'web/build/locales');
+  const english = JSON.parse(fs.readFileSync(path.join(localesDir, 'en.json'), 'utf8'));
+  assert.equal(english['footer.tagline'], 'On a mission to make the web smarter.');
+  for (const file of fs.readdirSync(localesDir).filter((name) => name.endsWith('.json'))) {
+    const dict = JSON.parse(fs.readFileSync(path.join(localesDir, file), 'utf8'));
+    assert.ok(String(dict['footer.tagline'] || '').trim(), `${file}: footer.tagline missing`);
+    if (file !== 'en.json') assert.notEqual(dict['footer.tagline'], english['footer.tagline'], `${file}: footer.tagline is untranslated`);
+  }
+  for (const name of ['home-template.html', 'template.html', 'websites-template.html']) {
+    const template = fs.readFileSync(path.join(ROOT, 'web/build', name), 'utf8');
+    assert.match(
+      template,
+      /<div class="footer-brand">\s*<p class="footer-tagline">\{\{t:footer\.tagline\}\}<\/p>\s*<span[^>]*>\{\{t-html:footer\.copyright_html\}\}<\/span>/,
+      `${name}: the mission line should sit above the copyright`,
+    );
+  }
+  const turkish = JSON.parse(fs.readFileSync(path.join(localesDir, 'tr.json'), 'utf8'));
+  for (const [page, line] of [
+    ['web/index.html', english['footer.tagline']],
+    ['web/browser/index.html', english['footer.tagline']],
+    ['web/websites/index.html', english['footer.tagline']],
+    ['web/tr/index.html', turkish['footer.tagline']],
+    ['web/tr/browser/index.html', turkish['footer.tagline']],
+  ]) {
+    const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+    assert.ok(html.includes(`<p class="footer-tagline">${line}</p>`), `${page}: footer mission line missing`);
+  }
+});
+
 test('download FAQ bridge is a single block-level link', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
   const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');

@@ -359,6 +359,7 @@
   "social.bluesky_label": "WebBrain en Bluesky",
   "social.discord_label": "WebBrain en Discord",
   "social.huggingface_label": "WebBrain en Hugging Face",
+  "footer.tagline": "Nuestra misión: hacer la web más inteligente.",
   "footer.copyright_html": "© 2026 WebBrain. Hecho por <a href=\"https://emresokullu.com\" target=\"_blank\">Emre Sokullu</a> y <a href=\"https://github.com/webbrain-one/webbrain/graphs/contributors\" target=\"_blank\">colaboradores</a>.",
   "footer.link_github": "GitHub",
   "footer.link_privacy": "Política de privacidad",
