@@ -9,7 +9,7 @@
   <meta property="og:title" content="{{t:meta.og_title}}">
   <meta property="og:description" content="{{t:meta.og_description}}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{locale_home_url}}">
+  <meta property="og:url" content="{{page_url}}">
   <meta property="og:site_name" content="WebBrain">
   <meta property="og:locale" content="{{locale_bcp47}}">
   <meta property="og:image" content="https://webbrain.one/og-image.png">
@@ -25,7 +25,7 @@
   <meta name="twitter:image:alt" content="{{t:meta.og_title}}">
   <meta name="robots" content="index, follow">
   <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="canonical" href="{{locale_home_url}}">
+  <link rel="canonical" href="{{page_url}}">
 {{hreflang_links}}
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -240,7 +240,7 @@
       border-radius: 7px;
       flex: 0 0 auto;
     }
-    .nav-links { display: flex; gap: 28px; align-items: center; margin-inline-start: auto; min-width: 0; }
+    .nav-links { display: flex; gap: 22px; align-items: center; margin-inline-start: auto; min-width: 0; }
     .nav-links a {
       color: var(--text-dim);
       font-size: 14px;
@@ -248,6 +248,10 @@
       transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links a[aria-current="page"] { color: var(--text); }
+    @media (max-width: 1080px) {
+      .nav-links .nav-secondary { display: none; }
+    }
     .language-picker {
       position: relative;
       display: flex;
@@ -3330,9 +3334,11 @@
       <img class="brand-logo" src="/logo-github.png" alt="" aria-hidden="true"> WebBrain<span style="opacity:0.5; font-weight:400; -webkit-text-fill-color:currentColor;">.one</span>
     </a>
     <div class="nav-links">
-      <a href="{{docs_url}}">{{t:nav.docs}}</a>
-      <a href="#faq">{{t:nav.faq}}</a>
-      <a href="/blog">{{t:nav.blog}}</a>
+      <a href="{{browser_path}}" aria-current="page">{{t:nav.browser_extension}}</a>
+      <a href="{{websites_path}}">{{t:nav.for_websites}}</a>
+      <a href="{{docs_url}}" class="nav-secondary">{{t:nav.docs}}</a>
+      <a href="#faq" class="nav-secondary">{{t:nav.faq}}</a>
+      <a href="/blog/" class="nav-secondary">{{t:nav.blog}}</a>
       <a href="#download" class="nav-cta">{{t:nav.download}}</a>
       <div class="language-picker" id="language-picker">
         <select class="language-select-native" id="lang-dropdown" tabindex="-1" aria-hidden="true" data-current="{{locale_code}}">
@@ -5130,7 +5136,7 @@
       if (parts.length && LOCALES.includes(parts[0])) {
         parts.shift(); // drop leading locale
       }
-      const rest = parts.length ? '/' + parts.join('/') : '/';
+      const rest = parts.length ? '/' + parts.join('/') + '/' : '/';
       const next = target === 'en' ? rest : '/' + target + rest;
       window.location.href = next + search + hash;
     });

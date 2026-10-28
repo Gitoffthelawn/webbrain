@@ -2,10 +2,14 @@
 /**
  * WebBrain marketing-site build.
  *
- * Reads web/build/template.html, web/build/faq-template.html, and
- * web/build/locales/*.json and writes:
- *   web/index.html
- *   web/{es,fr,tr,zh}/index.html
+ * Reads web/build/home-template.html, web/build/template.html (the browser
+ * extension page), web/build/websites-template.html, web/build/faq-template.html,
+ * and web/build/locales/*.json and writes:
+ *   web/index.html                       the short homepage (two paths)
+ *   web/{es,fr,tr,zh,...}/index.html
+ *   web/browser/index.html               the browser extension page
+ *   web/{es,fr,tr,zh,...}/browser/index.html
+ *   web/websites/index.html              WebBrain for websites (English)
  *   web/docs/faq/index.html
  *   web/docs/{es,fr,tr,zh,...}/faq/index.html
  *   web/sitemap.xml
@@ -15,7 +19,11 @@
  * placeholders the script fills per locale:
  *   {{locale_code}}      e.g. "en", "es"
  *   {{locale_bcp47}}     e.g. "en-US", "es-ES" (used in og:locale)
- *   {{locale_home_url}}  e.g. "https://webbrain.one/" or ".../es/"
+ *   {{locale_home_url}}  e.g. "https://webbrain.one/" or ".../es/" (brand link)
+ *   {{page_url}}         canonical URL of the page being rendered
+ *   {{browser_path}}     e.g. "/browser/" or "/es/browser/"
+ *   {{websites_path}}    "/websites/"
+ *   {{sites_dashboard_url}} the private WebBrain for websites dashboard
  *   {{docs_url}}         English docs, or the secondary Chinese docs for zh
  *   {{hreflang_links}}   <link rel="alternate" ...> block for this page
  *   {{faq_url}}          localized FAQ path under /docs/
@@ -41,10 +49,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');           // web/
 const BUILD_DIR = __dirname;                          // web/build/
 const LOCALES_DIR = path.join(BUILD_DIR, 'locales');
+// template.html is the browser extension page (it used to be the homepage).
 const TEMPLATE_PATH = path.join(BUILD_DIR, 'template.html');
+const HOME_TEMPLATE_PATH = path.join(BUILD_DIR, 'home-template.html');
+const WEBSITES_TEMPLATE_PATH = path.join(BUILD_DIR, 'websites-template.html');
 const FAQ_TEMPLATE_PATH = path.join(BUILD_DIR, 'faq-template.html');
 const SITE_ORIGIN = 'https://webbrain.one';
 const SOCIAL_IMAGE_URL = `${SITE_ORIGIN}/og-image.png`;
+const WEBSITES_PATH = '/websites/';
+// WebBrain for websites: the private dashboard that issues embed scripts.
+const SITES_DASHBOARD_URL = 'https://sites.webbrain.one';
 const LOGO_IMAGE_URL = `${SITE_ORIGIN}/logo-github.png`;
 
 // Locale config. The default locale (en) renders to web/index.html;
@@ -241,6 +255,20 @@ function homeUrlFor(locale) {
   return locale.isDefault ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}/${locale.code}/`;
 }
 
+function browserPathFor(locale) {
+  return locale.isDefault ? '/browser/' : `/${locale.code}/browser/`;
+}
+
+function browserUrlFor(locale) {
+  return `${SITE_ORIGIN}${browserPathFor(locale)}`;
+}
+
+function pageUrlFor(page, locale) {
+  if (page === 'browser') return browserUrlFor(locale);
+  if (page === 'websites') return `${SITE_ORIGIN}${WEBSITES_PATH}`;
+  return homeUrlFor(locale);
+}
+
 function faqPathFor(locale) {
   return locale.isDefault ? '/docs/faq/' : `/docs/${locale.code}/faq/`;
 }
@@ -253,13 +281,35 @@ function docsPathFor(locale) {
   return locale.code === 'zh' ? '/docs/zh/' : '/docs/';
 }
 
-function buildHreflangBlock() {
+function buildHreflangBlock(urlFor = homeUrlFor) {
   const links = LOCALES.map(
-    (l) => `  <link rel="alternate" hreflang="${l.code}" href="${homeUrlFor(l)}">`,
+    (l) => `  <link rel="alternate" hreflang="${l.code}" href="${urlFor(l)}">`,
   );
-  // x-default points at the default (English) homepage.
-  const xDefault = `  <link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/">`;
+  // x-default points at the default (English) version of the page.
+  const xDefault = `  <link rel="alternate" hreflang="x-default" href="${urlFor(LOCALES[0])}">`;
   return [...links, xDefault].join('\n');
+}
+
+// Headlines in most languages run longer than the English one. Measure
+// roughly how wide the homepage headline will be (CJK and Hangul glyphs are
+// about twice as wide as Latin letters) so long ones get the full-width layout.
+function headlineWidth(text) {
+  let width = 0;
+  for (const ch of String(text || '')) {
+    width += /[\u1100-\u11ff\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\uff00-\uffef]/u.test(ch) ? 2 : 1;
+  }
+  return width;
+}
+
+function homeTitleSize(dict) {
+  return headlineWidth(`${dict['home.title_line1'] || ''} ${dict['home.title_line2'] || ''}`) > 45 ? 'long' : 'short';
+}
+
+function hreflangBlockFor(page) {
+  if (page === 'browser') return buildHreflangBlock(browserUrlFor);
+  // The websites page is English-only, so it has no alternates to announce.
+  if (page === 'websites') return '';
+  return buildHreflangBlock(homeUrlFor);
 }
 
 function buildFaqHreflangBlock() {
@@ -384,7 +434,7 @@ function buildSoftwareJsonLd(dict, locale) {
     operatingSystem: 'Chrome, Edge, Firefox',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     description: dict['meta.description'],
-    url: homeUrlFor(locale),
+    url: browserUrlFor(locale),
     inLanguage: locale.bcp47,
     downloadUrl: 'https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb',
     softwareVersion: dict['meta.software_version'],
@@ -393,6 +443,37 @@ function buildSoftwareJsonLd(dict, locale) {
     isAccessibleForFree: true,
     image: LOGO_IMAGE_URL,
     screenshot: SOCIAL_IMAGE_URL,
+  };
+  return serializeScriptJson(payload, 2);
+}
+
+function buildHomeJsonLd(dict, locale) {
+  const payload = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${SITE_ORIGIN}/#organization`,
+        name: 'WebBrain',
+        url: `${SITE_ORIGIN}/`,
+        logo: LOGO_IMAGE_URL,
+        sameAs: [
+          'https://github.com/webbrain-one/webbrain',
+          MASTODON_PROFILE_URL,
+          BLUESKY_PROFILE_URL,
+          HUGGINGFACE_PROFILE_URL,
+        ],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_ORIGIN}/#website`,
+        name: 'WebBrain',
+        url: homeUrlFor(locale),
+        inLanguage: locale.bcp47,
+        description: dict['home.meta.description'],
+        publisher: { '@id': `${SITE_ORIGIN}/#organization` },
+      },
+    ],
   };
   return serializeScriptJson(payload, 2);
 }
@@ -482,7 +563,7 @@ function buildSubscribeHtml() {
 `;
 }
 
-function applyTemplate(template, dict, locale) {
+function applyTemplate(template, dict, locale, page = 'home') {
   const canonical = homeUrlFor(locale);
   const docsUrl = docsPathFor(locale);
 
@@ -495,19 +576,25 @@ function applyTemplate(template, dict, locale) {
     .replace(/\{\{locale_bcp47\}\}/g, locale.bcp47)
     .replace(/\{\{locale_dir\}\}/g, locale.dir || 'ltr')
     .replace(/\{\{locale_home_url\}\}/g, canonical)
+    .replace(/\{\{page_url\}\}/g, pageUrlFor(page, locale))
+    .replace(/\{\{browser_path\}\}/g, browserPathFor(locale))
+    .replace(/\{\{websites_path\}\}/g, WEBSITES_PATH)
+    .replace(/\{\{sites_dashboard_url\}\}/g, SITES_DASHBOARD_URL)
+    .replace(/\{\{home_title_size\}\}/g, homeTitleSize(dict))
     .replace(/\{\{docs_url\}\}/g, docsUrl)
     .replace(/\{\{docs_language_label\}\}/g, locale.code === 'zh' ? '中文' : 'EN')
     .replace(/\{\{faq_url\}\}/g, faqPathFor(locale))
     .replace(/\{\{faq_canonical\}\}/g, faqUrlFor(locale))
     .replace(/\{\{plausible_analytics\}\}/g, PLAUSIBLE_ANALYTICS)
-    .replace(/\{\{hreflang_links\}\}/g, buildHreflangBlock())
+    .replace(/\{\{hreflang_links\}\}/g, () => hreflangBlockFor(page))
     .replace(/\{\{faq_hreflang_links\}\}/g, buildFaqHreflangBlock())
     .replace(/\{\{faq_language_options\}\}/g, buildFaqLanguageOptions(locale))
     .replace(/\{\{faq_language_routes\}\}/g, () => buildFaqLanguageRoutes())
     .replace(/\{\{faq_sidebar_links\}\}/g, buildFaqSidebarLinks(dict))
     .replace(/\{\{faq_sections\}\}/g, buildFaqSections(dict))
     .replace(/\{\{faq_jsonld\}\}/g, () => buildFaqJsonLd(dict, locale.bcp47))
-    .replace(/\{\{software_jsonld\}\}/g, () => buildSoftwareJsonLd(dict, locale));
+    .replace(/\{\{software_jsonld\}\}/g, () => buildSoftwareJsonLd(dict, locale))
+    .replace(/\{\{home_jsonld\}\}/g, () => buildHomeJsonLd(dict, locale));
 
   // String substitutions. Missing keys fall back to English (already loaded
   // via the English dict being the default we pass in); we flag them below.
@@ -539,6 +626,8 @@ function applyTemplate(template, dict, locale) {
 
 async function main() {
   const template = await readFile(TEMPLATE_PATH, 'utf8');
+  const homeTemplate = await readFile(HOME_TEMPLATE_PATH, 'utf8');
+  const websitesTemplate = await readFile(WEBSITES_TEMPLATE_PATH, 'utf8');
   const faqTemplate = await readFile(FAQ_TEMPLATE_PATH, 'utf8');
   validateFaqRegistry();
   await syncLanguageFlagAssets();
@@ -567,16 +656,17 @@ async function main() {
       dict = { ...en, ...raw };
     }
     // Synthesize per-locale share-intent URLs from the locale's share text
-    // and home URL. Computed here (not in the JSON) so URL encoding stays
-    // out of the locale files. The shared URL is the locale's homepage so
-    // the recipient lands on a localized version when they open it.
-    const homeUrl = homeUrlFor(locale);
+    // and page URL. Computed here (not in the JSON) so URL encoding stays
+    // out of the locale files. The share buttons live on the browser
+    // extension page and describe the extension, so they share that page
+    // in the visitor's language.
+    const shareUrl = browserUrlFor(locale);
     const shareText = dict['share.text'] || '';
-    const shareTextWithUrl = `${shareText} ${homeUrl}`.trim();
+    const shareTextWithUrl = `${shareText} ${shareUrl}`.trim();
     dict = {
       ...dict,
-      'share.x_intent_url': `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(homeUrl)}`,
-      'share.linkedin_intent_url': `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(homeUrl)}`,
+      'share.x_intent_url': `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      'share.linkedin_intent_url': `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
       'share.mastodon_intent_url': `https://mastoturk.org/share?text=${encodeURIComponent(shareTextWithUrl)}`,
       'share.bluesky_intent_url': `https://bsky.app/intent/compose?text=${encodeURIComponent(shareTextWithUrl)}`,
       'social.mastodon_url': MASTODON_PROFILE_URL,
@@ -585,20 +675,25 @@ async function main() {
       'social.huggingface_url': HUGGINGFACE_PROFILE_URL,
     };
 
-    const { html, missing } = applyTemplate(template, dict, locale);
-    if (missing.size) {
-      totalMissing += missing.size;
-      console.warn(`[${locale.code}] ${missing.size} missing keys:`, [...missing].slice(0, 10).join(', '), missing.size > 10 ? '…' : '');
+    const localeDir = locale.isDefault ? ROOT : path.join(ROOT, locale.code);
+    const pages = [
+      { page: 'home', source: homeTemplate, outPath: path.join(localeDir, 'index.html') },
+      { page: 'browser', source: template, outPath: path.join(localeDir, 'browser', 'index.html') },
+    ];
+    // WebBrain for websites launches in English only.
+    if (locale.isDefault) {
+      pages.push({ page: 'websites', source: websitesTemplate, outPath: path.join(ROOT, 'websites', 'index.html') });
     }
-
-    const outPath = locale.isDefault
-      ? path.join(ROOT, 'index.html')
-      : path.join(ROOT, locale.code, 'index.html');
-    if (!locale.isDefault) {
+    for (const { page, source, outPath } of pages) {
+      const { html, missing } = applyTemplate(source, dict, locale, page);
+      if (missing.size) {
+        totalMissing += missing.size;
+        console.warn(`[${locale.code}/${page}] ${missing.size} missing keys:`, [...missing].slice(0, 10).join(', '), missing.size > 10 ? '…' : '');
+      }
       await mkdir(path.dirname(outPath), { recursive: true });
+      await writeFile(outPath, html, 'utf8');
+      console.log(`✓ wrote ${path.relative(process.cwd(), outPath)} (${html.length.toLocaleString()} bytes)`);
     }
-    await writeFile(outPath, html, 'utf8');
-    console.log(`✓ wrote ${path.relative(process.cwd(), outPath)} (${html.length.toLocaleString()} bytes)`);
 
     const { html: faqHtml, missing: faqMissing } = applyTemplate(faqTemplate, dict, locale);
     if (faqMissing.size) {
@@ -611,9 +706,12 @@ async function main() {
     console.log(`✓ wrote ${path.relative(process.cwd(), faqOutPath)} (${faqHtml.length.toLocaleString()} bytes)`);
   }
 
-  // sitemap.xml — localized homes plus public utility, blog, and user-doc pages.
+  // sitemap.xml — localized homes and browser pages, the websites page, plus
+  // public utility, blog, and user-doc pages.
   const sitemapUrls = [
     ...LOCALES.map((l) => ({ loc: homeUrlFor(l), alternates: 'home' })),
+    ...LOCALES.map((l) => ({ loc: browserUrlFor(l), alternates: 'browser' })),
+    { loc: `${SITE_ORIGIN}${WEBSITES_PATH}` },
     ...LOCALES.map((l) => ({ loc: faqUrlFor(l), alternates: 'faq' })),
     { loc: `${SITE_ORIGIN}/privacy` },
     { loc: `${SITE_ORIGIN}/subscribe/` },
@@ -640,7 +738,9 @@ async function main() {
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
     '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...sitemapUrls.map((u) => {
-      const alternateUrlFor = u.alternates === 'faq' ? faqUrlFor : homeUrlFor;
+      const alternateUrlFor = u.alternates === 'faq'
+        ? faqUrlFor
+        : u.alternates === 'browser' ? browserUrlFor : homeUrlFor;
       const alts = u.alternates === 'easy-cli-proxy'
         ? [
             `    <xhtml:link rel="alternate" hreflang="en" href="${SITE_ORIGIN}/docs/easy-cli-proxy/"/>`,

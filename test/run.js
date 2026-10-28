@@ -43839,7 +43839,7 @@ test('new locales are registered in extension and web language dropdowns', () =>
 test('web landing language picker mirrors the extension flag listbox', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   const expectedFlagCodes = {
     en: 'us', es: 'es', fr: 'fr', tr: 'tr', zh: 'cn', ru: 'ru', uk: 'ua', ar: 'sa',
     ja: 'jp', ko: 'kr', id: 'id', th: 'th', ms: 'my', tl: 'ph', he: 'il', hi: 'in',
@@ -43923,7 +43923,7 @@ test('web landing language picker mirrors the extension flag listbox', () => {
 test('web provider constellation reuses the Settings brand icon set', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   const providerIcons = [
     'llamacpp', 'ollama', 'openai', 'anthropic', 'openrouter', 'lmstudio',
     'vllm', 'xai', 'gemini', 'deepseek', 'mistral',
@@ -43965,7 +43965,7 @@ test('web provider constellation reuses the Settings brand icon set', () => {
 
 test('web hero social proof uses recognizable brand icons', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
 
   for (const [label, html] of [['landing template', template], ['generated landing page', generated]]) {
     assert.match(
@@ -44021,7 +44021,7 @@ test('web hero social proof uses recognizable brand icons', () => {
 
 test('webbrain.one homepage showcases a localized Apocalypse Mode readiness banner', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   const providersIndex = template.indexOf('<section class="section" id="providers"');
   const featuresIndex = template.indexOf('<!-- 5. FEATURES');
   const compareIndex = template.indexOf('<!-- 6. COMPARE');
@@ -44122,7 +44122,7 @@ test('public Apocalypse Mode guide and launch essay document the offline boundar
 test('homepage does not promote the unmerged Ollama launch handoff', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
 
   assert.doesNotMatch(
     template,
@@ -44214,7 +44214,7 @@ test('demo proof cards carry the security safeguards beside the comparison', () 
 test('web footer includes the Discord invite beside its other social icons', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   const english = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
 
   assert.match(
@@ -44392,8 +44392,10 @@ test('web language dropdowns pin English and Chinese before alphabetical languag
   ];
 
   for (const [label, rel] of [
-    ['landing template', 'web/build/template.html'],
-    ['generated landing page', 'web/index.html'],
+    ['browser page template', 'web/build/template.html'],
+    ['homepage template', 'web/build/home-template.html'],
+    ['generated homepage', 'web/index.html'],
+    ['generated browser page', 'web/browser/index.html'],
     ['privacy page', 'web/privacy.html'],
   ]) {
     const html = fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -44946,44 +44948,114 @@ test('web landing builder preserves template markers and HTML entity escaping', 
 });
 
 test('generated landing pages stay in sync with the web build template', () => {
-  // web/index.html and web/<locale>/index.html are build artifacts of
-  // web/build/template.html. Hand-editing one silently loses the edit on the
-  // next `npm run build:web`, so every literal chunk of the template (the text
-  // between {{...}} placeholders) must still appear, in order, in each page.
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const literals = template.split(/\{\{[^}]*\}\}/).filter((chunk) => chunk.trim().length > 0);
-  assert.ok(literals.length > 50, 'web build: template should split into literal chunks around placeholders');
-
+  // The homepage, the browser extension page, and the websites page are build
+  // artifacts of web/build/home-template.html, web/build/template.html and
+  // web/build/websites-template.html. Hand-editing one silently loses the edit
+  // on the next `npm run build:web`, so every literal chunk of a template (the
+  // text between {{...}} placeholders) must still appear, in order, in each page.
   const locales = fs
     .readdirSync(path.join(ROOT, 'web/build/locales'))
     .filter((name) => name.endsWith('.json'))
     .map((name) => name.replace(/\.json$/, ''));
-  const pages = locales.map((code) => (code === 'en' ? 'web/index.html' : `web/${code}/index.html`));
+  const localized = (suffix) => locales.map((code) => (code === 'en' ? `web/${suffix}` : `web/${code}/${suffix}`));
 
-  for (const page of pages) {
-    const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
-    let cursor = 0;
-    for (const chunk of literals) {
-      const at = html.indexOf(chunk, cursor);
-      if (at === -1) {
-        // Chunks span many lines; report the first template line the page lost.
-        const lost = chunk
-          .split('\n')
-          .map((line) => line.trim())
-          .find((line) => line.length > 8 && html.indexOf(line, cursor) === -1);
-        assert.fail(
-          `${page}: drifted from web/build/template.html — missing ${JSON.stringify(lost || chunk.trim().slice(0, 120))}. `
-          + 'Edit the template (and web/build/locales/*.json), then run `npm run build:web`.',
-        );
+  for (const [templateRel, pages, minimumChunks] of [
+    ['web/build/home-template.html', localized('index.html'), 20],
+    ['web/build/template.html', localized('browser/index.html'), 50],
+    ['web/build/websites-template.html', ['web/websites/index.html'], 10],
+  ]) {
+    const template = fs.readFileSync(path.join(ROOT, templateRel), 'utf8');
+    const literals = template.split(/\{\{[^}]*\}\}/).filter((chunk) => chunk.trim().length > 0);
+    assert.ok(literals.length > minimumChunks, `${templateRel}: template should split into literal chunks around placeholders`);
+
+    for (const page of pages) {
+      const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+      let cursor = 0;
+      for (const chunk of literals) {
+        const at = html.indexOf(chunk, cursor);
+        if (at === -1) {
+          // Chunks span many lines; report the first template line the page lost.
+          const lost = chunk
+            .split('\n')
+            .map((line) => line.trim())
+            .find((line) => line.length > 8 && html.indexOf(line, cursor) === -1);
+          assert.fail(
+            `${page}: drifted from ${templateRel} — missing ${JSON.stringify(lost || chunk.trim().slice(0, 120))}. `
+            + 'Edit the template (and web/build/locales/*.json), then run `npm run build:web`.',
+          );
+        }
+        cursor = at + chunk.length;
       }
-      cursor = at + chunk.length;
     }
+  }
+});
+
+test('homepage offers the browser extension and WebBrain for websites side by side', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/home-template.html'), 'utf8');
+  const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
+
+  assert.match(template, /id="hero-install-cta"[\s\S]*?\{\{t:hero\.cta\.install\}\}/, 'web home: first path installs the extension');
+  assert.match(template, /href="\{\{websites_path\}\}" class="btn btn-ink" id="hero-websites-cta"/, 'web home: second path adds WebBrain to a website');
+  assert.doesNotMatch(template, /View on GitHub|hero\.cta\.github/, 'web home: GitHub is no longer the second hero action');
+  assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');
+  assert.match(english, /href="\/browser\/"/, 'web home: English links to the browser extension page');
+  assert.match(turkish, /href="\/tr\/browser\/"/, 'web home: localized homepages link to their own browser page');
+  assert.match(turkish, /href="\/websites\/"/, 'web home: localized homepages link to the English websites page');
+  assert.match(english, /<link rel="canonical" href="https:\/\/webbrain\.one\/">/);
+  assert.match(
+    fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8'),
+    /<link rel="canonical" href="https:\/\/webbrain\.one\/browser\/">/,
+    'web browser page: canonical points at /browser/',
+  );
+  assert.match(build, /SITES_DASHBOARD_URL = 'https:\/\/sites\.webbrain\.one'/);
+});
+
+test('homepage forwards anchors that moved to the browser extension page', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/home-template.html'), 'utf8');
+  const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
+  const browser = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
+  const moved = template.match(/var moved = \[([^\]]+)\]/);
+  assert.ok(moved, 'web home: legacy anchor list missing');
+  for (const id of ['download', 'faq', 'mcp', 'features', 'providers', 'compare', 'apocalypse', 'demo']) {
+    assert.ok(moved[1].includes(`'${id}'`), `web home: #${id} should forward to the browser page`);
+    assert.match(browser, new RegExp(`id="${id}"`), `web browser page: #${id} target should exist`);
+  }
+  assert.match(turkish, /window\.location\.replace\('\/tr\/browser\/#' \+ hash\)/, 'web home: localized anchors stay in their language');
+});
+
+test('websites page promises free forever and sends visitors to the dashboard', () => {
+  const page = fs.readFileSync(path.join(ROOT, 'web/websites/index.html'), 'utf8');
+  const runtimeAttributes = ['data-webbrain-ask', 'data-webbrain-act'];
+  assert.match(page, /Free now\. <span>Free forever\.<\/span>/);
+  assert.match(page, /<form class="get-script" id="get-script" action="https:\/\/sites\.webbrain\.one\/dashboard" method="get">/);
+  assert.match(page, /name="url"/, 'websites: the address is handed to the dashboard as ?url=');
+  assert.match(page, /https:\/\/sites\.webbrain\.one\/embed\.js/);
+  for (const attribute of runtimeAttributes) {
+    assert.ok(page.includes(attribute), `websites: documents ${attribute}`);
+  }
+  assert.doesNotMatch(page, /hreflang=/, 'websites: English-only page announces no alternates');
+});
+
+test('new website routes are rewritten on Vercel and listed in the sitemap', () => {
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/vercel.json'), 'utf8'));
+  const sitemap = fs.readFileSync(path.join(ROOT, 'web/sitemap.xml'), 'utf8');
+  const sources = vercel.rewrites.map((rule) => rule.source);
+  for (const source of ['/browser', '/browser/', '/websites', '/websites/']) {
+    assert.ok(sources.includes(source), `vercel: ${source} rewrite missing`);
+  }
+  assert.ok(sources.some((source) => /^\/:locale\(.*\btr\b.*\)\/browser\/$/.test(source)), 'vercel: localized browser pages rewrite');
+  const catchAll = sources.indexOf('/(.*)');
+  assert.ok(sources.indexOf('/browser/') < catchAll && sources.indexOf('/websites/') < catchAll, 'vercel: new routes precede the catch-all');
+  for (const loc of ['https://webbrain.one/browser/', 'https://webbrain.one/tr/browser/', 'https://webbrain.one/websites/']) {
+    assert.ok(sitemap.includes(`<loc>${loc}</loc>`), `sitemap: ${loc} missing`);
   }
 });
 
 test('download FAQ bridge is a single block-level link', () => {
   const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const generated = fs.readFileSync(path.join(ROOT, 'web/browser/index.html'), 'utf8');
   for (const [label, html] of [['landing template', template], ['generated landing page', generated]]) {
     assert.match(
       html,
