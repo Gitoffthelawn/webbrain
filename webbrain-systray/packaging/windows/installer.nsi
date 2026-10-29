@@ -60,10 +60,50 @@ LangString FinishText ${LANG_TURKISH} "WebBrain Companion, saatin yanındaki bil
 LangString RemoveData ${LANG_ENGLISH} "Also delete your WebBrain Companion settings, sign-ins and downloaded models?"
 LangString RemoveData ${LANG_TURKISH} "WebBrain Companion ayarların, girişlerin ve indirilen modeller de silinsin mi?"
 
+; Automatic updates run this program silently as
+;   setup.exe /S /UPDATE=<pid>
+; where <pid> is the companion that downloaded the update. It quits by itself
+; after starting this program; the new version starts when installing is done.
+Var UpdatePID
+
+; A file that cannot be written stops the installation instead of being
+; skipped, which in silent mode would leave the old program and a new version
+; number behind.
+AllowSkipFiles off
+
+Function .onInit
+  ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/UPDATE=" $UpdatePID
+  ${If} ${Errors}
+    StrCpy $UpdatePID ""
+  ${EndIf}
+FunctionEnd
+
+; An update that could not finish starts the version that is in place, which
+; reports the failure and does not retry it by itself.
+Function .onInstFailed
+  ${If} $UpdatePID != ""
+    Exec '"$INSTDIR\${EXE}" --background --after-update'
+  ${EndIf}
+FunctionEnd
+
 ; Stops a running copy (and the local model server it started) so its files
 ; can be replaced.
 !macro CloseRunning
-  nsExec::Exec 'taskkill /F /T /IM "${EXE}"'
+  ${If} $UpdatePID != ""
+    ; Wait up to a minute for the companion that started the update to stop
+    ; its local model server and quit, then stop any copy still running. No /T
+    ; here: this program is that companion's child, and /T would stop it too.
+    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $UpdatePID) p .r0'
+    ${If} $0 <> 0
+      System::Call 'kernel32::WaitForSingleObject(p r0, i 60000) i .r1'
+      System::Call 'kernel32::CloseHandle(p r0)'
+    ${EndIf}
+    nsExec::Exec 'taskkill /F /IM "${EXE}"'
+  ${Else}
+    nsExec::Exec 'taskkill /F /T /IM "${EXE}"'
+  ${EndIf}
   Pop $0
   Sleep 600
 !macroend
@@ -95,6 +135,11 @@ Section "Install"
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
   WriteRegDWORD HKCU "${UNINSTKEY}" "EstimatedSize" "$0"
+
+  ${If} $UpdatePID != ""
+    ; Start the new version the way the companion starts at login.
+    Exec '"$INSTDIR\${EXE}" --background --after-update'
+  ${EndIf}
 SectionEnd
 
 Section "Uninstall"

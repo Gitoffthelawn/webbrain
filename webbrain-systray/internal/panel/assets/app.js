@@ -133,6 +133,19 @@
       hideList: "Hide",
       logFile: "Show log file",
       version: "Version {v}",
+      updates: "Updates",
+      updAuto: "Install updates automatically",
+      updAutoHelp: "New versions download in the background and install after 10 minutes without use. The companion then restarts by itself.",
+      updCheck: "Check for updates",
+      updChecking: "Checking for updates…",
+      updCurrent: "You have the newest version.",
+      updAvailable: "Version {v} is available.",
+      updDownloading: "Downloading version {v}…",
+      updReady: "Version {v} is ready to install.",
+      updInstalling: "Installing version {v}…",
+      updInstall: "Update to {v} now",
+      updFailed: "The update didn't finish: {e}",
+      updPage: "Download page",
       quit: "Quit WebBrain Companion",
       quitConfirm: "WebBrain loses access to your subscriptions until you open the companion again.",
       trayHidden: "macOS is hiding the WebBrain Companion icon because the menu bar is full. You can always come back here by opening WebBrain Companion again. To make room, hide menu bar icons you don't use in System Settings, Menu Bar.",
@@ -282,6 +295,19 @@
       hideList: "Gizle",
       logFile: "Günlük dosyasını göster",
       version: "Sürüm {v}",
+      updates: "Güncellemeler",
+      updAuto: "Güncellemeleri otomatik kur",
+      updAutoHelp: "Yeni sürümler arka planda iner ve 10 dakika kullanılmadığında kurulur. Ardından Companion kendiliğinden yeniden başlar.",
+      updCheck: "Güncellemeleri denetle",
+      updChecking: "Güncellemeler denetleniyor…",
+      updCurrent: "En yeni sürümü kullanıyorsun.",
+      updAvailable: "{v} sürümü çıktı.",
+      updDownloading: "{v} sürümü indiriliyor…",
+      updReady: "{v} sürümü kurulmaya hazır.",
+      updInstalling: "{v} sürümü kuruluyor…",
+      updInstall: "Şimdi {v} sürümüne güncelle",
+      updFailed: "Güncelleme tamamlanamadı: {e}",
+      updPage: "İndirme sayfası",
       quit: "WebBrain Companion'dan çık",
       quitConfirm: "Yeniden açana kadar WebBrain aboneliklerine erişemez.",
       trayHidden: "Menü çubuğu dolu olduğu için macOS, WebBrain Companion simgesini gizliyor. Bu panele her zaman WebBrain Companion'ı yeniden açarak dönebilirsin. Yer açmak için kullanmadığın simgeleri Sistem Ayarları, Menü Çubuğu bölümünden gizle.",
@@ -847,6 +873,40 @@
         : `<div class="sheet-actions end"><button class="btn small danger" data-act="ask-d1-remove" ${busy ? "disabled" : ""}>${t("removeFiles")}</button></div>`) : ""}`;
   }
 
+  // Updates: the automatic-install switch, where the update stands, and a
+  // button to check or install now. Development builds never update.
+  function updateSection(s) {
+    const u = s.update || {};
+    if (u.dev) return "";
+    const busy = ["checking", "downloading", "installing"].includes(u.state);
+    let status = "";
+    switch (u.state) {
+      case "checking": status = t("updChecking"); break;
+      case "downloading": {
+        const p = u.progress;
+        status = t("updDownloading", { v: u.latest }) + (p && p.total ? ` ${Math.floor((p.done / p.total) * 100)}%` : "");
+        break;
+      }
+      case "installing": status = t("updInstalling", { v: u.latest }); break;
+      case "ready": status = t("updReady", { v: u.latest }); break;
+      case "error": status = t("updFailed", { e: u.error }); break;
+      default: status = u.latest ? t("updAvailable", { v: u.latest }) : (u.checked_at ? t("updCurrent") : "");
+    }
+    const notes = [status ? `<p class="sheet-note${u.state === "error" ? " warn" : ""}">${esc(status)}</p>` : ""];
+    if (u.latest && !u.supported && u.reason) notes.push(`<p class="sheet-note warn">${esc(u.reason)}</p>`);
+    const action = u.latest && u.supported
+      ? `<button class="btn small primary" data-act="update-install" ${busy ? "disabled" : ""}>${esc(t("updInstall", { v: u.latest }))}</button>`
+      : `<button class="btn small" data-act="update-check" ${busy ? "disabled" : ""}>${t("updCheck")}</button>`;
+    const page = u.latest && !u.supported ? ` <button class="link" data-act="update-page">${t("updPage")}</button>` : "";
+    return `<h4>${t("updates")}</h4>
+      <div class="opts">
+        <label class="toggle"><input type="checkbox" data-change="auto-update" ${u.auto ? "checked" : ""}>${t("updAuto")}</label>
+        <p class="sheet-note">${t("updAutoHelp")}</p>
+        ${notes.join("")}
+        <div>${action}${page}</div>
+      </div>`;
+  }
+
   function settingsSheet() {
     const s = state;
     const models = s.models || [];
@@ -882,6 +942,7 @@
           ${models.length ? `<button class="btn small quiet" data-act="toggle-models" aria-expanded="${ui.showModels}">${ui.showModels ? t("hideList") : t("showList")}</button>` : ""}</div>
         ${ui.showModels && models.length ? `<ul class="chips">${models.map((m) => `<li><button data-act="copy" data-text="${esc(m)}" title="${t("copy")}">${esc(m)}</button></li>`).join("")}</ul>` : ""}
       </div>
+      ${updateSection(s)}
       <div class="sheet-foot">
         <button class="link" data-act="logs">${t("logFile")}</button>
         <span>${esc(t("version", { v: s.version }))}</span>
@@ -1091,6 +1152,9 @@
         break;
       }
       case "logs": run(api("POST", "/open", { target: "logs" })); break;
+      case "update-check": run(api("POST", "/update/check")); break;
+      case "update-install": run(api("POST", "/update/install")); break;
+      case "update-page": run(api("POST", "/open", { target: "url", url: (state.update && state.update.page) || "https://github.com/webbrain-one/webbrain/releases" })); break;
       case "port": {
         const v = parseInt((document.getElementById("port-input") || {}).value, 10);
         if (!v || v === state.preferred_port) break;
@@ -1112,6 +1176,7 @@
     switch (el.dataset.change) {
       case "autostart": run(api("PATCH", "/settings", { autostart: v })); break;
       case "network": run(api("PATCH", "/settings", { network: v })); break;
+      case "auto-update": run(api("PATCH", "/settings", { auto_update: v })); break;
       case "language": lang = v; state.language = v; run(api("PATCH", "/settings", { language: v })); el.blur(); reRender(); break;
       case "local-vision": run(api("PATCH", "/local", { vision: v })); el.blur(); break;
       case "local-context": state.local_context_setting = parseInt(v, 10); run(api("PATCH", "/local", { context: parseInt(v, 10) })); el.blur(); break;

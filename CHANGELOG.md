@@ -6,6 +6,9 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+### Added
+- WebBrain Companion updates itself from 0.1.3 on. Every six hours it checks GitHub for a newer Companion release, downloads it, and installs it only when the package matches the release's SHA256SUMS. It installs once nothing has used it for ten minutes, then restarts in the background. *Settings, Updates* turns automatic installs off, *Update now* in the tray menu or the panel installs at once, and `webbrain-companion --update` updates from the command line (`--headless` copies only report new versions). See `webbrain-systray/README.md`.
+
 ### Changed
 - Shorter planner requests: the planner and the intent check now ask for one-line JSON, include the Instagram carousel, Gmail count and CMS recipe rules only on turns that involve those sites or an enabled CMS recipe, and send the latest request, the page address and the prior request once each instead of two or three times.
 - WebBrain Companion planning: planner and classifier calls now ask for no thinking (`reasoning_effort: "none"`). Companion maps it per model (off where the model allows it, the lowest level where it cannot, dropped for models without thinking), and its local Bonsai 2 model now accepts it, so planning there no longer runs at the model's default xhigh reasoning.

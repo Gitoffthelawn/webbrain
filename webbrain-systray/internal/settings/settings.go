@@ -64,6 +64,9 @@ type Settings struct {
 	Decision            Decision `json:"decision"`
 	// Welcomed is set after the first panel opening so it is not repeated.
 	Welcomed bool `json:"welcomed"`
+	// ManualUpdates turns off automatic updates: new versions are still
+	// reported, and install only when asked.
+	ManualUpdates bool `json:"manual_updates,omitempty"`
 }
 
 type Store struct {

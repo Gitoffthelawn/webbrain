@@ -162,8 +162,18 @@ func (a *App) Menu(act MenuActions) []tray.Item {
 	if len(s.Accounts) == 0 {
 		items = append(items, tray.Item{Title: i18n.T("add"), OnClick: func() { act.OpenPanel("add") }})
 	}
+	items = append(items, tray.Item{Separator: true})
+	if u := s.Update; u.Latest != "" && u.Supported {
+		switch u.State {
+		case "downloading":
+			items = append(items, tray.Item{Title: fmt.Sprintf(i18n.T("update_downloading"), u.Latest), Disabled: true})
+		case "installing":
+			items = append(items, tray.Item{Title: fmt.Sprintf(i18n.T("update_installing"), u.Latest), Disabled: true})
+		default:
+			items = append(items, tray.Item{Title: fmt.Sprintf(i18n.T("update_now"), u.Latest), OnClick: a.InstallUpdate})
+		}
+	}
 	return append(items,
-		tray.Item{Separator: true},
 		tray.Item{Title: i18n.T("open_panel"), OnClick: func() { act.OpenPanel("") }},
 		tray.Item{Title: i18n.T("quit"), OnClick: act.Quit},
 	)

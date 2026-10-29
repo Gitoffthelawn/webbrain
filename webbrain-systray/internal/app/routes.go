@@ -481,10 +481,22 @@ func (a *App) routes(e *gin.Engine) {
 			Language  *string `json:"language"`
 			Welcomed  *bool   `json:"welcomed"`
 			Network   *bool   `json:"network"`
+			// AutoUpdate installs new versions by themselves when idle.
+			AutoUpdate *bool `json:"auto_update"`
 		}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			fail(c, http.StatusBadRequest, err)
 			return
+		}
+		if req.AutoUpdate != nil {
+			if _, err := a.Store.Update(func(s *settings.Settings) { s.ManualUpdates = !*req.AutoUpdate }); err != nil {
+				fail(c, http.StatusInternalServerError, err)
+				return
+			}
+			if *req.AutoUpdate {
+				a.CheckForUpdate()
+			}
+			a.changed()
 		}
 		if req.Autostart != nil {
 			if err := a.SetAutostart(*req.Autostart); err != nil {
@@ -548,6 +560,19 @@ func (a *App) routes(e *gin.Engine) {
 				a.Quit()
 			}()
 		}
+	})
+	api.POST("/update/check", func(c *gin.Context) {
+		a.CheckForUpdate()
+		c.JSON(http.StatusOK, gin.H{"ok": true})
+	})
+	api.POST("/update/install", func(c *gin.Context) {
+		if st := a.UpdateStatus(); st.Dev || a.Headless {
+			fail(c, http.StatusConflict, errors.New("this copy does not install updates by itself"))
+			return
+		}
+		// Reply first: installing quits the companion.
+		c.JSON(http.StatusOK, gin.H{"ok": true})
+		a.InstallUpdate()
 	})
 	api.POST("/key/rotate", func(c *gin.Context) {
 		a.queueRestart("rotate key", a.RotateKey)

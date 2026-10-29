@@ -44,7 +44,44 @@ language, network access, the port, the log file and *Quit*.
 | Linux (x64, Arm64) | `WebBrain-Companion-*-linux-*.tar.gz` | Run `webbrain-companion`. The tray uses StatusNotifierItem (KDE, XFCE, GNOME with the AppIndicator extension). |
 
 `--headless` runs the proxy and APIs without a tray icon, `--background` starts
-without opening the panel (used at login), `--version` prints the version.
+without opening the panel (used at login), `--version` prints the version and
+`--update` installs the newest version over this copy.
+
+## Updates
+
+From 0.1.3 on, the companion keeps itself current. Two minutes after it
+starts, and every six hours, it asks GitHub for the newest published
+`systray-v*` release of `webbrain-one/webbrain` (drafts and pre-releases are
+skipped). It downloads the package for this system and installs it only when
+the package's SHA-256 matches the release's `SHA256SUMS` file. Then it waits
+until nothing has used it for ten minutes: no model or decision request (its
+own usage refreshes do not count), no open panel, no model download, no
+sign-in in progress. Waking the computer counts as use. It installs the
+update, shuts down and starts the new version without opening the panel.
+
+- **macOS** swaps *WebBrain Companion.app* in its folder and **Linux** the
+  `webbrain-companion` program; the new version then takes over the same
+  process. The replaced copy stays hidden next to it until the new version
+  has started, and is put back if the new version cannot start. A copy that
+  macOS runs from a temporary location (not moved to Applications) cannot
+  replace itself. If macOS refuses the swap, allow WebBrain Companion under
+  *System Settings, Privacy & Security, App Management*, or download the new
+  version by hand. On Linux the program's folder must be writable.
+- **Windows** runs the new setup program silently (`/S /UPDATE=<pid>`). It
+  waits for the companion to quit, installs over the registered installation,
+  and starts the new version. If a file cannot be written, the setup stops and
+  starts the copy that is in place. The installation folder must be writable
+  without administrator rights.
+
+An update that fails is shown under *Settings, Updates* and is not tried again
+by itself; *Update now* tries again, and a newer release is installed as usual.
+
+*Settings, Updates* turns automatic installs off. New versions are then only
+reported, and *Update now* (also in the tray menu) installs them. With
+`--headless` the companion only reports new versions; run
+`webbrain-companion --update` and restart it. Development builds (a version
+with a suffix, such as `0.1.0-dev`) never update. Releases before 0.1.3 have no
+updater: download 0.1.3 or later once by hand.
 
 ## Connect WebBrain
 
@@ -150,7 +187,13 @@ it.
   pass through the panel.
 - No analytics. Besides the providers you sign in to, the embedded proxy
   refreshes CLIProxyAPI's public model catalog every few hours, and installing a
-  model downloads from Hugging Face, GitHub and (MLX only) PyPI.
+  model downloads from Hugging Face, GitHub and (MLX only) PyPI. The update
+  check reads GitHub's release list every six hours and downloads releases from
+  GitHub.
+- Updates are trusted as much as the GitHub release they come from: the
+  checksum file is part of the same release, so it catches damaged downloads,
+  not a release published by someone else. Packages are not signed with a
+  separate update key.
 - Using consumer subscriptions through a proxy may conflict with a provider's
   terms. Read WebBrain's
   [setup, security and account-risk guide](https://webbrain.one/docs/easy-cli-proxy/)

@@ -78,6 +78,7 @@ func LockFile() string    { return filepath.Join(Config(), "companion.lock") }
 func Logs() string        { return filepath.Join(Data(), "logs") }
 func Models() string      { return filepath.Join(Data(), "models") }
 func Runtimes() string    { return filepath.Join(Data(), "runtimes") }
+func Updates() string     { return filepath.Join(Data(), "updates") }
 
 // Ensure creates every directory the companion writes to.
 func Ensure() error {
