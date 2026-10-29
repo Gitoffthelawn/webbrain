@@ -24,6 +24,7 @@ const models = [
   { id: 'lfm3-1.7b', name: 'LFM3-1.7B', source: 'LiquidAI/LFM3-1.7B', repo: 'LiquidAI/LFM3-1.7B-GGUF', revision: 'bad5729bba61d076fff20d2548e62526665af215', file: 'LFM3-1.7B-Q4_K_M.gguf', bytes: 1099627808, sha256: '3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4' },
   { id: 'minicpm-v-4.7-1b', name: 'MiniCPM-V-4.7-1B', source: 'openbmb/MiniCPM-V-4.7-1B', repo: 'openbmb/MiniCPM-V-4.7-1B-gguf', revision: '345adbfa02c4a4671e61b7c75502dc9bf24fa93d', file: 'MiniCPM-V-4_7-1B-Q4_K_M.gguf', bytes: 672003680, sha256: 'f18f594747e5317ab490cff9c06339c9cfb89acbe2f02ebc48a4e167bc23576d' },
   { id: 'webbrain-compass-vld-tiny-v5', name: 'webbrain-compass-vld-tiny-v5', source: 'webbrain-one/webbrain-compass-vld-tiny-v5', repo: 'webbrain-one/webbrain-compass-vld-tiny-v5-gguf', revision: '5e51ae116a813baa3b39763864e6a26e0ff36fb5', file: 'webbrain-compass-vld-tiny-v5-Q4_K_M.gguf', bytes: 672005856, sha256: '0c86a9d444fd65b241b5daacb2f8e877637d5d8f6f3645ebcb6eba250027a8f6' },
+  { id: 'lfm3-vld-2b', name: 'lfm3-vld-2b', source: 'webbrain-one/lfm3-vld-2b', repo: 'webbrain-one/lfm3-vld-2b-gguf', revision: '5b541a3b2a448a72a9ac9f9aea4b04787a7590c0', file: 'LFM3-VL-2B-VLDR-Q4_K_M.gguf', bytes: 1247084544, sha256: '84e7ba7b57b38523e1f90c675f614dadf7ae87af19323f2e05f6914cf1296ddc' },
 ];
 
 if (requested && !models.some(m => m.id === requested)) throw new Error(`Unknown model: ${requested}`);

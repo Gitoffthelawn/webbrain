@@ -5635,6 +5635,1413 @@
           "requestSha256": "3b3bf23bf2f1a861b898dca8cb8dbc34e54c01c5d23552a5ef24987db6275c19"
         }
       ]
+    },
+    {
+      "model": "lfm3-vld-2b",
+      "metadata": "test/llm/analysis/2026-10-29-spark-lfm-minicpm-compact/lfm3-vld-2b-run.json",
+      "metadataSha256": "1516ec0a78eb787cefd71e71035cf48a5149595c2200461dac3a69551c38d718",
+      "records": [
+        {
+          "track": "first-turn",
+          "id": "001",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/001.json",
+          "sha256": "7f20ef1b68ef3507b4ee688f78a2fa14c1c4f2cb8f0ff4e548a509499a874c88",
+          "requestSha256": "de1b6af1352d6d5ba9bf7eaa8ebbfd698d9ee67f0c70cfdb2991652e68ed0fcd"
+        },
+        {
+          "track": "first-turn",
+          "id": "002",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/002.json",
+          "sha256": "c6cd58963f9e7c895f3d82793054cf3f1a517150df3cc559fe379bd670dfe2c2",
+          "requestSha256": "8c62abe156b42e92734acf577e6ae2e11892a15f344ae80df04b87af6b79d3d5"
+        },
+        {
+          "track": "first-turn",
+          "id": "003",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/003.json",
+          "sha256": "becf6f075ae623710f756ca4285f8a986898e6db91c49b55562176f6c34fec4e",
+          "requestSha256": "2ad6f6da02f59060e5f67183ca81cdd2d2bb81927c8f1c412f5e7368f2d0ecd6"
+        },
+        {
+          "track": "first-turn",
+          "id": "004",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/004.json",
+          "sha256": "14732cd10f36227c0ae805752f4e17e39bfc2642c8cfc32386eda4ff6393782e",
+          "requestSha256": "2a2bb0529b8cb5779c04867a6efbfca36730cae387b33b37ffde7c8a209ca653"
+        },
+        {
+          "track": "first-turn",
+          "id": "005",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/005.json",
+          "sha256": "fa4230387147e20f6cb10fe73232a1abb86bc5c936a24f165299ee894c34b861",
+          "requestSha256": "5847e628b1cc6178036a06362d37ff99dee9ae997459de1e4c65af6658b81e6d"
+        },
+        {
+          "track": "first-turn",
+          "id": "006",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/006.json",
+          "sha256": "d261102f73c1d90c212e4e12ac151f1f04c4b704fce03e1e36435ff6d68fc2d4",
+          "requestSha256": "acee56ade3151d9545360df847c7c3f0418591ced2ab271f316c8ab79d5bff5b"
+        },
+        {
+          "track": "first-turn",
+          "id": "007",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/007.json",
+          "sha256": "29a3888abf521c770fc470332874dfc9b8e88866b11fd20a823b37b36e6d0b65",
+          "requestSha256": "b506dd214813059bd3b19446606f3a26322fd4882a409a62e213d68cff939d51"
+        },
+        {
+          "track": "first-turn",
+          "id": "008",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/008.json",
+          "sha256": "48fd7fa7be9a0305e242901ac715e6d5f8f9fbe580815c43e6421b80cf3a40a9",
+          "requestSha256": "113d26f6c3623cec8eb77815801cf301f472f9534206eb59af699a6631ac6f66"
+        },
+        {
+          "track": "first-turn",
+          "id": "009",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/009.json",
+          "sha256": "3f9aa394796d2d2ec245c8888dc903c2210d704f8f12b12aa8bb25e9080b3f91",
+          "requestSha256": "b38a78f599f66622864d4a84be9b599a805be1e2f968b91f9987f44be1fcb12b"
+        },
+        {
+          "track": "first-turn",
+          "id": "010",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/010.json",
+          "sha256": "24a521c3f57341c9a4edbc6990ced48e42527d5381cd144c161f05d8effade30",
+          "requestSha256": "b5d233262a6be8f3050aa8b1def44b48635f69f944ec28e26cc0166436a27040"
+        },
+        {
+          "track": "first-turn",
+          "id": "011",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/011.json",
+          "sha256": "a9eab46d4aec0e9b0f79632aeaea56da7148915ecacd42c124939573cf02ce31",
+          "requestSha256": "718b84c4df35075ed5f6fd387050a734c13df529f8027f9459b0ab5615652af0"
+        },
+        {
+          "track": "first-turn",
+          "id": "012",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/012.json",
+          "sha256": "c2c6e0339c7e829e1b9b1d63d28a6ba015919bcf63317e1dd019da94db943bff",
+          "requestSha256": "acf086344978109aee8143bdb362aa4ea6c7aeee0c44bcd6fcd65bc18a32096f"
+        },
+        {
+          "track": "first-turn",
+          "id": "013",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/013.json",
+          "sha256": "72fb742ea5c1b4fe9bb1ff5226332b94e647fac5a6a8f34cad4b5fe7139605c6",
+          "requestSha256": "c50388938abae87c9c55bcac9953f782c317a536614fa565f1a8e1f8d10d790b"
+        },
+        {
+          "track": "first-turn",
+          "id": "014",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/014.json",
+          "sha256": "c2e7a08a4def59b625b3f6c8bb620a36d44ef12b102453da8d7d96acba722ffa",
+          "requestSha256": "ea33fc7947d9dad7bfffa0eb713da0785c027a3ddeb06d8acbddf0fee5f652ff"
+        },
+        {
+          "track": "first-turn",
+          "id": "015",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/015.json",
+          "sha256": "b4e97097fd186de77c8c62ac46a3d8d45989fa44345b4cb9948873b2e154e36d",
+          "requestSha256": "59cd44ffb471d5adbdcc5feeeb1e89c604b41c7caab2146923fb16543d771cdb"
+        },
+        {
+          "track": "first-turn",
+          "id": "016",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/016.json",
+          "sha256": "3fd3f7546c359c638cb2720c756c665000e80756109fd1e619c23cc8e94998d9",
+          "requestSha256": "5861c699a1bb5d8a16ed0993ef2e2697388c924ab60467aa0e291d04e4a6f4cb"
+        },
+        {
+          "track": "first-turn",
+          "id": "017",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/017.json",
+          "sha256": "be69c39286cfc441c0d9baa7af24630a28a52611f91b92885bbec5d038139145",
+          "requestSha256": "71b4e25ad25a249d66d7999427c5537ef527a1dcf14188c1eb916e4b720579f0"
+        },
+        {
+          "track": "first-turn",
+          "id": "018",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/018.json",
+          "sha256": "ad630ed8a4763b17a8969622c6ab58f151a6c3ab829266081bf5a07edbba89a1",
+          "requestSha256": "fde00cc27f7d853ba891f80d0fc7c8303fb972067be1698145d9789208d43e47"
+        },
+        {
+          "track": "first-turn",
+          "id": "019",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/019.json",
+          "sha256": "e62a07874aaf2b5c63f384ed81337eca095a878d891f6f8aa997a68b88d39b11",
+          "requestSha256": "bb7037381828b2e60ac26721d76b9d6378bec20c37342f33f565dba068979633"
+        },
+        {
+          "track": "first-turn",
+          "id": "020",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/020.json",
+          "sha256": "65d1b44dec69f98d82eeb7a72b5d723ae1b2ab98583d7a55c5bb334dc9adf9cf",
+          "requestSha256": "56d7a767b1d61886891165a1b49b473669b6f3960ead442a88e55e2426dcf7a5"
+        },
+        {
+          "track": "first-turn",
+          "id": "021",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/021.json",
+          "sha256": "3da434c0b7b10f815a79643b18ec535fce1756d74c215cfa0a69b298ddb31281",
+          "requestSha256": "bca7af40a97391a57d896395b85e45bafa73a703699ad79662f5b9640a52da3f"
+        },
+        {
+          "track": "first-turn",
+          "id": "022",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/022.json",
+          "sha256": "330b4b4eca50a38372af8062682e70095be599ca104a5bab955b05074ea5bbc8",
+          "requestSha256": "34d01ab3af2516ec572230a36e2912f5fedded56e1e02e09dcf4c8125dc42998"
+        },
+        {
+          "track": "first-turn",
+          "id": "023",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/023.json",
+          "sha256": "81e8093054c4869f25091da244981d6f0a97f9391dc463c7149e5e1c73da0f97",
+          "requestSha256": "5c074df3cfb026e74e46f29ceec0f4e865d9b30a4e61c1b9b5a404d440d653a2"
+        },
+        {
+          "track": "first-turn",
+          "id": "024",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/024.json",
+          "sha256": "db52dd49592a91d57141bb70f9c2dcd0bc5828794afb9d17a5aac02fad6babe3",
+          "requestSha256": "fa80274e86c34b194f3e63dda15e885e77c98cc357c50919e37911f805cc6976"
+        },
+        {
+          "track": "first-turn",
+          "id": "025",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/025.json",
+          "sha256": "ffcbf61deaf872c207239fb0154556363a9bbf2062604e88b53c56b736eb2a11",
+          "requestSha256": "cbf837549f2bc2ac8cac63ac88abe14e4f842592cc357776321ac52146eb4c65"
+        },
+        {
+          "track": "first-turn",
+          "id": "026",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/026.json",
+          "sha256": "4498386484d3895036c64875bfad3b5e0622e315653c0508a5af0e6c6ab55f3f",
+          "requestSha256": "fe795b04f70aabd556a4d1b83762dc2929dec0d537fa878f8b33cd4635b9694f"
+        },
+        {
+          "track": "first-turn",
+          "id": "027",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/027.json",
+          "sha256": "dd13d7a43d724e92c7a2bd1bb6e3f26010fa99be4ac11ca4612b23a4e01a9787",
+          "requestSha256": "c2f1d38e0d51a1c55f88260492f8f80f8ab320ece9246a9945ff17c57873cbaf"
+        },
+        {
+          "track": "first-turn",
+          "id": "028",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/028.json",
+          "sha256": "6da6685e068bdb88def1659461d42f48dfb4b1280544c1ef0cff64d035e02ef6",
+          "requestSha256": "98ed51fe49b01fbd921ab589dd5855172ed1adc52863c9a91269d0735715adeb"
+        },
+        {
+          "track": "first-turn",
+          "id": "029",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/029.json",
+          "sha256": "e756e1ed459c4ddb0f98be2835970903c97758716a617d9ef26226b5658fc4dc",
+          "requestSha256": "800e334c20cb36d4cae1ad2a7ff7a4c180810ec83e45b22cf2fcf53782616d0e"
+        },
+        {
+          "track": "first-turn",
+          "id": "030",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/030.json",
+          "sha256": "3cc78c527c93ffebd494a78c1e490c582800a95e521b81377d8577eb537f5b21",
+          "requestSha256": "f83f49b48708e2eb3d9a3ae1a2cede5926579c8bd4889bd36e9f753188acf94f"
+        },
+        {
+          "track": "first-turn",
+          "id": "031",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/031.json",
+          "sha256": "ece6488486e75d3af9456205c75a2d0dbb4d9a4b0307ea9d8ca5a327a1fd5d99",
+          "requestSha256": "460df7bc1d3e75a244ff97947e54c56cd5ec43feebfaa821b48cd65c4ef523d9"
+        },
+        {
+          "track": "first-turn",
+          "id": "032",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/032.json",
+          "sha256": "4854d0eef83532842a460016b1ebce7639a26a2dfba5c3b89e33c9a69c87a003",
+          "requestSha256": "87bdf591b16fae49aa3da44c8ecdca60112be567438b1280d24cd3f65d8f8e77"
+        },
+        {
+          "track": "first-turn",
+          "id": "033",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/033.json",
+          "sha256": "710acd78b1878504ab49b6e14548b16d74d754dca7fe202ef8bbd586c5d50afe",
+          "requestSha256": "308b5ee217203a6ef4034de541c1bf3b05ae1aee5694e4dae337075394b2d55a"
+        },
+        {
+          "track": "first-turn",
+          "id": "034",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/034.json",
+          "sha256": "de9e8bd7d60faa78ffc77630dca8bb6d678334683092a0909352c769e2cff01b",
+          "requestSha256": "d464636c8073585e335b6a1e354bc6122792348dd130321b6455a58ae0e8d50d"
+        },
+        {
+          "track": "first-turn",
+          "id": "035",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/035.json",
+          "sha256": "c101c52d7f9d3351138488f924db9072727a6de74ad07e5b759a967cd42496a7",
+          "requestSha256": "060ac2552234126ba9af4faa402ef6bdda207e3e5aa2f5688aeafcc4f8a00537"
+        },
+        {
+          "track": "first-turn",
+          "id": "036",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/036.json",
+          "sha256": "7ea6ec0ad064ba03894ced6c4f3cbb3c4f7f3268b8e3544fc82cdc665401bff8",
+          "requestSha256": "6fd0cb6724e7edef4b359fea1301792721e0bdb4ca0d71576e31b4b68ffacf7f"
+        },
+        {
+          "track": "first-turn",
+          "id": "037",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/037.json",
+          "sha256": "e6d1733c358aaabe66d50b35a7517c35878971de1df195333452824bdb50e1c9",
+          "requestSha256": "88f0b13ba98df2affeac1acceac97c37eb5acd18b228237d2a3b67e3b1c539cf"
+        },
+        {
+          "track": "first-turn",
+          "id": "038",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/038.json",
+          "sha256": "a67d35acd8e517f63e54040fa4e3f6f6f7e12852a8be96afd1e4d799c5c802a8",
+          "requestSha256": "c11d999acae7f61d351a4fd0af9006090aa130ef4d137c840d51ee07f5875581"
+        },
+        {
+          "track": "first-turn",
+          "id": "039",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/039.json",
+          "sha256": "e7d5d122feaa4483c8bac72a06e9b24ad5062358be19dc1a0bebb979a708ebc1",
+          "requestSha256": "ac8bc04875861fda2f16ec8a85b31388ada62f96fc3e059e53fbe022a5accafb"
+        },
+        {
+          "track": "first-turn",
+          "id": "040",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/040.json",
+          "sha256": "e208c4b005f9e1cb66a405c291cd59c362463b413b4cf7be2f63d87ab3973e7e",
+          "requestSha256": "379ad2de3759aa6f80222a532eec82433e6b2333dc21567a38c8284de0a314c9"
+        },
+        {
+          "track": "first-turn",
+          "id": "041",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/041.json",
+          "sha256": "b0ed93914294c8f06651deee238848ec5fb9068d9331b6b1d26abd26e6aea3c0",
+          "requestSha256": "5f80c691a4afac5275496a28fdb73d5a114ed515f26f2dc56c4832296be94e2c"
+        },
+        {
+          "track": "first-turn",
+          "id": "042",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/042.json",
+          "sha256": "79234e16b70a73c47ef72e737979e3f911041f38a3bd557d9e3ed8b0d2d69e9b",
+          "requestSha256": "753f28f9297eed82348fb21ae8bb47739e99cb75b51c272fb310e896a46c07c9"
+        },
+        {
+          "track": "first-turn",
+          "id": "043",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/043.json",
+          "sha256": "c7a6f0a4f78d79662f3221389be9c2e7518dda97b04bbf9f28106b9b93ad186d",
+          "requestSha256": "659a316f6d6154c0b7a7ed9474fa0a6cdfaa8029398694f426ef1ae2b2f960e4"
+        },
+        {
+          "track": "first-turn",
+          "id": "044",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/044.json",
+          "sha256": "d46d4762d2579c9b02b536dcf32648f3a612f25a7631a3a86e775877f6efd6ff",
+          "requestSha256": "a20f1cab5bd09d4da54a95030098edacec051477557f6150bfd5da783144f8df"
+        },
+        {
+          "track": "first-turn",
+          "id": "045",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/045.json",
+          "sha256": "50f9592e1ce730ce7e39025246bea3ac77fb0a84717e363992bfa0c2997fe84e",
+          "requestSha256": "85dce6b8544f19186f64f746545fd76e2c1ce78b1eae779d5315638001617545"
+        },
+        {
+          "track": "first-turn",
+          "id": "046",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/046.json",
+          "sha256": "b9c191897e1ba7bf015f7a9657e04480d70d468d1e27a71cd1e346a7681ef811",
+          "requestSha256": "8aee7f676314301cd5107315b3b374d6e4d85d57c93a903b4ac1f638ff1fc56c"
+        },
+        {
+          "track": "first-turn",
+          "id": "047",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/047.json",
+          "sha256": "61134c8431b3aad69d178d360210aaa49b1639435ef40c16b99a4f5e199d209b",
+          "requestSha256": "ad45923101e0c0c7c5dbb3b2044864b352529932220d5c3ed3f5bf48aba6147f"
+        },
+        {
+          "track": "first-turn",
+          "id": "048",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/048.json",
+          "sha256": "bc0bbe15097e0ece7dc88f7cb892d5626db92e88da4bc4d69ccfe43356353562",
+          "requestSha256": "13f042ae99959002cac8ed2f695c03d21b066688711feec63905b46150ee6fc0"
+        },
+        {
+          "track": "first-turn",
+          "id": "049",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/049.json",
+          "sha256": "457b0d0fe02c4e8186dbce6b7b84ebcbbd4b6b752b25cc167c72792381612e62",
+          "requestSha256": "7f4c245c584f661bcebf9e692531a1b286a2eaa0a74307c8a1d3983adcfbd31c"
+        },
+        {
+          "track": "first-turn",
+          "id": "050",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/050.json",
+          "sha256": "0a446faac39d0dd000a86b4786cdf7dbe60177e7584fb361acd514616475c222",
+          "requestSha256": "9a848e6f5c6095dfa081cddb55fde39ed44813a9186101ee0a16f754fbbc82a4"
+        },
+        {
+          "track": "first-turn",
+          "id": "051",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/051.json",
+          "sha256": "c6d356ff310e429cab1bc53c699a9cc1405872226c8a953e576c470b0662cac7",
+          "requestSha256": "b3eae74e4fcd044281c4729d4b51f867d80d27474805bd96b1093a74c8ce6519"
+        },
+        {
+          "track": "first-turn",
+          "id": "052",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/052.json",
+          "sha256": "cfa3db16bc21ee58e04f32fa567172b793de4bbc0f1cb4c1b0b0e74e3d4f263a",
+          "requestSha256": "e5759d1db56b2f83f783cc6317bc55ac87432af1974b89be77c6613b6985b660"
+        },
+        {
+          "track": "first-turn",
+          "id": "053",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/053.json",
+          "sha256": "656ff96a68c23bb7a057329fa94bae3bbe51278625321212b43ae38dee7f7fb4",
+          "requestSha256": "9f3f3eef04870c92d474a9d3abab1429ef8e784be3b72f8003d520e27ef38832"
+        },
+        {
+          "track": "first-turn",
+          "id": "054",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/054.json",
+          "sha256": "d5a7a137dee87c857c49b329409cf1045a7933feebbcb695151b7d1975c54dff",
+          "requestSha256": "4bd2ef0368125fba54067c44bbeb330a26bee10d04a875e39706efd47972e14f"
+        },
+        {
+          "track": "first-turn",
+          "id": "055",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/055.json",
+          "sha256": "911f82804bd677f0312bf41088bee23eab6ab3f384ca608c00e3ed610f55918f",
+          "requestSha256": "56a79963db5d47560f0e1e77b4ec40d008f8936cac9714f0a267ac6f2413f3e0"
+        },
+        {
+          "track": "first-turn",
+          "id": "056",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/056.json",
+          "sha256": "429a2ca8e2f5379ed43447612a10f96b69f3126a653f0e94c3df3d9ed7f70124",
+          "requestSha256": "5deba9581261e2ba2858a5a6454ba64f30c63220f5c3a4f4d45b186b178f6b76"
+        },
+        {
+          "track": "first-turn",
+          "id": "057",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/057.json",
+          "sha256": "b48fd027d7d9791f275c1bcda0de5aade7fe809e62a238b47a2e62948fd2a000",
+          "requestSha256": "cb29ca39ea3a253849f754c9ee32c90f751cd43e61e655e00496934b3f30cb70"
+        },
+        {
+          "track": "first-turn",
+          "id": "058",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/058.json",
+          "sha256": "45c802a652e7ba601dab3f06aa62c52806aa85a3eb7f80f2ba3e8b41f311bb53",
+          "requestSha256": "67df338c5ecec728f2aca27145b65326227517de2178958544920b6b542c1015"
+        },
+        {
+          "track": "first-turn",
+          "id": "059",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/059.json",
+          "sha256": "465f19f32b52d472e954ca3db6b2dad5398d51462fee51fd2baa6774fb020424",
+          "requestSha256": "87a6207ab14080f26c0154811570f0382494e5b7db410f46f0bf09c659d8f3d9"
+        },
+        {
+          "track": "first-turn",
+          "id": "060",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/060.json",
+          "sha256": "1cb015eab6345a39f552e0b801dab4f2d7b5b9dac181f7d80c97c75dab71a991",
+          "requestSha256": "64d799e5cd4c29dc33a1e23d86f0c2fb3f881d0679f4bd656c06740ce0436e42"
+        },
+        {
+          "track": "first-turn",
+          "id": "061",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/061.json",
+          "sha256": "a4cc635119f0f12a8549c060d5df66360501e79814ddbe8cf08223b1bbd19340",
+          "requestSha256": "bb48b2df42eb2b64060111245f8e2b36c2ddb3c781e4c7a9ebca9c95d86d712d"
+        },
+        {
+          "track": "first-turn",
+          "id": "062",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/062.json",
+          "sha256": "732ecfc3494320bf53e8cda82c0714e8fee4fa1324f047807b1419578acc549c",
+          "requestSha256": "36f57e727343e6dd9f3fc96062362138d84f4e7900b4f2574da829976a4d81a3"
+        },
+        {
+          "track": "first-turn",
+          "id": "063",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/063.json",
+          "sha256": "3801cd22d6a1dba4538e826265d0ef3cc68918730ffd8e7cd81e3a106d432c3f",
+          "requestSha256": "9a4241cfb79e2a10b49a3a19b10f8e7f5806f6038026c1220d32a735931adf45"
+        },
+        {
+          "track": "first-turn",
+          "id": "064",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/064.json",
+          "sha256": "407d93a64d79e7b9fba7f9d6602ca422382e6d7461b2bebce9aa21819558d4e7",
+          "requestSha256": "2133825513459034f1cce7e1bd6057e532f8af9a097dbe8da8d4a29b9d20e102"
+        },
+        {
+          "track": "first-turn",
+          "id": "065",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/065.json",
+          "sha256": "89b814ffb35ee3188c6731d72d95ff697700fa3e2550c17c828d3bd128bec947",
+          "requestSha256": "447609fe2374425df8051e73079866beae32285ac040461d10dcfb1cdfcc8932"
+        },
+        {
+          "track": "first-turn",
+          "id": "066",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/066.json",
+          "sha256": "b275a805285122ade041fa73e3255cb03d0e43cc877563dfcb17b899865a8bf6",
+          "requestSha256": "65ad61a909c10f92f46abbe0ca0516ce7fe2fba3011e82680c0e9632c2ebbeb4"
+        },
+        {
+          "track": "first-turn",
+          "id": "067",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/067.json",
+          "sha256": "2e60cc6801df912a426478e0f4fd52fb6b95864ddeca58a73ffb64da625203a5",
+          "requestSha256": "4c462707a73436d11af82f55d58e29021e1951516c40d02f82907d02faa0548e"
+        },
+        {
+          "track": "first-turn",
+          "id": "068",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/068.json",
+          "sha256": "1d13b98f6bba3fd4fbe659bd123a51bdeaf21e3959bc3831718679c95adaa5f9",
+          "requestSha256": "34596a5d45bb618f1a5cf4e8476669ba2599d3ff13b48cbaf712eaf713d1a314"
+        },
+        {
+          "track": "first-turn",
+          "id": "069",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/069.json",
+          "sha256": "e4aa4ab3064490ca822b7f743270da711d1d4a0df528b924d83cdc47d2fc65e5",
+          "requestSha256": "78766018d229af88fac7f884658e04aef1c7ba9b5127d067471aa7f8316bc750"
+        },
+        {
+          "track": "first-turn",
+          "id": "070",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/070.json",
+          "sha256": "4b1c494f8ec38a3078091668fea9009509324ee69b394c2274be4f5cf6574675",
+          "requestSha256": "fac64129f4ba54fabb1089d5fd20987dc274e01c921c78e5a10854669ab655a5"
+        },
+        {
+          "track": "first-turn",
+          "id": "071",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/071.json",
+          "sha256": "ee49295c9b2937aa1a134cfa88a092f23965a832bc0d82122b859220b40bf3ba",
+          "requestSha256": "faf7dd0fc8af38bb6f157d1e76f53c44111f420946bcb4cacc864a400dda8c08"
+        },
+        {
+          "track": "first-turn",
+          "id": "072",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/072.json",
+          "sha256": "4a1deebdfa7240428a6dcde1f19ab2f34766302ab8cf49aa52ac4157d6f16c4f",
+          "requestSha256": "c6c223f6c32d3eba0d0e9410872177cf0331b7906c31f6b79fde277442fb1ba6"
+        },
+        {
+          "track": "first-turn",
+          "id": "073",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/073.json",
+          "sha256": "4887d6956fc68e9344d3a19e13dcde1d02fc42ba70c84957e5a8bd82fee65d34",
+          "requestSha256": "71db1f0a5c003b57975d062ebb5b720749841aebbece36a3c5c81ae7786d0c5f"
+        },
+        {
+          "track": "first-turn",
+          "id": "074",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/074.json",
+          "sha256": "7d14a61fe18caf78a246623929a0ac5692c353ef040d17ff83b0bcc15a7dbe9c",
+          "requestSha256": "8def37d49e680762c84c7cfc06309ab12e9778b156dbe71061bd61e81fc69ce7"
+        },
+        {
+          "track": "first-turn",
+          "id": "075",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/075.json",
+          "sha256": "c5ef2e37ff37700f5a6a56b8146011de0e25e485b1c26fe462df48adab40b9a9",
+          "requestSha256": "2573b0df83a0c826c66c7d4c322f1480a6656110a3933dcf6e71f587d2149b4a"
+        },
+        {
+          "track": "first-turn",
+          "id": "076",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/076.json",
+          "sha256": "4ee240851de92ef70a93354309fe1ac39fda17cb86d6787210ec1c08b6d1a09b",
+          "requestSha256": "e549e2c197c004867cf705e82c1129c37c00d368f1dda69870701caff6593c77"
+        },
+        {
+          "track": "first-turn",
+          "id": "077",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/077.json",
+          "sha256": "344d78af45302a0f4725464f43bd973a42514672cdeddc48656cd92187d6b9fa",
+          "requestSha256": "ff241bb0b431c3b427e8ed0054636dae5d6b12e8e0bdc688cac68908c5cda58c"
+        },
+        {
+          "track": "first-turn",
+          "id": "078",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/078.json",
+          "sha256": "b65768ef9d0d724407608d1adc3d0e29f4f913bafccd514b23861b4d1c74a364",
+          "requestSha256": "de4db61419c2089e880dd1b5483c842036540302ec3026d12b1e8725145c2ad5"
+        },
+        {
+          "track": "first-turn",
+          "id": "079",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/079.json",
+          "sha256": "11fc1607c93ccc96a3df93898ccf47086ac2aae9cbfe64d5800394774ea1601b",
+          "requestSha256": "629570a707ee61c3d91b97851bb492c9454dc7d59b45db386d038cb4167cae94"
+        },
+        {
+          "track": "first-turn",
+          "id": "080",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/080.json",
+          "sha256": "6ee8730f4e5f0c12e08f494b33c76e09eb3e441de42ca6a2126eab30641c9668",
+          "requestSha256": "7d6009d73d711c264800ee6181857503ab29432fea0f974e61ff390b9363e79e"
+        },
+        {
+          "track": "first-turn",
+          "id": "081",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/081.json",
+          "sha256": "9125844a40d554bcc7dede082a0d0fee03cff56c3660f6b030958dc555a0a467",
+          "requestSha256": "2403f456c22e6cca1b0ce5865c16a8b7009e1eae689bf91d32091e34502cba2c"
+        },
+        {
+          "track": "first-turn",
+          "id": "082",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/082.json",
+          "sha256": "7d453c721ab805bb42fbc0fdc1fdc80b1873219a0730e8645db3fa0edc593b2b",
+          "requestSha256": "19152d9259263e4d3e2efbbcad7639109dc25b11f2813b360ce0f62b67f34436"
+        },
+        {
+          "track": "first-turn",
+          "id": "083",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/083.json",
+          "sha256": "ecbb1135a42ab662048e50eef99ed467691d72b2df1ba54f3c9f7a7ac37d6112",
+          "requestSha256": "baa6c494e37b97e28474ecc55667764ff294d0871805d95929094a36a7658e33"
+        },
+        {
+          "track": "first-turn",
+          "id": "084",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/084.json",
+          "sha256": "2a80036ffdbc8fd0065500b5281821149082307b58015260c836a1b6e17be2f7",
+          "requestSha256": "044ebe0ebc3bab0196fba9065a28ee90169c2da231836fbe5d0dbcb977cc08f6"
+        },
+        {
+          "track": "first-turn",
+          "id": "085",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/085.json",
+          "sha256": "f0c602986f12de3fd8c3f2076309c9d1212ac9f2a03637316658129cca353da8",
+          "requestSha256": "20b29a5c6d0968deaf61e8b60bd2b490c744acfd63b1ed755eac2331e2273577"
+        },
+        {
+          "track": "first-turn",
+          "id": "086",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/086.json",
+          "sha256": "a9037ba2a8b4fe439bbc335a4158d78694ac202723c8318c99fe9d962b7a664f",
+          "requestSha256": "778c69095386ace75be3785da2ae2ce297b31e79c962b16bc8aa1086dcf0b0a5"
+        },
+        {
+          "track": "first-turn",
+          "id": "087",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/087.json",
+          "sha256": "46f698be28058c7b3f7a51d4190f9a8d8bac84865237aabac1832abc676e0d0f",
+          "requestSha256": "9219900c331f37375b113b09f1262d9a5282ea61cf2c512991ebd3b438bb13a6"
+        },
+        {
+          "track": "first-turn",
+          "id": "088",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/088.json",
+          "sha256": "b7e9a8eef7bf4f325277e6b3640d6f1ac026a6c500b60949e19e6576559efec7",
+          "requestSha256": "47bdad75829ba9a1c2ce863d588d5e00482e7ad352f505e902dba5dfe62cb263"
+        },
+        {
+          "track": "first-turn",
+          "id": "089",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/089.json",
+          "sha256": "25f7941ada1c2c8d3f98d7fe6799e0dbca40b524e4a7740bbcd9d2a728d09de0",
+          "requestSha256": "4e792c37fd5757a52af8586dc72c943ba72e7037122f0a2de3a71363cdbd9016"
+        },
+        {
+          "track": "first-turn",
+          "id": "090",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/090.json",
+          "sha256": "a0bee7479edd0cd5b3c7f0f1008623663bf5ee3165ee9a4a422cfbec799ad6ba",
+          "requestSha256": "dd30c21ad0ade1f337404ac31711f7678bd7d1ddb750a9c321974fc58e980663"
+        },
+        {
+          "track": "first-turn",
+          "id": "091",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/091.json",
+          "sha256": "6d55412c9dc89fbf00220a6bf11e598f069fa19edb6a589b0b5b4424abd8d5d3",
+          "requestSha256": "c9005c199fa4b7b8e8ec7699106d0b162bbe9a9f7975678eca0c61b01d87a0aa"
+        },
+        {
+          "track": "first-turn",
+          "id": "092",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/092.json",
+          "sha256": "7ff6ecb1e64f33a804e7ad21e0ead9824f7127f428d923e2f438dc56d4f1fec6",
+          "requestSha256": "6055496fa7d292ba4426dcb94964d690d512f8a97dc0cd87a6f49f93ef87a29c"
+        },
+        {
+          "track": "first-turn",
+          "id": "093",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/093.json",
+          "sha256": "e1d4c6e05fe46fca34ff01c42419aabf9901ca5a0dd4c6d5cb1c60bcd601e268",
+          "requestSha256": "f97bef58100f2b8a8fe2c048543a442b22612310d53c0a57fb34a3e432a0eff6"
+        },
+        {
+          "track": "first-turn",
+          "id": "094",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/094.json",
+          "sha256": "fe6c2cbac39377b0265e369a7d3a05e2d7541388c71a1e466681f50994d517cf",
+          "requestSha256": "f088f43964c525d34cdfb677f394b05aca75bc7cedf537d80d385ed903b02d23"
+        },
+        {
+          "track": "first-turn",
+          "id": "095",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/095.json",
+          "sha256": "f06ecd4455ad93d6bba80c59c858b945533ad86fddb98375c2b6fad0883a91fb",
+          "requestSha256": "f82c30958aaa76d3b7881cae0a93bf5c053c30dd6fda84fabb7e1518fa2b7040"
+        },
+        {
+          "track": "first-turn",
+          "id": "096",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/096.json",
+          "sha256": "8d8a70c4a416a8d2c481ca4133a0eba9f677c7d2458c2223e89559b65bdfd1fe",
+          "requestSha256": "6e27aaded6a52d783082b3562d3332d51b9aa0a84373fcde8c7422796dc7e043"
+        },
+        {
+          "track": "first-turn",
+          "id": "097",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/097.json",
+          "sha256": "00317698c76d8c2360244e05cfe62c55430057021dfbc31f5d650dce82025793",
+          "requestSha256": "c162aa6124ba3f02c8e58c9022b9ed63df13640c42a21475fd6d6cfa6e229367"
+        },
+        {
+          "track": "first-turn",
+          "id": "098",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/098.json",
+          "sha256": "00e682cd2a0cc4fea9a761b88d08f5dbc8c677ace3cf77ee6f449adcc193bbc5",
+          "requestSha256": "99dd4bac732b7d437e01eaedcd21302bce14960bb5779c8c05f30a4e0a7f562e"
+        },
+        {
+          "track": "first-turn",
+          "id": "099",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/099.json",
+          "sha256": "5a7facb13fa0ab7968c0193626eac0cfca5b1946b4d501ded66ab735a1949f45",
+          "requestSha256": "c06fa5db60cb75d373eff21e34d1f7a0fe02d1d1b28c82e5039025b8a672cd8e"
+        },
+        {
+          "track": "first-turn",
+          "id": "100",
+          "path": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/100.json",
+          "sha256": "5eea13ef1afa8d809911a179592dbecd0e81f6189402e609f3307a7ad810f514",
+          "requestSha256": "eb464b270dddf260262e40b5a21991c12f33d756da64dc5f0cd876ffdec8aa94"
+        },
+        {
+          "track": "scenarios",
+          "id": "001",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/001.json",
+          "sha256": "abc2e8678c359aef724566fbf4a35354e86011cc7320c058523ecb811538ce54",
+          "requestSha256": "c7fe2e892b60cb6269421dec6ed75305e152e0b8554a063047a18458221f30fe"
+        },
+        {
+          "track": "scenarios",
+          "id": "002",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/002.json",
+          "sha256": "322badf7f16415f0517a41d8693ccd00ffcf5ac828f1599932d05d5b89f4a6d0",
+          "requestSha256": "81ef68aaca1211facba5b1603b81869576b56cfc05b9a0e6efce64936ec0d3b5"
+        },
+        {
+          "track": "scenarios",
+          "id": "003",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/003.json",
+          "sha256": "c4e941e967cf0869177cb04ca179187670109658970bba2a6bcf320c9880276a",
+          "requestSha256": "fd156f363c3915367637d4e5d567aad82818766917ae0023f3290e0d462f02c8"
+        },
+        {
+          "track": "scenarios",
+          "id": "004",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/004.json",
+          "sha256": "2100d51a7620c93debcad5270c0c915991dd77fba06837d6d4657b322408071e",
+          "requestSha256": "07dd2119978b820634de815ecdbede34230d4b98e1be0ad9dc03af7dc5b11a45"
+        },
+        {
+          "track": "scenarios",
+          "id": "005",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/005.json",
+          "sha256": "6b703fb6827f6cd6e85fd474230ed0eade3c7312d6f6e9c363cf59b77e0d9000",
+          "requestSha256": "d620cef7ac24df5dd28f486f126d5d5c7c0d0ec2cf0bc5a0f96e9fd784f4808b"
+        },
+        {
+          "track": "scenarios",
+          "id": "006",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/006.json",
+          "sha256": "6a01c9161d8c884b8bfff1556c5d774382c838f091e832495d6ab43cc957eb05",
+          "requestSha256": "027f05501cedc171eacea1e2c92417c053aa03bcd6faadd2bd548030adcf8bd2"
+        },
+        {
+          "track": "scenarios",
+          "id": "007",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/007.json",
+          "sha256": "c74ef6c8836ac2a2b283e55772d8ded9e4d8d9b3024a9a00a5e832ce1c2f0e77",
+          "requestSha256": "fda247afb3e1f90b8ecbdbea7fc4d7011294e79aaccbba330133d294c1fdfc3a"
+        },
+        {
+          "track": "scenarios",
+          "id": "008",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/008.json",
+          "sha256": "e4639d092f5f687b1cc557fe14da272f5e8f7a1a248238a6e7d4989490caead7",
+          "requestSha256": "5ebbb1b38ec6de881f269f7be6a211e11ee97cf2ca884b58e735f8884a42c016"
+        },
+        {
+          "track": "scenarios",
+          "id": "009",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/009.json",
+          "sha256": "22e485682e75dd6e535b877ed56b759b927b0cd684eb304934d43a22e8503cdd",
+          "requestSha256": "e9971c8a87d0ad4a7d136bd567050ef97574b800fac8d31e8f48c767648c3a5b"
+        },
+        {
+          "track": "scenarios",
+          "id": "010",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/010.json",
+          "sha256": "b2f339585054b8a2765d24c37d8f973cb6af69cb3825325d0a74865502153fa6",
+          "requestSha256": "45ebd475db27e0ead88fb4ab657b7c3dd1822588b6863875c06f998123d98a37"
+        },
+        {
+          "track": "scenarios",
+          "id": "011",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/011.json",
+          "sha256": "b2eb4cb2b9b93e6c74520ec92491843ac968b4585ff51df4aa377caf989ecfcc",
+          "requestSha256": "bebc5a34601e20e563849d0f40c305f2067842c983f814d9d7326706e0bbcf34"
+        },
+        {
+          "track": "scenarios",
+          "id": "012",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/012.json",
+          "sha256": "fe4b142f5dde0a4eb382ebe09f063e40c787a60811f39a6d08ed370e014a5beb",
+          "requestSha256": "6391860bffe0334c672694e85c6370988eb6e8adcb50b8f6b148b5199930620c"
+        },
+        {
+          "track": "scenarios",
+          "id": "013",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/013.json",
+          "sha256": "c64a44493c582343e1be30a6809a4178cd7d94e2d92c5a239ef3d021edc38e06",
+          "requestSha256": "d499b7f289e65c0e769aab1b295ad50a587cd6cac01b1f1fbc0b0eac10844d9f"
+        },
+        {
+          "track": "scenarios",
+          "id": "014",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/014.json",
+          "sha256": "e5ac42903ba71baf5015ca65d48dacf98d25247434eb20f39ebfeda9ec617e98",
+          "requestSha256": "6ade374859bf36844035cea4d6e4f6a0c60433d493773c708560cc7999223549"
+        },
+        {
+          "track": "scenarios",
+          "id": "015",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/015.json",
+          "sha256": "6c423529f02cd6dbed691e08f3bf938440e75ee93fcf6b72ababb9a4d8a5344c",
+          "requestSha256": "ea5db70317b16d4db2c0ba5e2d39e01cf59a33ad53960294deef493f4ebc229c"
+        },
+        {
+          "track": "scenarios",
+          "id": "016",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/016.json",
+          "sha256": "63617222117a8734f70ba1326a4c177352aa0c9b11bb07b1c3a35fa89d9580ea",
+          "requestSha256": "1853757f90768ec6ba3bbd09c23dba25aaf0abad1d71cda5463023ff6c8190e3"
+        },
+        {
+          "track": "scenarios",
+          "id": "017",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/017.json",
+          "sha256": "f7374a81736806e7733ea737219cdeba5e1500ebe765088904c293a5513395ca",
+          "requestSha256": "2e0e8ee0977791b126edc28c5fdb2ac5bf9c2f4db7be6269862b909f2ad800a7"
+        },
+        {
+          "track": "scenarios",
+          "id": "018",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/018.json",
+          "sha256": "bd5c6c8cda968b4854c74345faa812202d97148c8b0c6b9b7a33416f33aa9f51",
+          "requestSha256": "23a5a12ce11c04a7b381afcc22ce4a72171ecd231d795d7630dea4123076de43"
+        },
+        {
+          "track": "scenarios",
+          "id": "019",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/019.json",
+          "sha256": "3ff72a043010382a8520482a191c20865efc11e4ecb6646dd4728872ce485dc1",
+          "requestSha256": "afc7c032db2bafb3be21e3fc5dac216c98357b6006684e14f140ac39d1dfc699"
+        },
+        {
+          "track": "scenarios",
+          "id": "020",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/020.json",
+          "sha256": "ab3060418e320a5f954d2b9d852b676617717fe292e6c676a32ab6ead6ddfd41",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "021",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/021.json",
+          "sha256": "bffc784ed40d0e98b4b5ff5b34b83185eadea49812e1e09ade12cf96d6962ae6",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "022",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/022.json",
+          "sha256": "556e6703771e47cff705819ab8ac373330b643d0d333e929e55eb92072f35701",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "023",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/023.json",
+          "sha256": "a8e980e824656ea268e5e1f85d7fb1b6e865663419c511887d6cd9e408e2f8f8",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "024",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/024.json",
+          "sha256": "c153f6e5bf0b83d272b2985dc7e4c1517e7bc81ba9c08b9ccf65d6d5f0055505",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "025",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/025.json",
+          "sha256": "3c0567da10cb3c28dd8f2613ad143d68d94113b2355665ba40035e630c121cc8",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "026",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/026.json",
+          "sha256": "4f2997d8ed525d4ee3606e4521725280d2cf9b84caaa70522783a6a2ed75e98c",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "027",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/027.json",
+          "sha256": "341331171ac5781fa88fa65344305370f0898acd535b9af326cbddaf9cf3e508",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "028",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/028.json",
+          "sha256": "ee5310ff713435c78d32f9d43d598224f226f96b966c2b922514152f6a9c8af6",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "029",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/029.json",
+          "sha256": "863ca560d1409ab7dfa0a842491b21a88fd549537bbca72710197e5f03a3df4b",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "030",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/030.json",
+          "sha256": "4b8b21adb6990d57d48a6c57fc2fb5eee9e6cee8a4fdf6bc3d07dc7bb123cd70",
+          "requestSha256": null
+        },
+        {
+          "track": "scenarios",
+          "id": "031",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/031.json",
+          "sha256": "5e057a6282d092097aacbc1712575ee6daf2a448ecfce8607adafa5632ad094f",
+          "requestSha256": "767b075fef9555fc5c7449d3ac261f1345953d809e82c3c9d5699c8429057d08"
+        },
+        {
+          "track": "scenarios",
+          "id": "032",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/032.json",
+          "sha256": "6ccc0687a72959b22b00a139419678792a9c957ce75a00fd2e2385259e98f050",
+          "requestSha256": "664bb6816e014be12a21d84e44aa0aee9d40300b9ad77af484467d087e098707"
+        },
+        {
+          "track": "scenarios",
+          "id": "033",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/033.json",
+          "sha256": "f074846a076e9e582c4144e98b2d2b7e67bccd8d664d02c958835488ac5e250a",
+          "requestSha256": "019033d2ef81a33d6bc115dbb7da56864ede95f3d15c92706f24cd3b909b815f"
+        },
+        {
+          "track": "scenarios",
+          "id": "034",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/034.json",
+          "sha256": "9a8ee13f0f962f21e9d626c136101a4e677be08f701deee55ca03eb44ca9c413",
+          "requestSha256": "474327d9fca5f3e3f73a93ac4135acd434eba0a3bf4989ed3bee80eef2746e8f"
+        },
+        {
+          "track": "scenarios",
+          "id": "035",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/035.json",
+          "sha256": "1b1dc8713c114bb15bb9bf1fab70559f4d3d670ac9362088144d1e05890f6d72",
+          "requestSha256": "1b881cd486ae4b30853dad2c6fbca4d463004f3e957273de28060064eaad3f83"
+        },
+        {
+          "track": "scenarios",
+          "id": "036",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/036.json",
+          "sha256": "c7432e20de073a6e9aa2c629ecbceec7baab842ffcc952446101b4cd2ed431e1",
+          "requestSha256": "6b31ca48bd2de80177cbcec8708db68242fcc35cf9f94571fa478c6f6a3cc073"
+        },
+        {
+          "track": "scenarios",
+          "id": "037",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/037.json",
+          "sha256": "897ff0baff555b5502a64a84e6446f35d6c9bef120d5b4528586acaa14b8c808",
+          "requestSha256": "a52bff0d54e21680f41f47d1603f161948bd50368434a96d1e917f4857a8c347"
+        },
+        {
+          "track": "scenarios",
+          "id": "038",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/038.json",
+          "sha256": "49ebc30ca7356b7e6cb491296d9553b583fd6f9b53c6398fd3ab1f01833711da",
+          "requestSha256": "c3b16fd93f61fdd9498007a412d3a7299fc14c85f8526876139c70da311c21ce"
+        },
+        {
+          "track": "scenarios",
+          "id": "039",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/039.json",
+          "sha256": "e33b31d9ff41372b336684ea367fbfdb09132bb082545c66f74b409d81591150",
+          "requestSha256": "bc685059f234ad7c8f96822839be7a301d99afc2938538ca66fca2e33d6456f3"
+        },
+        {
+          "track": "scenarios",
+          "id": "040",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/040.json",
+          "sha256": "43c9c245516e20f53a602518796925eb9a679e7f1fb63025d25fd6f068019631",
+          "requestSha256": "e34c3d2067515a880775946e7b0808362eaf373308bf60a77bf58af75aafb7a0"
+        },
+        {
+          "track": "scenarios",
+          "id": "041",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/041.json",
+          "sha256": "b7983e35706cc29771dd7a23ec86f8479aba1cee138f03295a41a729f26518a6",
+          "requestSha256": "4c0246b40e8524c37a85726159591b3da3ef44fb063b3bf38007512350af2b58"
+        },
+        {
+          "track": "scenarios",
+          "id": "042",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/042.json",
+          "sha256": "8521e055e46c0bc3e39ace7cdc488902c302a4638ef752c2a7fc6438ffbf4b59",
+          "requestSha256": "d3bdec5ff8acfd8ba5512e9a0edb936d12ec61ab073a3241596fda06e1fd7896"
+        },
+        {
+          "track": "scenarios",
+          "id": "043",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/043.json",
+          "sha256": "b8c0b3711257a54efdc169b15d8ece4b71712c1fd6a40cdedc3831a4cfe951fa",
+          "requestSha256": "88d1d61fdc64da0f5d08cea5a86dbfab1ee98e7b1808c2a6466fb330f741a9a7"
+        },
+        {
+          "track": "scenarios",
+          "id": "044",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/044.json",
+          "sha256": "47532eaed5bfa057edc4fec71a4abdf6f5904d42e409ee8d2d6bb07e5b7d4e9f",
+          "requestSha256": "f64359ab111115d406d7cf066523623036ae5b610386943ed38d6d6afd0a88e9"
+        },
+        {
+          "track": "scenarios",
+          "id": "045",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/045.json",
+          "sha256": "ae24017f0bb53029da13bccf71f8ccca674f17ccedb8291c8e29312e2ce32c07",
+          "requestSha256": "6f9fc1282ba737dba3118708ced1ae4c8251acbd6f73a2debce8c25fa017b155"
+        },
+        {
+          "track": "scenarios",
+          "id": "046",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/046.json",
+          "sha256": "ef40954c9bb616d4aba042e493e80a3895442cabbf8b8f1d34ce578e8d454ff9",
+          "requestSha256": "5e621f3284680a10ef6a20af61c7e77f196fa2e46425f653dfdd93b6b1475c92"
+        },
+        {
+          "track": "scenarios",
+          "id": "047",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/047.json",
+          "sha256": "f8deb4b0a0323ce130dac5a2468e9aae6789f3570ac29d512870a5b51aa1afe7",
+          "requestSha256": "63e2390d61f1811962314dc72fcd3823342d448a4061d42821e9801afedb3511"
+        },
+        {
+          "track": "scenarios",
+          "id": "048",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/048.json",
+          "sha256": "98e9f087c2e7295d459a6577999686ebd47a884660c1302ba488bbfe92c0f636",
+          "requestSha256": "5c066e47c4a26516855b36192add11f09aa91ee396bf0e73156a0048d5ee4165"
+        },
+        {
+          "track": "scenarios",
+          "id": "049",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/049.json",
+          "sha256": "34591d2c002d1ed18fcdfbc04a3da90ae56c7e5f8e758278cbc5b36976a931d4",
+          "requestSha256": "2fbd5a5a8c614f1e5ee30a7b09433810ab45da85a98e076e4c67752c03502358"
+        },
+        {
+          "track": "scenarios",
+          "id": "050",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/050.json",
+          "sha256": "f67b47ea4bf8df0339eeb58c244c6c92f8fa803e59fa3cd830fc5b432dd78c47",
+          "requestSha256": "446990c38003d31112c31684e35b6604ebc742e9864b1d01ce3321c8e6df3ce0"
+        },
+        {
+          "track": "scenarios",
+          "id": "051",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/051.json",
+          "sha256": "3211cc081d6f58ccea2fbb29774603ea2965441d5dc96cd407ec98724ebc8d6e",
+          "requestSha256": "819dc2ae4a80aa7b0dc33d4898bcd7203f150a53b978a40128c95f529a60ece6"
+        },
+        {
+          "track": "scenarios",
+          "id": "052",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/052.json",
+          "sha256": "2dd623b1d4567bdc7dec3db7d489deeada9df4124670d5c39912985c17591205",
+          "requestSha256": "31c029d6577485c454f377ab88ff0790ebd583cece8ea9e7edb24164639ab0f9"
+        },
+        {
+          "track": "scenarios",
+          "id": "053",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/053.json",
+          "sha256": "eae2833c6957cea0f21071be7d3d31203a170124a54a3e26eb62b14ce2eecc92",
+          "requestSha256": "17e2ec70080e7ce17fd5b984d6bdc2882c05fe65b2d94ac47a7f7f949f56625e"
+        },
+        {
+          "track": "scenarios",
+          "id": "054",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/054.json",
+          "sha256": "4cd6bbf25e41fc67ad9dc9cfe27f74117108810091dff073c3e596ad257e61c3",
+          "requestSha256": "481a39a5211c88ee6e591fe80a296a26baa47775ae416f0daddea1578dc73dce"
+        },
+        {
+          "track": "scenarios",
+          "id": "055",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/055.json",
+          "sha256": "4ebc410ebbcaa7ebe2795f1c53d8090dabf8e47cc95e4b55725025bbeacb141e",
+          "requestSha256": "bcfc767e1bc4f6ecb13da5e11e12c7d8a7384d54392a159413897d304493f787"
+        },
+        {
+          "track": "scenarios",
+          "id": "056",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/056.json",
+          "sha256": "b010c577cfad9ae55a10d7589b9f394efd84f8dfc2aae7d51a9c08c4a489f075",
+          "requestSha256": "ae867457cfcaed3cf5e337901f19185095ed1f80b3cab4480c8c78d39ab44f9f"
+        },
+        {
+          "track": "scenarios",
+          "id": "057",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/057.json",
+          "sha256": "4f2edd5eadc5923a9419ebb875232360907ac385c262ea0e5b9518e0ba59d7e1",
+          "requestSha256": "9c73730de2c14e1a1ebb07935bcf3a1deeaf50354d3004b9deda119e3275b86e"
+        },
+        {
+          "track": "scenarios",
+          "id": "058",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/058.json",
+          "sha256": "fad5152fc2c70c057f24fa40c11609d904520f7354d176531bd883960da1fc49",
+          "requestSha256": "a0238274a2c7a9112dc768070112b2125ef80785d5a678d13dbd868432d0bb08"
+        },
+        {
+          "track": "scenarios",
+          "id": "059",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/059.json",
+          "sha256": "2c71f21ef9b5fabf479c8188016010c5854a99a9b9276777a6e278b853ec8083",
+          "requestSha256": "aaf132aa6e92fd3f64428b9b88d1a63e1ec285fcf2b53fe0e6bc34e06e18cc93"
+        },
+        {
+          "track": "scenarios",
+          "id": "060",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/060.json",
+          "sha256": "4336785104efaeb3ebf96c1cc51eac4646bf00ffef0a4ca78be1c50117506239",
+          "requestSha256": "40606b7c40fd44345d65f2c9e1c5654ed063d37d8142fa4aea84a7ba19058231"
+        },
+        {
+          "track": "scenarios",
+          "id": "061",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/061.json",
+          "sha256": "44777441b176e9d53ec39efc73a1140f81f8dff69dc72e8033614ab301c0100b",
+          "requestSha256": "1107a930f95fe5fc04fa2361762b006acf85cc0bcda6a1efb432b3d4b84dedf5"
+        },
+        {
+          "track": "scenarios",
+          "id": "062",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/062.json",
+          "sha256": "cbafec26b314b39998e64f3cb58b3f8cf89ec02f374179f570c51322ba58c63c",
+          "requestSha256": "e7870d6214121de7b356f842fa4361f379423f0b1882dc10d4471a414c368a52"
+        },
+        {
+          "track": "scenarios",
+          "id": "063",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/063.json",
+          "sha256": "6183bd5646458fa9a0d75ca33581db962fca406992dd48f4c14f5237193d5e55",
+          "requestSha256": "a23bf553350cae9bc68b0c6bf1f6fad9847f505b3738aef09cf9407c00a4e69e"
+        },
+        {
+          "track": "scenarios",
+          "id": "064",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/064.json",
+          "sha256": "24850d07b0480692fefe60b6926f6d96e783798f05e71b805202f58d52e15312",
+          "requestSha256": "10c33b56f7652a9c40b78960dbeeda0cca12d6ad94fceabb81f7df700d43ceb6"
+        },
+        {
+          "track": "scenarios",
+          "id": "065",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/065.json",
+          "sha256": "8cd3185b294e17353a62c79b7c955c07a2137bd4eb09a663b16f07315d03ea87",
+          "requestSha256": "dd2bfa7bce7908913504cd300124bf3c718d3eaf93217069bbd266f16bc76cfb"
+        },
+        {
+          "track": "scenarios",
+          "id": "066",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/066.json",
+          "sha256": "a3b698b74b0977d4850805e6ed1ee763557fec989c66e4e1d3f701c877527d4b",
+          "requestSha256": "8c2c9fa389f097a35b8268346d74ebe95ab5322f4f38502ac3df4aadff23298b"
+        },
+        {
+          "track": "scenarios",
+          "id": "067",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/067.json",
+          "sha256": "b3014f16fc0f1897d4532cad8f3a05b79719764ba99faaf22134c79b1e6a5aed",
+          "requestSha256": "0cdda2883b3690cd39558dc334fdf125d88f252c7fa2b0f3b62573b76b312451"
+        },
+        {
+          "track": "scenarios",
+          "id": "068",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/068.json",
+          "sha256": "8053d5981b2757dd001f4a77bb663118116b65a5f7d2016effe68da50cbd379a",
+          "requestSha256": "efbfd5ab7831fb53232ee6692ece9366e65cfdd7a51e188f8b3fd56fcabed7e5"
+        },
+        {
+          "track": "scenarios",
+          "id": "069",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/069.json",
+          "sha256": "cdf3551a052c9b267c927ac57e0715cea3ced1b89f0b58e9ded53fb9cdcb09ba",
+          "requestSha256": "c36793004791838dc6b7c5cd3db17dbda30714a57aca2654e60b4bf7ceed98d0"
+        },
+        {
+          "track": "scenarios",
+          "id": "070",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/070.json",
+          "sha256": "13231718fc19946ab0ec1d05d869eb389b1bcc44c8a39402601749068ab00ace",
+          "requestSha256": "d52b891c4d1b6c6706464a474c639d57bb56fc97b83d0074cb9f720bf52ee929"
+        },
+        {
+          "track": "scenarios",
+          "id": "071",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/071.json",
+          "sha256": "bd83dc1a7330e6891332529108ba5a3c01f043dd255111df1eda3506ad4d2ba7",
+          "requestSha256": "459162db8929a32003ba81706521dc842d8582880021ee15ba054d83f7b31d85"
+        },
+        {
+          "track": "scenarios",
+          "id": "072",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/072.json",
+          "sha256": "a7e64bbc6035479c2edbb1ea812b6be02f68f369dd2ff80221d39277803c4534",
+          "requestSha256": "2f793ac1d04c5a65854aed6e3ed09d2f1c9f54e889d7de48c955a3e38c3ffd35"
+        },
+        {
+          "track": "scenarios",
+          "id": "073",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/073.json",
+          "sha256": "6e80549a2b8e729cfe5b9a998e12b6e129e36c4bc2c5022a0f479b12a5e8d2db",
+          "requestSha256": "22b1bbb55a1c05c0840cdaf9a2c93d05e425d1a502ee3fd43107600b22368bea"
+        },
+        {
+          "track": "scenarios",
+          "id": "074",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/074.json",
+          "sha256": "97ecb25bf017cd1e3ea3eacae23aa706e0b8dc20aa769778333417549351b22e",
+          "requestSha256": "8853da8e47339ab046d23ec7635a5fde9cf3cf3c57c4ff9501ad8bb73c3a5fea"
+        },
+        {
+          "track": "scenarios",
+          "id": "075",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/075.json",
+          "sha256": "f1eadfc6d8c03baf606ea3f2ab6aede840f8cc876f4cb821932f8779b31732c7",
+          "requestSha256": "77070d0ea59d22997c0d02c7369f82ff94d0f0de9af681c6e3dfc00f72f08e44"
+        },
+        {
+          "track": "scenarios",
+          "id": "076",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/076.json",
+          "sha256": "fda76426eb5263bdc28c17fa93de1b6acce93bd15d6c1ca44956b90cce1e98f9",
+          "requestSha256": "a8f96fc5c64ca86652a21b39912d6768b4b4240fbb1d1ddf65cb39d2b49c0168"
+        },
+        {
+          "track": "scenarios",
+          "id": "077",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/077.json",
+          "sha256": "3a63b5336d0ed5ff8a099515e52aa0ae3001e3b1e696d4998c234f12c8f4c0e3",
+          "requestSha256": "ed911868a5e72bff99bafe458f3a4da57634363d69e31593f2f1b9ec3e2a640c"
+        },
+        {
+          "track": "scenarios",
+          "id": "078",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/078.json",
+          "sha256": "145038ecdcd245844a77d357ca457a83952905fc01ff901f21be4b022fa1a595",
+          "requestSha256": "0f5110df56b8117a2f1193195ac1de21f0d6a76f92c2500e9414c589b779a9e5"
+        },
+        {
+          "track": "scenarios",
+          "id": "079",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/079.json",
+          "sha256": "a8f39257b7ea402a897663c9b124b18eaf92a831081d3ee79631b4135b7688a9",
+          "requestSha256": "57eee64187f8d602f31c44f6639f219b63e767a2b3baf8dce1d0441eb98c6296"
+        },
+        {
+          "track": "scenarios",
+          "id": "080",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/080.json",
+          "sha256": "8078fa63a30420727e064d9858c98a53e55b5d3b14af602ac5aca9e42a7bf75a",
+          "requestSha256": "1c23db4235ba860003248b0edfe6a740ff737a10277759ad19875dc68c6c215f"
+        },
+        {
+          "track": "scenarios",
+          "id": "081",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/081.json",
+          "sha256": "f2398d1e7369a68e321b4d1cb9a06bced52d84501631bb36c47c798f96f5e408",
+          "requestSha256": "543cfee5c3a018fc9de4b5c975aa4fa352b3ca7d5b5cd9fc0dd4ccd461cd7ca1"
+        },
+        {
+          "track": "scenarios",
+          "id": "082",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/082.json",
+          "sha256": "3b5b8b57add72e5480a6c625c7e8cce32b0dc009c05619bf5c49432b1f88174d",
+          "requestSha256": "4f88f451e7ae0eb4da79b906b4489e6cc1d67d47374dda8ad090effe71e44221"
+        },
+        {
+          "track": "scenarios",
+          "id": "083",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/083.json",
+          "sha256": "c26ea267b1c25ce746dba1b7459ab01d5fe37a43847751a24527e7f66318ef76",
+          "requestSha256": "7bda3a0d17dab766265a6508caf4149f5882f21d89de16f96ec20178313f977e"
+        },
+        {
+          "track": "scenarios",
+          "id": "084",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/084.json",
+          "sha256": "e5af03dd610a83b41f33bf686fda088eded78fc3443ed721882700bbad0cf752",
+          "requestSha256": "bb664ecf94a1c0d4b1ddbd5c4cba879ed6d29f93458cffaac2173c9f7133d4a5"
+        },
+        {
+          "track": "scenarios",
+          "id": "085",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/085.json",
+          "sha256": "5735f81becfba54f2274c7bbba8f338f38b51676fe4f6ac429d05a63840e3602",
+          "requestSha256": "cd324f28d9e58ba91c0426690806311b4a462cdd54a98978378a685a9ea9ccd5"
+        },
+        {
+          "track": "scenarios",
+          "id": "086",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/086.json",
+          "sha256": "0ca64b0081560ae8d66240622ac6a7bec4dd295fa845fd5acde7f3b1fccacb1e",
+          "requestSha256": "80bb1e7531fbcdca33cd9c963c16c9018dc0f24331f27f86da231d66db1cc4c9"
+        },
+        {
+          "track": "scenarios",
+          "id": "087",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/087.json",
+          "sha256": "0b321d3b0566ed582fae88a0629a777942e44c56bfcdedd4a5e3b5b90d04f65e",
+          "requestSha256": "65926ec8845aeefb6b5978e48b134e8997438938acffe2583e211af98d0c824c"
+        },
+        {
+          "track": "scenarios",
+          "id": "088",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/088.json",
+          "sha256": "da9fb945957abff3a4da612657c831695edbe5d6467e326deffda7da7e89a970",
+          "requestSha256": "6278444a3db967cc5005f848db7ec2fb125bb8f6106058128cf1efd973a33776"
+        },
+        {
+          "track": "scenarios",
+          "id": "089",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/089.json",
+          "sha256": "f542873ff34d69673e4f98ed0150a6f8019b84525aec3bb29565ce2726a95d83",
+          "requestSha256": "f6852c7ac231964b468ff7c54d625e71f1349f89a3976739497dc8feff6b0c57"
+        },
+        {
+          "track": "scenarios",
+          "id": "090",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/090.json",
+          "sha256": "b1ab0220b9f50a2b91a279f5ac4870436bce2af281b7c344e7722b230a9bca46",
+          "requestSha256": "efcb8c56ba76c54d721d67b63ca6f87182c9f0765d0fa3c0a4f4d6434b389c5b"
+        },
+        {
+          "track": "scenarios",
+          "id": "091",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/091.json",
+          "sha256": "6d7ea124cf3732358f0fb763a00f4c86cf3d461bc3bd6db2936e51632d6494d8",
+          "requestSha256": "a38884751f2d3d8577110db0655968c8baba7713a414a8d1af01de0c259bf6a5"
+        },
+        {
+          "track": "scenarios",
+          "id": "092",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/092.json",
+          "sha256": "2a0b29008460e4fa0cc728a039b09ed91b9aa46dadf1ff1282a63306f2d19b7e",
+          "requestSha256": "3b211bc0ed3e6d3cc2611c9763c034f042d92d7f7b4135ad9d09fb14bda97cdf"
+        },
+        {
+          "track": "scenarios",
+          "id": "093",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/093.json",
+          "sha256": "b8cbdf8c4769b356cf8a8f5685af315883c3335a2f2c30c9b2686140bb999630",
+          "requestSha256": "bb9951c0b8f6b92925184bf92f52a0c3cd10daafdb126a6266ad4fa482fc215d"
+        },
+        {
+          "track": "scenarios",
+          "id": "094",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/094.json",
+          "sha256": "cc053c6e64d6d39d02f285d5ee5219e1142a494ba7b73dba918e16807c3ffd5a",
+          "requestSha256": "93497217cc2cb6c54dc5414867ae9586c9caaabcafac69ecc81b0a0fa4c5cfe7"
+        },
+        {
+          "track": "scenarios",
+          "id": "095",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/095.json",
+          "sha256": "02f2f6bc33822350227c5cd7f5aa31a907c154b36ae62c682c7d3ab09a20f725",
+          "requestSha256": "f44c56d8598c156cda209c61cb66e282f996ba4ef5d5f8ef615fff9755ba9456"
+        },
+        {
+          "track": "scenarios",
+          "id": "096",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/096.json",
+          "sha256": "f86be74e0f9c58c540a0f32d93f42c544d6524ef322722d74029da7894b61aab",
+          "requestSha256": "3cfb6101c69499918e79cc045b06035fcbddd95be67102e8b49679df9a1f1987"
+        },
+        {
+          "track": "scenarios",
+          "id": "097",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/097.json",
+          "sha256": "dbc66df227742fbcf37b5993408a7ac3b8699e506d96e56034121d0547fad5f4",
+          "requestSha256": "8924bcad83f6286abbbc770039b71b8f807f4e14dd043cef6a5b9965b17263d5"
+        },
+        {
+          "track": "scenarios",
+          "id": "098",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/098.json",
+          "sha256": "8b04c9f7f5f0c9b0b90f02f5cd367e531eea7dccbc4ff2952a2ef624c4788c5e",
+          "requestSha256": "26e625cba46ad6d788db070339785b89b0ed1f52350a44c26bdf2a79defc8703"
+        },
+        {
+          "track": "scenarios",
+          "id": "099",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/099.json",
+          "sha256": "6a7c04ce86d9f97a6b6450d50efc093e0066b0ea83a0fe19ef110f2498066361",
+          "requestSha256": "15f3ca8b8a764be37bdeb95e56cfe871bfa0786f7b1c2fd34cbb5d1dbac78ef1"
+        },
+        {
+          "track": "scenarios",
+          "id": "100",
+          "path": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact/100.json",
+          "sha256": "047310881df951d736861e4433428ae9e0b3c6d5f4ddd1a808b3229b02c53ede",
+          "requestSha256": "6031d2af6ab6953fd6c118c7a831c61d3f006a8199df232fdffa12c1da3e3e7d"
+        }
+      ]
     }
   ]
 }
