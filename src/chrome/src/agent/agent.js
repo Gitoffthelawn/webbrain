@@ -43,6 +43,7 @@ import { applyReadPageWindow, fitReadPageWindowResult, isReadPageWindowResult } 
 import { STANDARD_TOOL_RESULT_CHARS, createReadCompletenessState, isCommunicationThreadContext, normalizeReadScope, readCompletenessBlock, readCompletenessLimitation, readCompletenessMadeProgress, readWindowLimits, recordReadCompleteness, requirePlannerReadCompleteness, requiresCompleteThreadRead } from './read-completeness.js';
 import { LoopDetector } from './loop-detector.js';
 import { recordCollectionReadProgress } from './collection-read-progress.js';
+import { recordDocumentReadProgress } from './document-read-progress.js';
 import { parseToolCallsFromText } from './tool-call-parser.js';
 import { IMAGE_BUDGET, estimateImageTokens, fitImageDimensions } from './image-budget.js';
 import { cropImage } from './vision-encoder.js';
@@ -1261,6 +1262,7 @@ export class Agent extends LoopDetector {
     this.deliveryObservationStreaks = new Map(); // tabId -> count
     this.deliveryActionableDiscoveryResets = new Set(); // tabIds that used their one discovery reset since meaningful progress
     this.deliveryCollectionReads = new Map(); // tabId -> task-bound finite source coverage
+    this.deliveryDocumentReads = new Map(); // tabId -> read_page windows read this run
     this.lastAutoScreenshotTs = new Map(); // tabId -> ms — defensive debounce
     // tabId -> { toolName, streak }. Burst state must not leak across tabs or
     // be consumed by read-only preflight checks.
@@ -10612,6 +10614,7 @@ export class Agent extends LoopDetector {
   _clearRunLoopState(tabId) {
     super._clearRunLoopState(tabId);
     this.deliveryCollectionReads.delete(tabId);
+    this.deliveryDocumentReads.delete(tabId);
   }
 
   /**
@@ -11478,11 +11481,20 @@ export class Agent extends LoopDetector {
     return recordCollectionReadProgress(coverage, args, result).madeProgress;
   }
 
+  _deliveryCheckpointDocumentReadProgress(tabId, name, result) {
+    if (name !== 'read_page') return false;
+    const recorded = recordDocumentReadProgress(this.deliveryDocumentReads.get(tabId), result);
+    this.deliveryDocumentReads.set(tabId, recorded.state);
+    return recorded.madeProgress;
+  }
+
   _checkDeliveryObservationStreak(tabId, name, args = {}, result = null, options = {}) {
     const observation = this.constructor.DELIVERY_OBSERVATION_TOOLS.has(name)
       && !isNetworkMutation(name, args);
     const collectionReadProgress = observation
       && this._deliveryCheckpointCollectionReadProgress(tabId, name, args, result);
+    const documentReadProgress = observation && !collectionReadProgress
+      && this._deliveryCheckpointDocumentReadProgress(tabId, name, result);
     if (observation
       && options.discoveredActionableTargets === true
       && !this.deliveryActionableDiscoveryResets.has(tabId)) {
@@ -11512,6 +11524,11 @@ export class Agent extends LoopDetector {
       // post-action verification debt is meaningful progress. Start the next
       // research streak from zero instead of charging this verification read.
       this.deliveryObservationStreaks.delete(tabId);
+      return { kind: 'none' };
+    }
+    if (documentReadProgress) {
+      // The next window of a long page (document-read-progress.js) is not
+      // counted. It does not clear the streak either: it is not task progress.
       return { kind: 'none' };
     }
     if (!observation) {

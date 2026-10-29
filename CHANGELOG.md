@@ -15,6 +15,7 @@ This changelog was generated from the repository Git history and release tags. V
 
 ### Fixed
 - Side panel math: inline formulas written between single dollar signs, such as `$\rightarrow$`, `$W \cdot S \cdot H$` or `$O(n^2)$`, now render with KaTeX instead of showing the raw TeX. A `$...$` span renders only when it reads as TeX (a command, `^`, `_` or braces, or a single letter), so prices such as $5 to $10 stay text, and saved history keeps each formula as its TeX source. Both builds.
+- **Summarize this page** on a long page no longer stops after eight `read_page` windows and returns its summary as partial. Each further window of the same page that adds unread text is now progress through the page and does not count toward the eight-observation delivery checkpoint, which had cut off the read of a 43,000-character GitHub README just as it reached the end. The first window of each page, rereads and other observations still count, and a run gets at most 16 uncounted windows. Both builds.
 - WebBrain Companion: its local Bonsai 2 model no longer fails a request that asks for `high` reasoning effort, which clients such as Cline, Kilo and Open WebUI send. Bonsai 2's chat template accepts only `low`, `medium` and `xhigh`, so Companion now declares just those, and its proxy sends `high` as `medium`, the nearest declared level.
 
 ## [45.0.1] - 2026-10-29
