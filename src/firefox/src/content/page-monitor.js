@@ -1280,9 +1280,12 @@
     }
     return null;
   }
-  function mainActionOwner(action) {
-    const main = action.closest('main,[role="main"]');
-    if (!main || main === action || main === document.body || main === document.documentElement || !visible(main)) return null;
+  // A model capture certifies every visible control on the page, and each
+  // control in the primary landmark asks for the same landmark scan. Within
+  // one synchronous capture the page cannot change, so captureModel keeps
+  // each landmark's scan here and drops them when it returns.
+  let mainOwnerScans = null;
+  function scanMainOwner(main) {
     const mains = document.querySelectorAll('main,[role="main"]');
     if (mains.length > 64 || [...mains].some(other => other !== main && visible(other))) return null;
     // A native primary landmark can own a form-less page action. Walk a
@@ -1296,14 +1299,20 @@
     }
     const local = node => node.closest('main,[role="main"]') === main
       && !node.closest('aside,nav,[role="navigation"],[role="complementary"]');
-    const activeNode = (node, structuralFile = false) => {
-      for (let current = structuralFile ? bindingParent(node) : node; current && current !== main; current = bindingParent(current)) {
-        const style = getComputedStyle(current);
-        if (current.inert || current.getAttribute('aria-hidden') === 'true' || style.display === 'none'
-            || ['hidden', 'collapse'].includes(style.visibility) || Number(style.opacity) === 0 || style.contentVisibility === 'hidden') return false;
-      }
-      return true;
+    // A node is active when it and every binding ancestor below main are.
+    // Siblings share those ancestors, so each one's style is read once.
+    const activity = new Map();
+    const chainActive = current => {
+      if (!current || current === main) return true;
+      if (activity.has(current)) return activity.get(current);
+      const style = getComputedStyle(current);
+      const active = !(current.inert || current.getAttribute('aria-hidden') === 'true' || style.display === 'none'
+          || ['hidden', 'collapse'].includes(style.visibility) || Number(style.opacity) === 0 || style.contentVisibility === 'hidden')
+        && chainActive(bindingParent(current));
+      activity.set(current, active);
+      return active;
     };
+    const activeNode = (node, structuralFile = false) => chainActive(structuralFile ? bindingParent(node) : node);
     const headings = nodes.filter(node => local(node) && visible(node) && activeNode(node)
       && node.matches('h1,h2,h3,h4,h5,h6,[role="heading"],[aria-current]'));
     const controls = nodes.filter(node => local(node) && node.matches(modelControlSelector)
@@ -1315,13 +1324,25 @@
     // must not turn all page imagery into the action's current account proof.
     const images = nodes.filter(node => node instanceof HTMLImageElement && local(node) && activeNode(node)
       && !node.closest(entityOwnerSelector + ',form,[role="form"],input,textarea,[contenteditable]:not([contenteditable="false"])'));
-    const ownedHeadings = headings.filter(node => !action.contains(node)
+    if (headings.length > 32 || controls.length > 64 || identities.length > 64 || owners.length > 64 || images.length > 64) return null;
+    return { headings, controls, identities, owners, images };
+  }
+  function mainActionOwner(action) {
+    const main = action.closest('main,[role="main"]');
+    if (!main || main === action || main === document.body || main === document.documentElement || !visible(main)) return null;
+    let scan = mainOwnerScans?.get(main);
+    if (scan === undefined) {
+      scan = scanMainOwner(main);
+      mainOwnerScans?.set(main, scan);
+    }
+    if (!scan) return null;
+    const ownedHeadings = scan.headings.filter(node => !action.contains(node)
       && !node.closest(entityOwnerSelector + ',form,[role="form"]'));
     const primary = ownedHeadings.filter(node => node.matches('h1,[role="heading"][aria-level="1"]'));
     const purpose = primary.length ? primary : ownedHeadings;
-    if (purpose.length !== 1 || !purpose[0].textContent.trim() || headings.length > 32
-        || controls.length > 64 || identities.length > 64 || owners.length > 64 || images.length > 64) return null;
-    return { main, headings, controls, identities, owners, images };
+    if (purpose.length !== 1 || !purpose[0].textContent.trim()) return null;
+    return { main, headings: [...scan.headings], controls: [...scan.controls], identities: [...scan.identities],
+      owners: [...scan.owners], images: [...scan.images] };
   }
   function nativeFileWidget(target) {
     if (!(target instanceof HTMLInputElement) || target.type !== 'file' || target.disabled
@@ -2097,6 +2118,7 @@
     const authority = Object.freeze({ runToken, documentToken, owner: params.nativeChatOwner,
       userAt: lastUserAt, interventionRevision });
     identityPreparationCapture = authority;
+    mainOwnerScans = new Map();
     try {
       const result = captureCurrentModel(params, authority);
       let unread = false;
@@ -2104,7 +2126,10 @@
       // The agent reads texts consulted unread (it asks content.js for them)
       // and captures again.
       return unread && result && typeof result === 'object' ? { ...result, pageTextsUnread: true } : result;
-    } finally { if (identityPreparationCapture === authority) identityPreparationCapture = null; }
+    } finally {
+      mainOwnerScans = null;
+      if (identityPreparationCapture === authority) identityPreparationCapture = null;
+    }
   }
   function currentIdentityPreparationCapture(authority, owner) {
     return !!authority && authority === identityPreparationCapture && active && !disposed
