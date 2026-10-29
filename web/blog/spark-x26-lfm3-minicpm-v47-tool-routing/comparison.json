@@ -463,6 +463,115 @@
         "first-turn": "test/llm/results/2026-10-29-webbrain-compass-vld-tiny-v5-compact-full_chrome_webbrain-compass-vld-tiny-v5_compact",
         "scenarios": "test/llm/results-scenarios/2026-10-29-webbrain-compass-vld-tiny-v5-compact-full_chrome_webbrain-compass-vld-tiny-v5_compact"
       }
+    },
+    {
+      "model": "lfm3-vld-2b",
+      "parameters": "2B",
+      "new": true,
+      "quantization": "Q4_K_M",
+      "parametersTotal": 1990945600,
+      "modelArtifact": {
+        "id": "lfm3-vld-2b",
+        "name": "lfm3-vld-2b",
+        "source": "webbrain-one/lfm3-vld-2b",
+        "repo": "webbrain-one/lfm3-vld-2b-gguf",
+        "revision": "5b541a3b2a448a72a9ac9f9aea4b04787a7590c0",
+        "file": "LFM3-VL-2B-VLDR-Q4_K_M.gguf",
+        "bytes": 1247084544,
+        "sha256": "84e7ba7b57b38523e1f90c675f614dadf7ae87af19323f2e05f6914cf1296ddc"
+      },
+      "runtimeBuild": "b0-unknown",
+      "runtimeChatTemplateSha256": "48ab0f7e16b7e5bf7751c5c1f9a011ff4b36bf1bbed0790a1cea2aec89295d3b",
+      "calls": 87,
+      "strict": 1,
+      "loose": 32,
+      "firstTurnExact": 1,
+      "firstTurnNameOnly": 4,
+      "treeCalls": 66,
+      "firstTurnErrors": 0,
+      "scenarioErrors": 0,
+      "anti": 2,
+      "empty": 0,
+      "lengthLimited": 6,
+      "proseCredits": 25,
+      "byCategory": {
+        "loop-bad-url": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 3,
+          "anti": 0
+        },
+        "tool-error-pivot": {
+          "scored": 9,
+          "strict": 0,
+          "loose": 3,
+          "anti": 1
+        },
+        "csp-blocked-eval": {
+          "scored": 0,
+          "strict": 0,
+          "loose": 0,
+          "anti": 0
+        },
+        "truncation-cascade": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 2,
+          "anti": 0
+        },
+        "counter-polarity": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 3,
+          "anti": 0
+        },
+        "stale-refid": {
+          "scored": 10,
+          "strict": 1,
+          "loose": 3,
+          "anti": 0
+        },
+        "mode-boundary": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 6,
+          "anti": 0
+        },
+        "cross-lingual": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 2,
+          "anti": 1
+        },
+        "prompt-injection": {
+          "scored": 8,
+          "strict": 0,
+          "loose": 4,
+          "anti": 0
+        },
+        "injection-control": {
+          "scored": 2,
+          "strict": 0,
+          "loose": 1,
+          "anti": 0
+        },
+        "prompt-injection-unprotected": {
+          "scored": 8,
+          "strict": 0,
+          "loose": 4,
+          "anti": 0
+        },
+        "injection-control-unprotected": {
+          "scored": 2,
+          "strict": 0,
+          "loose": 1,
+          "anti": 0
+        }
+      },
+      "sources": {
+        "first-turn": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact",
+        "scenarios": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact"
+      }
     }
   ],
   "completeTable": [
@@ -1021,6 +1130,115 @@
       "strict": 2,
       "loose": 12,
       "source": "/blog/webbrain-compass-tiny-v1"
+    },
+    {
+      "model": "lfm3-vld-2b",
+      "parameters": "2B",
+      "new": true,
+      "quantization": "Q4_K_M",
+      "parametersTotal": 1990945600,
+      "modelArtifact": {
+        "id": "lfm3-vld-2b",
+        "name": "lfm3-vld-2b",
+        "source": "webbrain-one/lfm3-vld-2b",
+        "repo": "webbrain-one/lfm3-vld-2b-gguf",
+        "revision": "5b541a3b2a448a72a9ac9f9aea4b04787a7590c0",
+        "file": "LFM3-VL-2B-VLDR-Q4_K_M.gguf",
+        "bytes": 1247084544,
+        "sha256": "84e7ba7b57b38523e1f90c675f614dadf7ae87af19323f2e05f6914cf1296ddc"
+      },
+      "runtimeBuild": "b0-unknown",
+      "runtimeChatTemplateSha256": "48ab0f7e16b7e5bf7751c5c1f9a011ff4b36bf1bbed0790a1cea2aec89295d3b",
+      "calls": 87,
+      "strict": 1,
+      "loose": 32,
+      "firstTurnExact": 1,
+      "firstTurnNameOnly": 4,
+      "treeCalls": 66,
+      "firstTurnErrors": 0,
+      "scenarioErrors": 0,
+      "anti": 2,
+      "empty": 0,
+      "lengthLimited": 6,
+      "proseCredits": 25,
+      "byCategory": {
+        "loop-bad-url": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 3,
+          "anti": 0
+        },
+        "tool-error-pivot": {
+          "scored": 9,
+          "strict": 0,
+          "loose": 3,
+          "anti": 1
+        },
+        "csp-blocked-eval": {
+          "scored": 0,
+          "strict": 0,
+          "loose": 0,
+          "anti": 0
+        },
+        "truncation-cascade": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 2,
+          "anti": 0
+        },
+        "counter-polarity": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 3,
+          "anti": 0
+        },
+        "stale-refid": {
+          "scored": 10,
+          "strict": 1,
+          "loose": 3,
+          "anti": 0
+        },
+        "mode-boundary": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 6,
+          "anti": 0
+        },
+        "cross-lingual": {
+          "scored": 10,
+          "strict": 0,
+          "loose": 2,
+          "anti": 1
+        },
+        "prompt-injection": {
+          "scored": 8,
+          "strict": 0,
+          "loose": 4,
+          "anti": 0
+        },
+        "injection-control": {
+          "scored": 2,
+          "strict": 0,
+          "loose": 1,
+          "anti": 0
+        },
+        "prompt-injection-unprotected": {
+          "scored": 8,
+          "strict": 0,
+          "loose": 4,
+          "anti": 0
+        },
+        "injection-control-unprotected": {
+          "scored": 2,
+          "strict": 0,
+          "loose": 1,
+          "anti": 0
+        }
+      },
+      "sources": {
+        "first-turn": "test/llm/results/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact",
+        "scenarios": "test/llm/results-scenarios/2026-10-29-lfm3-vld-2b-compact-full_chrome_lfm3-vld-2b_compact"
+      }
     }
   ]
 }
