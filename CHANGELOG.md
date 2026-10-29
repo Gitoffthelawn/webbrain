@@ -6,6 +6,8 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+## [45.0.2] - 2026-10-29
+
 ### Added
 - WebBrain Companion updates itself from 0.1.3 on. Every six hours it checks GitHub for a newer Companion release, downloads it, and installs it only when the package matches the release's SHA256SUMS. It installs once nothing has used it for ten minutes, then restarts in the background. *Settings, Updates* turns automatic installs off, *Update now* in the tray menu or the panel installs at once, and `webbrain-companion --update` updates from the command line (`--headless` copies only report new versions). See `webbrain-systray/README.md`.
 
