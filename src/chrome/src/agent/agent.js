@@ -1222,8 +1222,9 @@ export class Agent extends LoopDetector {
     this._cloudflareManagedChallenges = new Map(); // tabId -> sanitized response-backed interstitial state
     this._cloudflareManagedChallengeTransitions = new Map(); // tabId -> serialized transition promise
     // Pre-execution planner (Settings → Plan before Act). Default "try";
-    // attempts a read-only planning LLM call and degrades the current turn to
-    // Ask/read-only if structured planning itself fails. "strict" fails closed.
+    // attempts a read-only planning LLM call, and if planning still fails after
+    // its retry, continues the turn without a plan and with its intent unknown
+    // (_plannerActContinuation). "strict" fails closed.
     this.planBeforeActMode = 'try';
     this.planBeforeAct = true; // legacy boolean mirror for older call sites/tests
     this.planReviewMode = 'confidence'; // confidence | always | never

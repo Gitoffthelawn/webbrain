@@ -683,7 +683,15 @@ export function plannerRequestBody(config = {}, {
   }
 
   if (disableThinking) {
-    if (preset === 'openrouter') {
+    if (providerName === 'webbrain-companion') {
+      // Companion's proxy (CLIProxyAPI) maps this one value per model from its
+      // capability registry: thinking off where the model allows it, its
+      // lowest level where it cannot, and dropped for a model without
+      // thinking, so no upstream receives a value it rejects. Companion
+      // declares that its local Bonsai model can turn thinking off too
+      // (webbrain-systray internal/core/proxy.go), so it receives "none".
+      body.reasoning_effort = 'none';
+    } else if (preset === 'openrouter') {
       body.reasoning = { enabled: false };
     } else if ((preset === 'qwen' && isLocalOpenAICompat) || providerName === 'vllm' || providerName === 'sglang') {
       body.chat_template_kwargs = { enable_thinking: false };
