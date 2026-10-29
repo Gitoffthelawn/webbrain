@@ -949,3 +949,52 @@ export function renderMarkdownTables(text) {
 
   return rendered.join('\n');
 }
+
+// A TeX command (\rightarrow, \frac) or a sign only math uses.
+const TEX_COMMAND = /\\[A-Za-z]+/;
+const TEX_SIGNS = /[\^_{}]/;
+
+/**
+ * Find single-dollar inline math ($\rightarrow$, $O(n^2)$, $x$) and replace
+ * each span with render(tex). Single dollars are mostly prices, so a span
+ * counts only when it reads as TeX, following Pandoc's rule for $ math:
+ * - the opening $ is followed by a non-space and the closing $ comes after
+ *   one, on the same line; \$ is a literal dollar;
+ * - the closing $ is not followed by a digit ("$5 or $10"), unless the span
+ *   holds a TeX command ("$\sim$5 GB");
+ * - the span holds a TeX command, ^, _, { or }, or is a single letter.
+ * $$display$$ math is left for the KaTeX pass.
+ */
+export function replaceInlineDollarMath(text, render) {
+  const source = String(text == null ? '' : text);
+  let output = '';
+  let index = 0;
+  let from = 0;
+  while (from < source.length) {
+    const open = source.indexOf('$', from);
+    if (open < 0) break;
+    if (source[open + 1] === '$') {
+      const close = source.indexOf('$$', open + 2);
+      from = close < 0 ? open + 2 : close + 2;
+      continue;
+    }
+    from = open + 1;
+    if ((open > 0 && source[open - 1] === '\\') || !source[open + 1] || /\s/.test(source[open + 1])) continue;
+    let close = -1;
+    for (let at = open + 1; at < source.length && source[at] !== '\n'; at++) {
+      if (source[at] === '$' && source[at - 1] !== '\\') {
+        close = at;
+        break;
+      }
+    }
+    if (close < 0) continue;
+    const tex = source.slice(open + 1, close);
+    const after = source[close + 1] || '';
+    const readsAsTex = TEX_COMMAND.test(tex) || TEX_SIGNS.test(tex) || /^[A-Za-z]$/.test(tex);
+    if (/\s/.test(source[close - 1]) || after === '$' || tex.length > 300 || !readsAsTex
+      || (/\d/.test(after) && !TEX_COMMAND.test(tex))) continue;
+    output += source.slice(index, open) + render(tex);
+    index = from = close + 1;
+  }
+  return output + source.slice(index);
+}

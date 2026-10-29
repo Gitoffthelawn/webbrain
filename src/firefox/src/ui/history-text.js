@@ -19,6 +19,20 @@ const BLOCK_TAGS = new Set([
 
 const SKIPPED_TAGS = new Set(['SCRIPT', 'STYLE', 'TEMPLATE']);
 
+// The TeX source KaTeX keeps in <annotation encoding="application/x-tex">.
+function texAnnotation(node) {
+  for (const child of Array.from(node?.childNodes || [])) {
+    if (!child || child.nodeType !== ELEMENT_NODE) continue;
+    if (String(child.tagName || '').toUpperCase() === 'ANNOTATION'
+      && child.getAttribute?.('encoding') === 'application/x-tex') {
+      return String(child.textContent ?? '');
+    }
+    const found = texAnnotation(child);
+    if (found !== null) return found;
+  }
+  return null;
+}
+
 function elementChildren(node) {
   return Array.from(node?.childNodes || []).filter((child) => child && child.nodeType === ELEMENT_NODE);
 }
@@ -102,6 +116,17 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
     const tagName = String(node.tagName || '').toUpperCase();
     if (SKIPPED_TAGS.has(tagName)) return;
     if (node.classList?.contains?.('code-block-header')) return;
+    // KaTeX output holds the formula three times (MathML, its TeX source and
+    // the visible HTML). Save the source with delimiters the panel renders
+    // again.
+    const display = node.classList?.contains?.('katex-display');
+    if (display || node.classList?.contains?.('katex')) {
+      const tex = texAnnotation(node);
+      if (tex !== null) {
+        output += display ? `$$${tex}$$` : `\\(${tex}\\)`;
+        return;
+      }
+    }
     if (tagName === 'BR') {
       // Every rendered <br> represents a source newline, including consecutive
       // <br>s used for blank lines. Do not deduplicate these hard breaks.

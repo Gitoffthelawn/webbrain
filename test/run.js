@@ -22505,7 +22505,7 @@ test('sidepanels wire highlighting and heading rendering into fenced Markdown', 
   ]) {
     const panel = fs.readFileSync(path.join(ROOT, panelRel), 'utf8');
     const css = fs.readFileSync(path.join(ROOT, cssRel), 'utf8');
-    assert.match(panel, /import \{ codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceMarkdownCodeFences \} from '\.\/markdown-render\.js';/, `${label}: renderer helpers should be imported`);
+    assert.match(panel, /import \{ codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences \} from '\.\/markdown-render\.js';/, `${label}: renderer helpers should be imported`);
     assert.match(panel, /const lang = codeFenceLanguage\(info\);/, `${label}: fenced code should tolerate metadata after its language token`);
     assert.match(panel, /const highlighted = enhance \? highlightCode\(code, lang\) : escapeHtml\(code\);/, `${label}: completed fenced code should be highlighted by its language while live code stays lightweight`);
     assert.match(panel, /text = renderMarkdownTables\(text\);\s*text = renderMarkdownBlockquotes\(text\);\s*text = renderMarkdownHeadings\(text\);/, `${label}: pipe tables and quotes must render before headings swallow the following newline`);

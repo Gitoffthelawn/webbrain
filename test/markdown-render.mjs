@@ -676,6 +676,96 @@ for (const build of ['chrome', 'firefox']) {
     assert.match(formatMarkdown(source), /<h2>After<\/h2>/);
   });
 
+  test(`${build}: single-dollar math is found only where it reads as TeX`, () => {
+    const mark = source => helpers.replaceInlineDollarMath(source, tex => `[${tex}]`);
+    for (const [source, expected] of [
+      ['traces $\\rightarrow$ rotation $\\rightarrow$ GPTQ', 'traces [\\rightarrow] rotation [\\rightarrow] GPTQ'],
+      ['in $O(n^2)$ time for $x$ items, $a_{i}$ and $\\alpha$', 'in [O(n^2)] time for [x] items, [a_{i}] and [\\alpha]'],
+      ['about $\\sim$5 GB', 'about [\\sim]5 GB'],
+      // Prices, shell variables, escaped and unclosed dollars stay text.
+      ['It costs $1,263 and then $2,526 more.', null],
+      ['from $5 to $10, $5-$10, $5,$10', null],
+      ['$HOME/$USER and $PATH', null],
+      ['a \\$5$ fee, $ 5$, open $x', null],
+      ['across $a\nb$ lines', null],
+      // Display math belongs to the KaTeX pass.
+      ['see $$a^2$$ here', null],
+    ]) assert.equal(mark(source), expected ?? source, source);
+  });
+
+  test(`${build}: inline TeX math goes to KaTeX as \\(...\\); prices and code stay text`, () => {
+    const html = formatMarkdown('traces $\\rightarrow$ rotation, about $\\sim$5 GB, $\\alpha*\\beta*$ and `$\\rightarrow$`');
+    assert.match(html, /traces \\\(\\rightarrow\\\) rotation, about \\\(\\sim\\\)5 GB, \\\(\\alpha\*\\beta\*\\\) and <code>\$\\rightarrow\$<\/code>/);
+    assert.doesNotMatch(html, /<em>/);
+    const prices = 'It costs $1,263 and then $2,526 more.';
+    assert.equal(formatMarkdown(prices), prices);
+    assert.equal(formatMarkdown('a $\\rightarrow$ b', { enhance: false }), 'a $\\rightarrow$ b');
+  });
+
+  test(`${build}: history saves rendered formulas as their TeX source`, () => {
+    const text = value => ({ nodeType: 3, nodeValue: value, textContent: value });
+    const element = (tagName, className, ...childNodes) => ({
+      nodeType: 1, tagName, childNodes,
+      classList: { contains: name => String(className || '').split(' ').includes(name) },
+      getAttribute: () => null,
+      get textContent() { return childNodes.map(child => child.textContent).join(''); },
+    });
+    // KaTeX keeps MathML with the TeX source, and the visible HTML.
+    const katex = (tex, shown) => {
+      const annotation = { ...element('annotation', '', text(tex)), getAttribute: name => (name === 'encoding' ? 'application/x-tex' : null) };
+      return element('SPAN', 'katex',
+        element('SPAN', 'katex-mathml', element('math', '', element('semantics', '', element('mrow', '', text(shown)), annotation))),
+        element('SPAN', 'katex-html', text(shown)));
+    };
+    const saved = historyTextFromElement(element('DIV', '',
+      text('traces '), katex('\\rightarrow', '→'), text(' rotation, '), element('SPAN', 'katex-display', katex('a^2', 'a2'))));
+    assert.equal(saved, 'traces \\(\\rightarrow\\) rotation, $$a^2$$');
+    // Read back, the panel renders them again.
+    assert.match(formatMarkdown(saved), /traces \\\(\\rightarrow\\\) rotation, \$\$a\^2\$\$/);
+  });
+
+  if (process.env.WEBBRAIN_MARKDOWN_DOM === '1') test(`${build}: browser renders inline TeX with KaTeX and saves it back`, async () => {
+    const { chromium, firefox } = await import('playwright');
+    const browser = await (build === 'chrome' ? chromium : firefox).launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      await page.route('http://markdown.test/**', async route => {
+        const name = new URL(route.request().url()).pathname.slice(1);
+        if (/^[\w-]+\.js$/.test(name)) {
+          await route.fulfill({ contentType: 'text/javascript', body: readUi(build, name) });
+        } else if (/^katex\/[\w.-]+\.js$/.test(name)) {
+          await route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(new URL(`../src/${build}/vendor/${name}`, import.meta.url), 'utf8') });
+        } else {
+          await route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><head><script src="/katex/katex.min.js"></script><script src="/katex/auto-render.min.js"></script></head><body><div id="messages"><div class="message-text" id="message"></div></div></body></html>' });
+        }
+      });
+      await page.goto('http://markdown.test/');
+      const result = await page.evaluate(async ({ formatter, scheduler, source }) => {
+        const helpers = await import('/markdown-render.js');
+        const { sanitizeMarkdownLinks, linkifyPlainUrls } = await import('/markdown-link.js');
+        const { escapeHtml } = await import('/utils.js');
+        const { historyTextFromElement } = await import('/history-text.js');
+        const scheduleMathRender = new Function(`let _mathRenderTimer = null; return (${scheduler})`)();
+        const dependencies = { ...helpers, sanitizeMarkdownLinks, linkifyPlainUrls, escapeHtml, t: key => key, scheduleMathRender };
+        const format = new Function(...Object.keys(dependencies), `return (${formatter})`)(...Object.values(dependencies));
+        const message = document.querySelector('#message');
+        const render = async markdown => {
+          message.innerHTML = format(markdown);
+          await new Promise(resolve => setTimeout(resolve, 150));
+        };
+        await render(source);
+        const formulas = message.querySelectorAll('.katex').length;
+        const shown = message.querySelector('.katex-html')?.textContent;
+        const saved = historyTextFromElement(message);
+        await render(saved);
+        return { formulas, shown, saved, again: message.querySelectorAll('.katex').length, errors: message.querySelectorAll('.katex-error').length };
+      }, { formatter: panelFormatter(build), scheduler: panelFunction(build, 'scheduleMathRender'), source: 'traces $\\rightarrow$ export. It costs $1,263 and then $2,526.' });
+      assert.deepEqual(result, { formulas: 1, shown: '→', saved: 'traces \\(\\rightarrow\\) export. It costs $1,263 and then $2,526.', again: 1, errors: 0 });
+    } finally {
+      await browser.close();
+    }
+  });
+
   // Opt-in native DOM checks: WEBBRAIN_MARKDOWN_DOM=1 npm run test:markdown.
   if (process.env.WEBBRAIN_MARKDOWN_DOM === '1') test(`${build}: browser render, Copy and history round trip`, async () => {
     const { chromium, firefox } = await import('playwright');

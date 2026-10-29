@@ -17,7 +17,7 @@ import { t, getLocale, setLocale, LANGUAGES, applyDOMTranslations, translationsF
 import { CAPABILITY_LABEL, PERMISSION_GATE_SESSION_OFF_KEY, uploadApprovalCard } from '../agent/permission-gate.js';
 import { sanitizeMarkdownLinks, linkifyPlainUrls } from './markdown-link.js';
 import { installChatLinkIcons } from './chat-link-icons.js';
-import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceMarkdownCodeFences } from './markdown-render.js';
+import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences } from './markdown-render.js';
 import { applyMode, loadMode, watch } from './theme.js';
 import {
   UI_SCALE_LEVELS,
@@ -15069,11 +15069,11 @@ function scheduleMathRender() {
       const target = document.getElementById('messages');
       if (!target) return;
       window.renderMathInElement(target, {
-        // Delimiters in order of precedence. We deliberately do NOT enable
-        // single-`$...$` as an inline-math delimiter: LLM responses very
-        // often contain dollar amounts ("$1,263 ... $2,526") and KaTeX
-        // would pair them up and italicize the prose between them. Users
-        // who genuinely want inline math can use \\( ... \\) or $$...$$.
+        // Delimiters in order of precedence. Single `$...$` is NOT one:
+        // LLM responses often contain dollar amounts ("$1,263 ... $2,526")
+        // and KaTeX would pair them up and italicize the prose between them.
+        // formatMarkdown turns $...$ that reads as TeX into \\( ... \\)
+        // first (replaceInlineDollarMath).
         delimiters: [
           { left: '$$', right: '$$', display: true },
           { left: '\\[', right: '\\]', display: true },
@@ -15120,6 +15120,13 @@ function formatMarkdown(text, options = {}) {
     const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return placeholders.add(`<code>${escaped}</code>`, code);
   });
+
+  // 2b. Inline $...$ that reads as TeX ($\rightarrow$, $O(n^2)$) becomes
+  // \(...\) text for the KaTeX pass, kept away from emphasis and escaping.
+  // Prices stay text (replaceInlineDollarMath has the rules).
+  if (enhance) {
+    text = replaceInlineDollarMath(text, tex => placeholders.add(escapeHtml(`\\(${tex}\\)`), `$${tex}$`));
+  }
 
   // 3. Escape HTML in the remaining text
   text = text
