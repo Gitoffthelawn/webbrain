@@ -134,9 +134,11 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
       return;
     }
     if (tagName === 'HR') {
+      // Blank lines around it keep a saved rule from reading as the underline
+      // of a heading on the line above.
       ensureBreak();
-      output += '---';
-      appendHardBreak();
+      if (output && !output.endsWith('\n\n')) output += '\n';
+      output += '---\n\n';
       return;
     }
 
@@ -192,6 +194,28 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
       if (href) output += '[';
       for (const child of Array.from(node.childNodes || [])) visit(child, false, inPre);
       if (href) output += `](${href})`;
+      return;
+    }
+    if (markdown && (tagName === 'UL' || tagName === 'OL')) {
+      // A rendered list goes back to Markdown the panel renders as one: a
+      // marker per item, and its further lines and nested lists indented
+      // under the marker.
+      const ordered = tagName === 'OL';
+      let number = Number.parseInt(String(node.getAttribute?.('start') ?? '1'), 10);
+      if (!Number.isSafeInteger(number) || number < 0) number = 1;
+      const items = [];
+      for (const item of elementChildren(node)) {
+        if (String(item.tagName || '').toUpperCase() !== 'LI') continue;
+        const marker = ordered ? `${number++}. ` : '- ';
+        const body = historyTextFromElement(item, { markdown: true }).replace(/^\n+|\s+$/g, '');
+        items.push(marker + body.split('\n')
+          .map((line, index) => (index && line ? ' '.repeat(marker.length) + line : line)).join('\n'));
+      }
+      if (items.length) {
+        ensureBreak();
+        output += items.join('\n');
+        ensureBreak();
+      }
       return;
     }
     if (markdown && (tagName === 'TABLE' || node.classList?.contains?.('markdown-table-wrapper'))) {

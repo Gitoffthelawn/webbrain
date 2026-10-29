@@ -850,6 +850,115 @@ export function highlightCode(code, language) {
   }
 }
 
+// A thematic break: three or more -, * or _ alone on a line ("---", "* * *").
+const MARKDOWN_RULE = /^[ \t]{0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
+// A bullet (-, * or +) or numbered (1. or 1)) list item with its text.
+const MARKDOWN_LIST_ITEM = /^([ \t]*)([-*+]|\d{1,9}[.)])[ \t]+(\S.*)$/;
+
+function markdownIndent(line) {
+  let width = 0;
+  for (const character of /^[ \t]*/.exec(line)[0]) width += character === '\t' ? 4 - (width % 4) : 1;
+  return width;
+}
+
+function markdownListItem(line) {
+  const match = MARKDOWN_LIST_ITEM.exec(line);
+  if (!match || MARKDOWN_RULE.test(line)) return null;
+  const ordered = /\d/.test(match[2]);
+  return {
+    indent: markdownIndent(line),
+    tag: ordered ? 'ol' : 'ul',
+    number: ordered ? Number.parseInt(match[2], 10) : 1,
+    text: match[3],
+  };
+}
+
+// One list block from lines[start]: nested by indentation, items continued by
+// indented lines, kept open across blank lines that more of it follows.
+function parseMarkdownList(lines, start) {
+  const roots = [];
+  const open = [];
+  const openList = (item, owner) => {
+    const list = { tag: item.tag, start: item.number, indent: item.indent, items: [] };
+    (owner ? owner.lists : roots).push(list);
+    open.push(list);
+    return list;
+  };
+  let index = start;
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line.trim()) {
+      let next = index + 1;
+      while (next < lines.length && !lines[next].trim()) next += 1;
+      const following = lines[next];
+      if (following === undefined || MARKDOWN_RULE.test(following)
+          || (!markdownListItem(following) && markdownIndent(following) === 0)) break;
+      index = next;
+      continue;
+    }
+    if (MARKDOWN_RULE.test(line)) break;
+    const item = markdownListItem(line);
+    if (item) {
+      while (open.length && open[open.length - 1].indent > item.indent) open.pop();
+      let list = open[open.length - 1];
+      if (!list) list = openList(item, null);
+      else if (item.indent > list.indent) list = openList(item, list.items[list.items.length - 1]);
+      else if (list.tag !== item.tag) {
+        open.pop();
+        const parent = open[open.length - 1];
+        list = openList(item, parent ? parent.items[parent.items.length - 1] : null);
+      }
+      list.items.push({ lines: [item.text], lists: [] });
+      index += 1;
+      continue;
+    }
+    // Indented text continues the innermost item; unindented text ends the list.
+    if (!open.length || markdownIndent(line) === 0) break;
+    const list = open[open.length - 1];
+    list.items[list.items.length - 1].lines.push(line.trim());
+    index += 1;
+  }
+  return { roots, next: index };
+}
+
+/**
+ * Convert escaped Markdown bullet and numbered lists (nested by indentation)
+ * and thematic breaks (---) into <ul>/<ol> and <hr>. renderItem formats one
+ * item's text, whose lines it receives joined by \n; wrap receives each
+ * finished block and returns what stands for it in the text, so a caller can
+ * keep later passes out of it. A block keeps its own line: blank lines around
+ * a rule are dropped, and the newline after a block is the caller's to drop,
+ * after the line-based passes that run later have seen it.
+ */
+export function renderMarkdownListsAndRules(text, { renderItem = value => value, wrap = html => html } = {}) {
+  const lines = String(text == null ? '' : text).split(/\r?\n/);
+  const output = [];
+  const render = list => {
+    const start = list.tag === 'ol' && list.start !== 1 ? ` start="${list.start}"` : '';
+    const items = list.items.map(item => `<li>${renderItem(item.lines.join('\n'))}${item.lists.map(render).join('')}</li>`);
+    return `<${list.tag}${start}>${items.join('')}</${list.tag}>`;
+  };
+  for (let index = 0; index < lines.length;) {
+    const line = lines[index];
+    if (MARKDOWN_RULE.test(line)) {
+      while (output.length && !output[output.length - 1].trim()) output.pop();
+      output.push(wrap('<hr>'));
+      index += 1;
+      while (index < lines.length && !lines[index].trim()) index += 1;
+      continue;
+    }
+    if (markdownListItem(line)) {
+      const { roots, next } = parseMarkdownList(lines, index);
+      output.push(wrap(roots.map(render).join('')));
+      index = next;
+      continue;
+    }
+    output.push(line);
+    index += 1;
+  }
+  return output.join('\n');
+}
+
 /**
  * Convert escaped Markdown blockquote lines (`&gt; text`) into blockquote
  * elements. Showing the markers literally makes people copy them back into

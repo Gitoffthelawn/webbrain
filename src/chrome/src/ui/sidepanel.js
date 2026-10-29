@@ -17,7 +17,7 @@ import { t, getLocale, setLocale, LANGUAGES, applyDOMTranslations, translationsF
 import { CAPABILITY_LABEL, PERMISSION_GATE_SESSION_OFF_KEY, uploadApprovalCard } from '../agent/permission-gate.js';
 import { sanitizeMarkdownLinks, linkifyPlainUrls } from './markdown-link.js';
 import { installChatLinkIcons } from './chat-link-icons.js';
-import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences } from './markdown-render.js';
+import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownListsAndRules, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences } from './markdown-render.js';
 import { applyMode, loadMode, watch } from './theme.js';
 import {
   UI_SCALE_LEVELS,
@@ -15134,22 +15134,36 @@ function formatMarkdown(text, options = {}) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // 4. Tables, then headings, inline formatting, markdown link sanitization,
-  // then newline → <br>. Headings swallow their trailing newline, so tables
-  // must run first or a table on the next line is glued onto the heading.
+  // 4. Tables, then lists and --- rules, quotes, headings, inline formatting,
+  // markdown link sanitization, then newline → <br>. Quotes and headings
+  // swallow their trailing newline, so tables and lists must run first or a
+  // table or list on the next line is glued onto them.
   // Code and inline-code placeholders were extracted above, so
   // Markdown-looking source inside them is not interpreted here.
-  text = renderMarkdownTables(text);
-  text = renderMarkdownBlockquotes(text);
-  text = renderMarkdownHeadings(text);
   const emphasis = value => value
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>');
   // Protect destinations from emphasis (a URL can itself contain '*').
-  text = linkifyPlainUrls(sanitizeMarkdownLinks(text)).replace(/(<a\b[^>]*>)([\s\S]*?)(<\/a>)/g, (_match, open, label, close) => (
+  const inline = value => emphasis(linkifyPlainUrls(sanitizeMarkdownLinks(value)).replace(/(<a\b[^>]*>)([\s\S]*?)(<\/a>)/g, (_match, open, label, close) => (
     placeholders.add(`${open}${/^https?:\/\/\S+$/i.test(label) ? label : emphasis(label)}${close}`)
-  ));
-  text = emphasis(text).replace(/\n/g, '<br>');
+  )));
+  text = renderMarkdownTables(text);
+  // Each list item is formatted on its own, so a * bullet never pairs with an
+  // emphasis marker in another item.
+  const blocks = [];
+  text = renderMarkdownListsAndRules(text, {
+    renderItem: value => inline(value).replace(/\n/g, '<br>'),
+    wrap: html => {
+      const token = placeholders.add(html);
+      blocks.push(token);
+      return token;
+    },
+  });
+  text = renderMarkdownBlockquotes(text);
+  text = renderMarkdownHeadings(text);
+  // A list or rule is a block: the newline after it is not a line break.
+  for (const token of blocks) text = text.split(`${token}\n`).join(token);
+  text = inline(text).replace(/\n/g, '<br>');
   text = placeholders.restore(text);
 
   // Schedule KaTeX rendering of any math expressions in the messages area.

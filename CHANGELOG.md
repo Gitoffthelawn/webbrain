@@ -6,6 +6,9 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+### Fixed
+- Side panel answers show bullet and numbered lists, nested by indentation, and `---` rules as lists and dividers instead of literal `*`, `-` and `---` lines. Each list item gets its own emphasis, so a `*` bullet no longer pairs with an asterisk in another item, and saved history keeps the lists as Markdown that renders the same way. Both builds.
+
 ## [45.0.2] - 2026-10-29
 
 ### Added
