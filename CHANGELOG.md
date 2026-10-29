@@ -6,6 +6,8 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+## [45.0.3] - 2026-10-29
+
 ### Fixed
 - Side panel answers show bullet and numbered lists, nested by indentation, and `---` rules as lists and dividers instead of literal `*`, `-` and `---` lines. Each list item gets its own emphasis, so a `*` bullet no longer pairs with an asterisk in another item, and saved history keeps the lists as Markdown that renders the same way. Both builds.
 - Faster steps on long pages: the page snapshot taken before every model call, which binds the visible controls the model may act on, scanned the page's main landmark once for every control and read every ancestor's style again for each element. On a GitHub README page this took 3.4 to 4.5 s per step, about 30 s of a 100 s Summarize this page run. The landmark is now scanned once per snapshot, about 12 times faster in testing on that page, with the same snapshot. Both builds.
