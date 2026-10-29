@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Introducing OpenBonsai: Open-Source Ternary Quantization - WebBrain Blog</title>
-  <meta name="description" content="Introducing OpenBonsai, an open-source (Apache-2.0) framework to compress models and fine-tunes into Prism ML-compatible ternary weights (-1, 0, +1), shrinking Qwen3.5-9B from ~18 GB to ~2 GB on an RTX 5090.">
+  <meta name="description" content="OpenBonsai is an open-source Apache-2.0 framework for ternary quantization, compressing 9B models like Qwen3.5-9B from 18 GB down to ~2 GB on a single RTX 5090.">
   <meta name="keywords" content="OpenBonsai, ternary quantization, tiny models, on-device AI, WebBrain, Qwen3.5-9B, Prism ML, Ternary Bonsai, llama.cpp, local AI">
-  <meta property="og:title" content="Introducing OpenBonsai: Open-Source Ternary Quantization">
-  <meta property="og:description" content="OpenBonsai brings open ternary quantization to on-device models: compress Qwen3.5-9B from ~18 GB down to ~2 GB in 5 hours on an RTX 5090.">
+  <meta property="og:title" content="Introducing OpenBonsai: open-source ternary quantization for on-device models">
+  <meta property="og:description" content="OpenBonsai brings open ternary quantization to local AI: compress Qwen3.5-9B from ~18 GB down to ~2 GB in 5 hours on a single RTX 5090.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://webbrain.one/blog/openbonsai-open-source-ternary-quantization">
   <meta property="og:image" content="https://webbrain.one/og-image.png">
@@ -17,8 +17,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="WebBrain — Open-source AI browser agent">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Introducing OpenBonsai: Open-Source Ternary Quantization">
-  <meta name="twitter:description" content="Shrink 9B models to ~2 GB with open ternary quantization. OpenBonsai compresses your own models and fine-tunes into Prism ML-compatible weights.">
+  <meta name="twitter:title" content="Introducing OpenBonsai: open-source ternary quantization">
+  <meta name="twitter:description" content="Compress 9B models to ~2 GB with open ternary quantization. OpenBonsai lets you ternarize your own models and fine-tunes with Prism ML compatibility.">
   <meta name="twitter:image" content="https://webbrain.one/twitter-image.png">
   <meta name="twitter:image:alt" content="WebBrain — Open-source AI browser agent">
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -474,8 +474,8 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Introducing OpenBonsai: Open-Source Ternary Quantization for Tiny, Capable On-Device Models",
-  "description": "Introducing OpenBonsai, an open-source (Apache-2.0) framework to compress models and fine-tunes into Prism ML-compatible ternary weights (-1, 0, +1), shrinking Qwen3.5-9B from ~18 GB to ~2 GB on an RTX 5090.",
+  "headline": "Introducing OpenBonsai: open-source ternary quantization for tiny on-device models",
+  "description": "OpenBonsai is an open-source Apache-2.0 framework for ternary quantization, compressing 9B models like Qwen3.5-9B from 18 GB down to ~2 GB on a single RTX 5090.",
   "author": {
     "@type": "Person",
     "name": "Emre Sokullu",
@@ -524,30 +524,28 @@
 
   <article>
     <div class="meta">October 29, 2026 &middot; 4 min read &middot; <a href="/blog">&larr; All posts</a></div>
-    <h1>Introducing OpenBonsai: Open-Source Ternary Quantization for Tiny, Capable On-Device Models</h1>
-    <p class="lede"><strong>My long-term goal is to make a tiny WebGPU model the core of WebBrain.</strong> Today, we are releasing OpenBonsai: an open-source (Apache-2.0) framework that lets you compress your own models or fine-tunes into ternary weights compatible with Prism ML&#39;s format, shrinking Qwen3.5-9B from ~18 GB down to ~2 GB on a single RTX 5090.</p>
-<h2 id="the-path-to-tiny-ondevice-models">The path to tiny on-device models</h2>
-<p>As you might know, I&#39;m passionate about tiny AI models. The web browser is where people spend their digital lives, and having an intelligent browser agent that runs completely private, local, and fast requires pushing model efficiency to the limit. My long-term goal is to make a tiny WebGPU model the core of WebBrain.</p>
-<p>Our recent experiments with combined vision-language and decision models, including <a href="https://huggingface.co/webbrain-one/webbrain-compass-vld-tiny-v5-onnx" target="_blank" rel="noopener">WebBrain Compass VLD Tiny</a> (based on MiniCPM-V 4.7) and <a href="https://huggingface.co/webbrain-one/lfm3-vld-2b" target="_blank" rel="noopener">LFM3-VLD-2B</a>, suggest that we are getting closer. Compact, purpose-built architectures can deliver impressive domain competence without needing a cluster of enterprise GPUs.</p>
-<h2 id="shrinking-capable-models-the-ternary-gap">Shrinking capable models: the ternary gap</h2>
-<p>While training and fine-tuning compact base models is one path forward, I&#39;ve also been exploring a complementary approach: shrinking larger, highly capable foundation models through ternary quantization, as Prism ML has done with its Ternary Bonsai models.</p>
-<p>Prism ML did an impressive job: fitting a 9B model into roughly 2 GB by representing weights with ternary values (-1, 0, +1). Their weights are open, but the compression recipe is not. You can fine-tune their pre-quantized models, but you cannot take your own fine-tuned model and compress it into that same format using their publicly available tools.</p>
-<p>Going from BF16 to ternary has remained Prism ML&#39;s secret sauce. That&#39;s the gap I wanted to tackle.</p>
-<h2 id="the-clue-attending-to-your-own-thoughts">The clue: attending to your own thoughts</h2>
-<p>A recent paper from Intel Labs China (Wang et al., <em>&quot;Attend to Your Own Thoughts&quot;</em>) offered an interesting clue: calibrate compression using the model&#39;s own reasoning traces, rather than relying solely on generic text corpora.</p>
-<p>Reasoning traces expose the critical pathways a model uses when thinking through complex steps. Calibrating the quantizer against these internal activation states preserves the weights that actually drive the model&#39;s decision-making.</p>
-<p>So I put the idea to the test in my homelab, with assistance from my AI agents.</p>
-<h2 id="enter-openbonsai">Enter OpenBonsai</h2>
-<p>The result is <strong>OpenBonsai</strong>, an open-source (Apache-2.0) framework that lets you compress your own models or fine-tunes into ternary weights compatible with Prism ML&#39;s format.</p>
-<p>Here is what we have achieved so far:</p>
-<ul><li><strong>Qwen3.5-9B:</strong> ~18 GB (BF16) → ~2 GB (Ternary)</li><li><strong>Runtime:</strong> Fully compatible with Prism ML&#39;s <code>llama.cpp</code> fork</li><li><strong>Compression time:</strong> ~5 hours end-to-end on a single NVIDIA GeForce RTX 5090</li><li><strong>Reproducibility:</strong> The same pipeline also worked on Qwen3-8B without code changes</li></ul>
-<h2 id="research-preview-results-and-limitations">Research preview: results and limitations</h2>
-<p>The results are encouraging, although there is still a quality gap compared with the original uncompressed models and Prism&#39;s own releases. </p>
-<p>This is a research preview, not a finished product. In the spirit of open science, I have documented the benchmarks, limitations, and the experiments that didn&#39;t work along the way. Hopefully, others in the open-source and local AI community can build on this, refine the calibration methods, and push open ternary quantization further.</p>
-<h2 id="try-it-out">Try it out</h2>
-<p>Here is the first compressed model checkpoint, along with the framework to ternarize your own fine-tunes:</p>
-<ul><li>🤗 <strong>Model:</strong> <a href="https://huggingface.co/webbrain-one/openbonsai-qwen-3.5-9b" target="_blank" rel="noopener">webbrain-one/openbonsai-qwen-3.5-9b</a></li><li>💻 <strong>Framework:</strong> <a href="https://github.com/esokullu/openbonsai" target="_blank" rel="noopener">esokullu/openbonsai on GitHub</a></li><li>🌐 <strong>Project website:</strong> <a href="https://openbonsai.org" target="_blank" rel="noopener">openbonsai.org</a></li></ul>
-<p>I&#39;d love to see what others can do with it!</p>
+    <h1>Introducing OpenBonsai: open-source ternary quantization for tiny on-device models</h1>
+    <p class="lede"><strong>Our long-term target for WebBrain is an on-device WebGPU model running at the core of the browser agent.</strong> Recent experiments with combined vision-language and decision models — including <a href="https://huggingface.co/webbrain-one/webbrain-compass-vld-tiny-v5-onnx" target="_blank" rel="noopener">WebBrain Compass VLD Tiny</a> and <a href="https://huggingface.co/webbrain-one/lfm3-vld-2b" target="_blank" rel="noopener">LFM3-VLD-2B</a> — show that compact architectures are getting close. But training small models from scratch isn&#39;t the only path: shrinking capable foundation models through ternary quantization opens another route entirely.</p>
+<h2 id="the-missing-half-of-the-ternary-recipe">The missing half of the ternary recipe</h2>
+<p>Prism ML demonstrated what ternary quantization can do with its Ternary Bonsai releases: packing a 9B model into roughly 2 GB of memory by constraining weights to ternary values <code>{-1, 0, +1}</code>.</p>
+<p>The weights were released openly, but the compression pipeline stayed behind closed doors. You could fine-tune an existing ternary checkpoint, but if you trained your own BF16 model or specialized fine-tune, there was no public tool to compress it into the same format. Going from full precision down to ternary weights remained a proprietary black box.</p>
+<p>That was the gap we set out to close.</p>
+<h2 id="calibrating-against-reasoning-traces">Calibrating against reasoning traces</h2>
+<p>A recent paper from Intel Labs China (Wang et al., <em>&quot;Attend to Your Own Thoughts&quot;</em>) provided the key insight.</p>
+<p>Traditional post-training quantization evaluates weight importance across generic text corpora. But when a model is compressed down to ternary precision, generic calibration washes out the nuanced activation pathways that govern step-by-step reasoning. Wang et al. proposed a different approach: calibrate compression using the model&#39;s own reasoning traces.</p>
+<p>By conditioning the quantizer on the internal activations generated during genuine problem solving, the pipeline protects the weights that drive decision-making and planning.</p>
+<p>We implemented and iterated on this approach in our lab, using autonomous agent workflows to accelerate the experimental loop.</p>
+<h2 id="what-openbonsai-delivers">What OpenBonsai delivers</h2>
+<p>The result is <strong>OpenBonsai</strong>, an Apache-2.0 framework that compresses arbitrary BF16 models and fine-tunes into ternary weights compatible with Prism ML&#39;s runtime.</p>
+<p>The initial results on consumer hardware:</p>
+<ul><li><strong>Qwen3.5-9B:</strong> ~18 GB (BF16) compressed to ~2 GB in ternary format.</li><li><strong>Runtime:</strong> Direct drop-in compatibility with Prism ML&#39;s <code>llama.cpp</code> fork.</li><li><strong>Hardware footprint:</strong> End-to-end compression takes ~5 hours on a single NVIDIA GeForce RTX 5090.</li><li><strong>Portability:</strong> The exact same pipeline compressed Qwen3-8B without architecture-specific code tweaks.</li></ul>
+<h2 id="a-research-preview">A research preview</h2>
+<p>This is a research preview, not a finished product. While the compressed models produce coherent generations at a fraction of the memory footprint, a measurable quality delta remains when compared against uncompressed base models and Prism ML&#39;s proprietary releases.</p>
+<p>Rather than keeping the pipeline private until every benchmark was solved, we are publishing the code, the first checkpoint, and our failure logs. The repository documents our benchmarks, known failure modes, and calibration experiments that didn&#39;t pan out, giving the community a concrete baseline to build on.</p>
+<h2 id="resources-and-checkpoints">Resources and checkpoints</h2>
+<p>The framework and initial checkpoints are available today:</p>
+<ul><li>🤗 <strong>Model checkpoint:</strong> <a href="https://huggingface.co/webbrain-one/openbonsai-qwen-3.5-9b" target="_blank" rel="noopener">webbrain-one/openbonsai-qwen-3.5-9b</a></li><li>💻 <strong>Code &amp; pipeline:</strong> <a href="https://github.com/esokullu/openbonsai" target="_blank" rel="noopener">esokullu/openbonsai on GitHub</a> (Apache-2.0)</li><li>🌐 <strong>Project documentation:</strong> <a href="https://openbonsai.org" target="_blank" rel="noopener">openbonsai.org</a></li></ul>
+<p>If you&#39;re exploring extreme quantization or running agents on edge hardware, give it a spin. Pull requests and replication reports are welcome.</p>
 <p>Tags: #TinyModels #TernaryQuantization #OnDeviceAI #OpenSource #LocalAI #WebBrain</p>
 
     <div class="author-box">
