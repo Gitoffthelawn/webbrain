@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-29T10:10:26.378Z",
+  "id": "001",
+  "model": "webbrain-one/lfm3-vld-2b",
+  "endpoint": "http://127.0.0.1:18080/v1/chat/completions",
+  "promptMode": "production",
+  "question": {
+    "schemaVersion": 1,
+    "id": "001",
+    "difficulty": {
+      "level": 1,
+      "slug": "easy",
+      "label": "Easy"
+    },
+    "category": "authentication",
+    "title": "Welcome back",
+    "image": "images/001.png",
+    "question": "What is preventing the user from completing Sign in? Focus on the “Welcome back” screen.",
+    "defaultPromptMode": "production"
+  },
+  "image": {
+    "path": "images/001.png",
+    "bytes": 121862,
+    "sha256": "ebc7460f2b041e1b39c4fe671bb79744cb6dae04910c3fa142f6441980a08723"
+  },
+  "request": {
+    "systemPrompt": "You are the vision subsystem of a web-automation agent. A screenshot of the current browser viewport is attached. Describe what is on screen so the planning agent can decide its next action.\n\nFormat — keep it terse, structured, no flowery prose:\n\n1) Page purpose: one line (e.g. \"GitHub repo issue list\", \"Gmail compose\", \"Stripe checkout form\").\n2) Visible text: list the EXACT strings on buttons, links, headings, tabs, and menu items. Quote them verbatim. Do not paraphrase.\n3) Inputs: list each visible form field with its label, placeholder, current value, and whether it is focused/disabled.\n4) State signals: loading spinners, toasts, modals, error banners, success messages, CAPTCHAs, cookie/consent banners, overlays.\n5) Blockers: anything that would prevent the next likely action (overlay, disabled submit, missing data, auth prompt).\n6) Unknowns: if you cannot read something clearly, say so. Do not guess numbers, names, or identifiers.\n\nRules: no prose intro, no conclusion, no \"this screenshot shows...\", no layout description unless it matters (e.g. \"left nav is collapsed\"). If the page is blank or still loading, say that in one line and stop.",
+    "userText": "Describe this screenshot of the current browser viewport for a web-automation agent. Follow the format in the system prompt.",
+    "foldSystem": false,
+    "temperature": 0,
+    "maxTokens": 800,
+    "chatTemplateKwargs": {
+      "enable_thinking": false,
+      "think": false,
+      "thinking": false
+    }
+  },
+  "response": {
+    "status": 200,
+    "content": "1) Login form\n2) \"Welcome back\" heading, \"Use your account to continue\" text, \"Email\" label, \"Sign in\" button, \"Need help?\" link\n3) Email: input with value \"you@example.com\", focused; Password: input with placeholder \"Enter password\"\n4) No modals or error banners\n5) None\n6) None",
+    "reasoningChars": 0,
+    "usage": {
+      "completion_tokens": 80,
+      "prompt_tokens": 1208,
+      "total_tokens": 1288,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": null,
+    "provider": null,
+    "finishReason": "stop",
+    "raw": "data: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"1\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" Login\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" form\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"2\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Welcome\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" back\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" heading\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\",\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Use\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" your\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" account\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" to\"}}],\"created\":1793268625,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" continue\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" text\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\",\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Email\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" label\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\",\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Sign\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" in\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" button\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\",\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Need\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" help\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"?\\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" link\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"3\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" Email\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\":\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" input\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" with\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" value\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"you\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"@example\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\".com\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\",\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" focused\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\";\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" Password\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\":\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" input\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" with\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" placeholder\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Enter\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" password\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\\n\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"4\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" No\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" mod\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"als\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" or\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" error\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" b\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"anners\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"5\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" None\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"6\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" None\"}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"delta\":{}}],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[],\"created\":1793268626,\"id\":\"chatcmpl-Mz6yusnqGAXHqzcxbRKFeKWcWv7iMwjx\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\",\"usage\":{\"completion_tokens\":80,\"prompt_tokens\":1208,\"total_tokens\":1288,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"timings\":{\"cache_n\":0,\"prompt_n\":1208,\"prompt_ms\":209.752,\"prompt_per_token_ms\":0.17363576158940397,\"prompt_per_second\":5759.1822723978785,\"predicted_n\":80,\"predicted_ms\":480.754,\"predicted_per_token_ms\":6.085493670886076,\"predicted_per_second\":164.32520582252045}}\n\ndata: [DONE]\n\n"
+  },
+  "latencyMs": {
+    "headers": 180,
+    "total": 872
+  },
+  "score": {
+    "success": false,
+    "ratio": 0.7,
+    "earned": 7,
+    "possible": 10,
+    "threshold": 0.72,
+    "sectionCount": 6,
+    "criticalFailures": [],
+    "dimensions": {
+      "page_purpose": {
+        "earned": 1,
+        "possible": 1,
+        "ratio": 1
+      },
+      "visible_text": {
+        "earned": 4,
+        "possible": 4,
+        "ratio": 1
+      },
+      "inputs": {
+        "earned": 0,
+        "possible": 1,
+        "ratio": 0
+      },
+      "blockers": {
+        "earned": 0,
+        "possible": 2,
+        "ratio": 0
+      }
+    },
+    "checks": [
+      {
+        "id": "purpose",
+        "dimension": "page_purpose",
+        "section": 1,
+        "kind": "any",
+        "values": [
+          "sign in",
+          "login",
+          "identity verification",
+          "session expired"
+        ],
+        "weight": 1,
+        "critical": true,
+        "passed": true,
+        "matched": [
+          "login"
+        ],
+        "scopeFound": true
+      },
+      {
+        "id": "heading",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "Welcome back",
+        "weight": 2,
+        "critical": true,
+        "caseSensitive": true,
+        "passed": true,
+        "matched": [
+          "Welcome back"
+        ],
+        "scopeFound": true
+      },
+      {
+        "id": "button",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "Sign in",
+        "weight": 2,
+        "critical": true,
+        "caseSensitive": true,
+        "passed": true,
+        "matched": [
+          "Sign in"
+        ],
+        "scopeFound": true
+      },
+      {
+        "id": "email-input",
+        "dimension": "inputs",
+        "section": 3,
+        "kind": "all",
+        "values": [
+          "Email",
+          "empty"
+        ],
+        "weight": 1,
+        "critical": false,
+        "passed": false,
+        "matched": [
+          "Email"
+        ],
+        "scopeFound": true
+      },
+      {
+        "id": "blocker",
+        "dimension": "blockers",
+        "section": 5,
+        "kind": "any",
+        "values": [
+          "missing",
+          "email",
+          "password"
+        ],
+        "weight": 2,
+        "critical": false,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      }
+    ]
+  },
+  "error": null
+}
