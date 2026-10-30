@@ -22,6 +22,8 @@
  *   {{browser_path}}     the browser extension's page: the localized homepage
  *                        ("/" or "/es/"); /browser/ redirects there
  *   {{websites_path}}    "/websites/"
+ *   <!-- if websites -->…<!-- else websites -->…<!-- end websites -->
+ *                        kept or dropped by WEBSITES_LAUNCHED (site-footer.mjs)
  *   {{sites_dashboard_url}} the private WebBrain for websites dashboard
  *   {{docs_url}}         English docs, or the secondary Chinese docs for zh
  *   {{hreflang_links}}   <link rel="alternate" ...> block for this page
@@ -51,6 +53,7 @@ import {
   HUGGINGFACE_PROFILE_URL,
   MASTODON_PROFILE_URL,
   SITE_FOOTER_STYLES,
+  WEBSITES_LAUNCHED,
   siteFooter,
   withSiteFooter,
 } from './site-footer.mjs';
@@ -323,7 +326,7 @@ function siteFooterFor(dict, locale, page) {
     : [];
   return siteFooter(dict, {
     browserPath: browserPathFor(locale),
-    websitesPath: WEBSITES_PATH,
+    websitesPath: WEBSITES_LAUNCHED ? WEBSITES_PATH : null,
     companionPath: companionPathFor(locale),
     docsPath: docsPathFor(locale),
     faqPath: faqPathFor(locale),
@@ -612,12 +615,21 @@ function buildSubscribeHtml() {
 `;
 }
 
+// Templates mark what depends on WebBrain for websites being open:
+//   <!-- if websites -->shown once it launches<!-- else websites -->shown until then<!-- end websites -->
+// The else part is optional. See WEBSITES_LAUNCHED in site-footer.mjs.
+const WEBSITES_BLOCK_RE = /<!-- if websites -->([\s\S]*?)(?:<!-- else websites -->([\s\S]*?))?<!-- end websites -->/g;
+
+function applyLaunchBlocks(html, launched = WEBSITES_LAUNCHED) {
+  return html.replace(WEBSITES_BLOCK_RE, (_, on, off = '') => (launched ? on : off));
+}
+
 function applyTemplate(template, dict, locale, page = 'home') {
   const canonical = homeUrlFor(locale);
   const docsUrl = docsPathFor(locale);
 
   // Build-time placeholders first (they're fixed per locale, not per key).
-  let out = template
+  let out = applyLaunchBlocks(template)
     .replace(/\{\{locale_code\}\}/g, locale.code)
     .replace(/\{\{locale_code_upper\}\}/g, locale.code.toUpperCase())
     .replace(/\{\{locale_flag_code\}\}/g, LANGUAGE_FLAG_CODES[locale.code])
@@ -777,7 +789,7 @@ async function main() {
   // public utility, blog, and user-doc pages.
   const sitemapUrls = [
     ...LOCALES.map((l) => ({ loc: homeUrlFor(l), alternates: 'home' })),
-    { loc: `${SITE_ORIGIN}${WEBSITES_PATH}` },
+    ...(WEBSITES_LAUNCHED ? [{ loc: `${SITE_ORIGIN}${WEBSITES_PATH}` }] : []),
     { loc: `${SITE_ORIGIN}${RESEARCH_PATH}` },
     ...researchData.projects.map((project) => ({ loc: `${SITE_ORIGIN}${researchPathFor(project.slug)}` })),
     ...LOCALES.map((l) => ({ loc: faqUrlFor(l), alternates: 'faq' })),
@@ -852,7 +864,7 @@ async function main() {
 
 export {
   serializeScriptJson, escJson, htmlToPlain, buildFaqJsonLd,
-  buildSoftwareJsonLd, buildFaqLanguageRoutes, applyTemplate,
+  buildSoftwareJsonLd, buildFaqLanguageRoutes, applyTemplate, applyLaunchBlocks,
 };
 
 // Importing the pure builders must not generate site files.

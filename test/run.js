@@ -44906,7 +44906,13 @@ test('generated landing pages stay in sync with the web build template', () => {
     ['web/build/template.html', localized('index.html'), 50],
     ['web/build/websites-template.html', ['web/websites/index.html'], 10],
   ]) {
-    const template = fs.readFileSync(path.join(ROOT, templateRel), 'utf8');
+    // Keep the side of each <!-- if websites --> block the build keeps
+    // (WEBSITES_LAUNCHED in web/build/site-footer.mjs; off until launch).
+    const launched = process.env.WEBBRAIN_WEBSITES_LAUNCHED === '1';
+    const template = fs.readFileSync(path.join(ROOT, templateRel), 'utf8').replace(
+      /<!-- if websites -->([\s\S]*?)(?:<!-- else websites -->([\s\S]*?))?<!-- end websites -->/g,
+      (_, on, off = '') => (launched ? on : off),
+    );
     const literals = template.split(/\{\{[^}]*\}\}/).filter((chunk) => chunk.trim().length > 0);
     assert.ok(literals.length > minimumChunks, `${templateRel}: template should split into literal chunks around placeholders`);
 
@@ -44979,6 +44985,11 @@ test('homepage leads with the browser extension and offers WebBrain for websites
 
   assert.match(template, /id="hero-install-cta"[\s\S]*?\{\{t:hero\.cta\.install\}\}/, 'web home: the browser card installs the extension');
   assert.match(template, /href="\{\{websites_path\}\}" class="path-btn path-btn-ink" id="hero-websites-cta"/, 'web home: the website card adds WebBrain to a website');
+  // WebBrain for websites is on hold until its dashboard launches: the card
+  // stays in the template, switched off, and the built pages leave it out.
+  assert.match(template, /<!-- if websites -->\s*<!-- WebBrain for websites:[\s\S]*?<section class="path path-websites"[\s\S]*?<\/section>\s*<!-- end websites -->/, 'web home: the website card is behind the launch switch');
+  assert.match(build, /WEBSITES_LAUNCHED,/, 'web home: the build reads the launch switch');
+  assert.doesNotMatch(english, /class="path path-websites"|id="hero-websites-cta"|id="home-demo-open"/, 'web home: no website card before launch');
   assert.match(template, /<section class="path path-browser" aria-label="\{\{t:home\.browser\.title\}\}">\s*<!-- Browser mockup/, 'web home: the browser card opens straight on the carousel tabs');
   assert.doesNotMatch(template, /home\.browser\.features|View on GitHub|hero\.cta\.github/, 'web home: no Features link and no GitHub hero action');
   assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');
@@ -44986,10 +44997,11 @@ test('homepage leads with the browser extension and offers WebBrain for websites
   assert.ok(nav, 'web home: nav links missing');
   assert.deepEqual(
     [...nav[1].matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1]),
-    ['For websites', 'Research', 'Docs', 'Blog', 'Download'],
-    'web home: the nav keeps only the other product, research, docs, blog and the install shortcut',
+    ['Research', 'Docs', 'Blog', 'Download'],
+    'web home: the nav keeps research, docs, blog and the install shortcut (For websites returns at launch)',
   );
-  assert.match(turkish, /href="\/websites\/"/, 'web home: localized homepages link to the English websites page');
+  assert.match(template, /<!-- if websites --><a href="\{\{websites_path\}\}">\{\{t:nav\.for_websites\}\}<\/a><!-- end websites -->/, 'web home: the For websites link waits for the launch');
+  assert.doesNotMatch(turkish, /href="\/websites\/"/, 'web home: no page links to the websites page before launch');
   assert.match(english, /<link rel="canonical" href="https:\/\/webbrain\.one\/">/);
   assert.match(turkish, /<link rel="canonical" href="https:\/\/webbrain\.one\/tr\/">/);
   assert.match(build, /SITES_DASHBOARD_URL = 'https:\/\/sites\.webbrain\.one'/);
@@ -45021,21 +45033,31 @@ test('homepage plays the product video in a dialog and loads a live websites dem
   }
   assert.equal(strings['home.browser.watch'], 'Watch it in action');
 
-  // Demo: loads WebBrain for websites on the homepage, only when asked.
+  // Demo: loads WebBrain for websites on the homepage, only when asked (once
+  // the website card is back after launch).
   assert.match(build, /const SITES_DEMO_SITE_ID = 'site_webbrain_one';/);
-  assert.match(english, /id="home-demo-open" data-embed-src="https:\/\/sites\.webbrain\.one\/embed\.js" data-site-id="site_webbrain_one"/);
+  assert.match(template, /id="home-demo-open" data-embed-src="\{\{sites_dashboard_url\}\}\/embed\.js" data-site-id="\{\{sites_demo_site_id\}\}"/);
   assert.doesNotMatch(english, /<script[^>]+src="https:\/\/sites\.webbrain\.one\/embed\.js"/, 'web home: the demo script must not load until the visitor asks');
-  assert.match(english, /<p class="path-status" id="home-demo-status" role="status"><\/p>/);
+  assert.match(template, /<p class="path-status" id="home-demo-status" role="status"><\/p>/);
+  assert.match(template, /if \(!trigger \|\| !status\) return;/, 'web home: the demo script does nothing while the card is left out');
   assert.equal(strings['home.websites.demo'], 'Demo');
   assert.doesNotMatch(template, /home\.websites\.info/, 'web home: the website card has no Info link');
 });
 
-test('websites page promises free forever and sends visitors to the dashboard', () => {
+test('websites page promises free forever and holds the dashboard actions until launch', () => {
   const page = fs.readFileSync(path.join(ROOT, 'web/websites/index.html'), 'utf8');
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/websites-template.html'), 'utf8');
   const runtimeAttributes = ['data-webbrain-ask', 'data-webbrain-act'];
   assert.match(page, /Free now\. <span>Free forever\.<\/span>/);
-  assert.match(page, /<form class="get-script" id="get-script" action="https:\/\/sites\.webbrain\.one\/dashboard" method="get">/);
-  assert.match(page, /name="url"/, 'websites: the address is handed to the dashboard as ?url=');
+  // The launched page stays in the template: the form hands the address to
+  // the dashboard as ?url=.
+  assert.match(template, /<!-- if websites -->\s*<form class="get-script" id="get-script" action="\{\{sites_dashboard_url\}\}\/dashboard" method="get">[\s\S]*?name="url"[\s\S]*?<!-- else websites -->/);
+  // Until then nothing on the page leads to the dashboard.
+  assert.doesNotMatch(page, /<a [^>]*href="https:\/\/sites\.webbrain\.one|action="https:\/\/sites\.webbrain\.one/, 'websites: no link or form leads to the dashboard before launch');
+  assert.match(page, /<input id="get-script-url" type="text" placeholder="yourwebsite\.com" disabled>\s*<button class="btn" type="button" disabled>Coming soon<\/button>/);
+  assert.match(page, /<span class="nav-cta is-disabled" aria-disabled="true">Dashboard coming soon<\/span>/);
+  assert.equal((page.match(/<span class="btn is-disabled" aria-disabled="true">Coming soon<\/span>/g) || []).length, 2, 'websites: both closing calls to action are switched off');
+  assert.match(page, /<meta name="robots" content="noindex, follow">/, 'websites: kept out of search until launch');
   assert.match(page, /https:\/\/sites\.webbrain\.one\/embed\.js/);
   for (const attribute of runtimeAttributes) {
     assert.ok(page.includes(attribute), `websites: documents ${attribute}`);
@@ -45095,6 +45117,7 @@ test('research section renders a mosaic and one page per research line', () => {
   for (const rel of ['web/index.html', 'web/tr/index.html', 'web/websites/index.html', 'web/blog/index.html']) {
     assert.ok(fs.readFileSync(path.join(ROOT, rel), 'utf8').includes('href="/research/"'), `${rel}: links to Research`);
   }
+  assert.ok(!fs.readFileSync(path.join(ROOT, 'web/research/index.html'), 'utf8').includes('href="/websites/"'), 'research: no For websites link before launch');
 });
 
 test('new website routes are rewritten on Vercel and listed in the sitemap', () => {
@@ -45113,7 +45136,8 @@ test('new website routes are rewritten on Vercel and listed in the sitemap', () 
   const localized = vercel.redirects.find((rule) => /^\/:locale\(.*\btr\b.*\)\/browser\/$/.test(rule.source));
   assert.ok(localized && localized.destination === '/:locale/', 'vercel: localized browser pages redirect to their homepage');
   assert.ok(!sources.some((source) => source.includes('/browser')), 'vercel: no rewrites to the retired browser page');
-  assert.ok(sitemap.includes('<loc>https://webbrain.one/websites/</loc>'), 'sitemap: websites page missing');
+  // The page is still served, but stays out of the sitemap until launch.
+  assert.ok(!sitemap.includes('<loc>https://webbrain.one/websites/</loc>'), 'sitemap: websites page is listed before launch');
   assert.ok(!sitemap.includes('/browser/'), 'sitemap: the retired browser page is not listed');
 });
 
@@ -45185,6 +45209,7 @@ test('every webbrain.one page shares one footer', () => {
   }
   assert.match(footerOf('web/tr/index.html'), /<a href="\/tr\/">/, 'localized footers link to their own homepage for the extension');
   assert.match(reference, /<a href="\/companion\/">Desktop Companion<\/a>/, 'the footer links the desktop Companion');
+  assert.doesNotMatch(reference, /href="\/websites\/"/, 'the footer leaves out For websites until launch');
   assert.match(footerOf('web/tr/index.html'), /<a href="\/companion\/tr\/">Masaüstü Companion<\/a>/, 'localized footers link the Companion page in their language');
   assert.match(footerOf('web/docs/zh/index.html'), /<a href="\/companion\/zh\/">/, 'Chinese docs link the Chinese Companion page');
   assert.match(footerOf('web/docs/zh/index.html'), /href="\/docs\/zh\/faq\/"/, 'Chinese docs link to the Chinese FAQ');

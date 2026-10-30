@@ -15,6 +15,14 @@
  * give it a solid background with --wb-footer-bg.
  */
 
+// WebBrain for websites is on hold until its dashboard launches: while this is
+// false, no page links to /websites/ and the homepage leaves out its block.
+// Nothing is deleted. Flip it to true (or build with
+// WEBBRAIN_WEBSITES_LAUNCHED=1 to preview) to bring it all back.
+export const WEBSITES_LAUNCHED = process.env.WEBBRAIN_WEBSITES_LAUNCHED
+  ? process.env.WEBBRAIN_WEBSITES_LAUNCHED === '1'
+  : false;
+
 export const MASTODON_PROFILE_URL = 'https://mastoturk.org/@webbrain';
 export const BLUESKY_PROFILE_URL = 'https://bsky.app/profile/webbrain-one.bsky.social';
 export const DISCORD_INVITE_URL = 'https://discord.gg/cgC325ssfw';
@@ -92,7 +100,8 @@ function socialLink(href, label, icon, rel = 'me noopener') {
  */
 export function siteFooter(dict, {
   browserPath = '/',
-  websitesPath = '/websites/',
+  // null leaves the link out (see WEBSITES_LAUNCHED).
+  websitesPath = WEBSITES_LAUNCHED ? '/websites/' : null,
   companionPath = '/companion/',
   researchPath = '/research/',
   docsPath = '/docs/',
@@ -123,8 +132,8 @@ ${languages.map((l) => `      <a href="${esc(l.href)}" hreflang="${esc(l.code)}"
     <div class="wb-footer-row">
       <div class="wb-footer-links">
         <a href="${esc(browserPath)}">${t('nav.browser_extension')}</a>
-        <a href="${esc(websitesPath)}">${t('nav.for_websites')}</a>
-        <a href="${esc(companionPath)}">${t('footer.link_companion')}</a>
+${websitesPath ? `        <a href="${esc(websitesPath)}">${t('nav.for_websites')}</a>
+` : ''}        <a href="${esc(companionPath)}">${t('footer.link_companion')}</a>
         <a href="${esc(researchPath)}">${t('nav.research')}</a>
         <a href="${esc(docsPath)}">${t('nav.docs')}</a>
         <a href="${esc(faqPath)}">${t('nav.faq')}</a>

@@ -3787,7 +3787,7 @@
       <img class="brand-logo" src="/logo-github.png" alt="" aria-hidden="true"> WebBrain<span style="opacity:0.5; font-weight:400; -webkit-text-fill-color:currentColor;">.one</span>
     </a>
     <div class="nav-links">
-      <a href="{{websites_path}}">{{t:nav.for_websites}}</a>
+      <!-- if websites --><a href="{{websites_path}}">{{t:nav.for_websites}}</a><!-- end websites -->
       <a href="/research/" class="nav-secondary">{{t:nav.research}}</a>
       <a href="{{docs_url}}" class="nav-secondary">{{t:nav.docs}}</a>
       <a href="/blog/" class="nav-secondary">{{t:nav.blog}}</a>
@@ -4182,8 +4182,10 @@
 
   </div>
 
+  <!-- if websites -->
   <!-- WebBrain for websites: same weight of words, less room. The code
-       illustration marks it as the developer product. -->
+       illustration marks it as the developer product. Left out until the
+       dashboard launches (WEBSITES_LAUNCHED in site-footer.mjs). -->
   <section class="path path-websites" aria-labelledby="path-websites-title">
     <div class="illo illo-site" aria-hidden="true">
       <div class="code-pane">
@@ -4236,6 +4238,7 @@
       </div>
     </div>
   </section>
+  <!-- end websites -->
 </section>
 
 <dialog class="video-dialog" id="home-video-dialog" aria-labelledby="home-video-title">

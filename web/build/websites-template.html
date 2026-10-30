@@ -18,7 +18,7 @@
   <meta name="twitter:title" content="WebBrain for websites — Add an AI guide to your website">
   <meta name="twitter:description" content="One script tag gives every visitor an AI guide that explains your pages, answers questions, and fills in forms when you allow it. Free forever.">
   <meta name="twitter:image" content="https://webbrain.one/twitter-image.png">
-  <meta name="robots" content="index, follow">
+  <!-- if websites --><meta name="robots" content="index, follow"><!-- else websites --><meta name="robots" content="noindex, follow"><!-- end websites -->
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="canonical" href="{{page_url}}">
   <script type="application/ld+json">
@@ -237,6 +237,17 @@
     .btn:hover { background: var(--accent-hover); color: #fff; text-decoration: none; transform: translateY(-1px); }
     .btn-quiet { background: transparent; color: var(--text); border-color: var(--border-strong); box-shadow: none; }
     .btn-quiet:hover { background: var(--bg-card-hover); color: var(--text); }
+    /* Until the dashboard launches every action that leads to it is shown
+       but switched off (WEBSITES_LAUNCHED in site-footer.mjs). */
+    .btn:disabled, .btn.is-disabled, .nav-cta.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn:disabled:hover, .btn.is-disabled:hover { background: var(--accent); }
+    .nav-cta.is-disabled:hover { background: var(--accent); }
+    .get-script input:disabled { opacity: 0.6; cursor: not-allowed; }
     .hero-note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; color: var(--text-dim); font-size: 14px; }
     .free-dot { display: inline-flex; align-items: center; gap: 7px; color: var(--success); font-weight: 700; }
     .free-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px var(--success-bg); }
@@ -406,7 +417,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </button>
-      <a class="nav-cta" href="{{sites_dashboard_url}}/dashboard">Open the dashboard</a>
+      <!-- if websites --><a class="nav-cta" href="{{sites_dashboard_url}}/dashboard">Open the dashboard</a><!-- else websites --><span class="nav-cta is-disabled" aria-disabled="true">Dashboard coming soon</span><!-- end websites -->
     </div>
   </div>
 </header>
@@ -417,15 +428,23 @@
       <p class="kicker">WebBrain for websites</p>
       <h1 id="websites-title">Add an AI guide <span class="accent-line">to your website.</span></h1>
       <p class="lede">Paste one line of code and every visitor can ask about the page they're on. WebBrain reads the page, answers from it, and, if you allow it, fills in forms and clicks through for them.</p>
+      <!-- if websites -->
       <form class="get-script" id="get-script" action="{{sites_dashboard_url}}/dashboard" method="get">
         <label for="get-script-url">Your website address</label>
         <input id="get-script-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="yourwebsite.com" spellcheck="false">
         <button class="btn" type="submit">Get your script</button>
       </form>
+      <!-- else websites -->
+      <form class="get-script" aria-describedby="get-script-soon" onsubmit="return false">
+        <label for="get-script-url">Your website address</label>
+        <input id="get-script-url" type="text" placeholder="yourwebsite.com" disabled>
+        <button class="btn" type="button" disabled>Coming soon</button>
+      </form>
+      <!-- end websites -->
       <p class="hero-note">
         <span class="free-dot">Free forever</span>
         <span>No credit card. Nothing for visitors to install.</span>
-        <a href="{{sites_dashboard_url}}/playground">Try the live demo</a>
+        <!-- if websites --><a href="{{sites_dashboard_url}}/playground">Try the live demo</a><!-- else websites --><span id="get-script-soon">The dashboard opens soon.</span><!-- end websites -->
       </p>
     </div>
 
@@ -540,7 +559,7 @@ WebBrain.<span class="tok-attr">reloadConfig</span>();</pre>
     <h2 id="free-title">Free now. <span>Free forever.</span></h2>
     <div>
       <p>WebBrain for websites is free to use, and the free plan is here to stay. Paid tiers with extra features will come later, for teams that want more.</p>
-      <a class="btn" href="{{sites_dashboard_url}}/dashboard">Get your script</a>
+      <!-- if websites --><a class="btn" href="{{sites_dashboard_url}}/dashboard">Get your script</a><!-- else websites --><span class="btn is-disabled" aria-disabled="true">Coming soon</span><!-- end websites -->
     </div>
   </section>
 
@@ -580,8 +599,12 @@ WebBrain.<span class="tok-attr">reloadConfig</span>();</pre>
   <section class="closing" aria-labelledby="closing-title">
     <h2 id="closing-title">Give every visitor a guide to your site.</h2>
     <div class="closing-actions">
+      <!-- if websites -->
       <a class="btn" href="{{sites_dashboard_url}}/dashboard">Get your script</a>
       <a class="btn btn-quiet" href="{{sites_dashboard_url}}/playground">Try the live demo</a>
+      <!-- else websites -->
+      <span class="btn is-disabled" aria-disabled="true">Coming soon</span>
+      <!-- end websites -->
     </div>
   </section>
 </main>

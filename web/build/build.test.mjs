@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url';
 const runFile = promisify(execFile);
 const locale = { code: 'en', bcp47: 'en-US', dir: 'ltr', isDefault: true };
 const exportNames = [
-  'applyTemplate', 'buildFaqJsonLd', 'buildFaqLanguageRoutes',
+  'applyLaunchBlocks', 'applyTemplate', 'buildFaqJsonLd', 'buildFaqLanguageRoutes',
   'buildSoftwareJsonLd', 'escJson', 'htmlToPlain', 'serializeScriptJson',
 ].sort();
 const scriptTemplate = [
@@ -159,4 +159,12 @@ test('route-map placeholders remain parseable with their existing locale paths',
   assert.equal(parsed.routes.zh, '/docs/zh/faq/');
   assert.equal(parsed.flags.en, 'us');
   assert.equal(parsed.flags.tr, 'tr');
+});
+
+test('websites launch blocks keep one side of the switch', () => {
+  const source = 'a<!-- if websites -->ON<!-- else websites -->OFF<!-- end websites -->b<!-- if websites -->X<!-- end websites -->c';
+  assert.equal(builder.applyLaunchBlocks(source, true), 'aONbXc');
+  assert.equal(builder.applyLaunchBlocks(source, false), 'aOFFbc');
+  // Until the dashboard launches, templates render the "off" side.
+  assert.equal(builder.applyTemplate(source, {}, locale).html, 'aOFFbc');
 });
