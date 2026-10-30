@@ -45009,6 +45009,21 @@ test('homepage leads with the browser extension and offers WebBrain for websites
   assert.match(template, /<!-- if websites -->\s*<!-- WebBrain for websites:[\s\S]*?<section class="path path-websites"[\s\S]*?<\/section>\s*<!-- end websites -->/, 'web home: the website card is behind the launch switch');
   assert.match(build, /WEBSITES_LAUNCHED,/, 'web home: the build reads the launch switch');
   assert.doesNotMatch(english, /class="path path-websites"|id="hero-websites-cta"|id="home-demo-open"/, 'web home: no website card before launch');
+  // The hero speaks for the browser extension alone until launch.
+  for (const key of ['kicker', 'title_line1', 'title_line2', 'lede']) {
+    assert.match(template, new RegExp(`<!-- if websites -->[^]*?\\{\\{t:home\\.${key}\\}\\}[^]*?<!-- else websites -->[^]*?\\{\\{t:home\\.${key}_browser\\}\\}[^]*?<!-- end websites -->`), `web home: ${key} has a browser-only version`);
+  }
+  assert.match(english, /<p class="hero-kicker">Free and open source<\/p>/);
+  assert.match(english, /<span class="title-line">An AI agent on every page<\/span> <span class="title-line title-accent">you visit\.<\/span>/);
+  assert.match(turkish, /<span class="title-line">Gezdiğiniz her sayfada<\/span> <span class="title-line title-accent">bir AI ajanı\.<\/span>/);
+  const hero = english.slice(english.indexOf('<section class="home-hero"'), english.indexOf('id="voices"')).replace(/<!--[\s\S]*?-->/g, '');
+  assert.doesNotMatch(hero, /website|or build/i, 'web home: the hero does not mention websites before launch');
+  for (const file of fs.readdirSync(path.join(ROOT, 'web/build/locales')).filter((name) => name.endsWith('.json'))) {
+    const dict = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales', file), 'utf8'));
+    for (const key of ['kicker', 'title_line1', 'title_line2', 'lede']) {
+      assert.ok(String(dict[`home.${key}_browser`] || '').trim(), `${file}: home.${key}_browser missing`);
+    }
+  }
   assert.match(template, /<section class="path path-browser" aria-label="\{\{t:home\.browser\.title\}\}">\s*<!-- Browser mockup/, 'web home: the browser card opens straight on the carousel tabs');
   assert.doesNotMatch(template, /home\.browser\.features|View on GitHub|hero\.cta\.github/, 'web home: no Features link and no GitHub hero action');
   assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');

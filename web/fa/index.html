@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/fa/",
       "inLanguage": "fa-IR",
-      "description": "WebBrain یک عامل هوش مصنوعی رایگان است که صفحات وب را می‌خواند، توضیح می‌دهد و روی آن‌ها کار انجام می‌دهد. افزونه متن‌باز را به Chrome، Edge یا Firefox اضافه کنید، یا WebBrain را برای بازدیدکنندگان به وب‌سایت خود بیفزایید.",
+      "description": "WebBrain یک جایگزین رایگان و منبع باز برای پلاگین مرورگر کلود است. عامل مرورگر هوش مصنوعی برای Chrome، Firefox، و Edge - خواندن صفحات، استخراج داده ها، خودکار کردن وظایف. با llama.cpp، OpenAI، کلود، OpenRouter کار می کند. رابط کاربری چند زبانه، اسکرین‌شات‌های مبتنی بر نشانه. دارای مجوز GPL-3.0-or-later",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4247,10 +4250,12 @@
   <div class="hero-split">
     <div class="hero-copy" data-title="long">
       <div class="hero-title">
-        <p class="hero-kicker">رایگان برای مرورگرها و وب‌سایت‌ها</p>
-        <h1 id="home-title"><span class="title-line">در هر صفحه‌ای که می‌بینید یا می‌سازید،</span> <span class="title-line title-accent">یک عامل هوش مصنوعی.</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">رایگان و متن‌باز</p>
+        <h1 id="home-title"><span class="title-line">در هر صفحه‌ای که می‌بینید،</span> <span class="title-line title-accent">یک عامل هوش مصنوعی.</span></h1>
       </div>
-      <p class="hero-lede">WebBrain صفحات وب را می‌خواند، توضیح می‌دهد و روی آن‌ها کار انجام می‌دهد. آن را به مرورگرتان اضافه کنید تا در هر سایتی کمک بگیرید، یا به وب‌سایتتان تا بازدیدکنندگان هم همین کمک را بگیرند.</p>
+      <p class="hero-lede">WebBrain صفحه‌های وب را می‌خواند، توضیح می‌دهد و روی آن‌ها کار انجام می‌دهد. آن را به Chrome، Edge یا Firefox اضافه کنید و در هر سایتی کمک بگیرید، با هر مدلی، از جمله مدل‌های محلی.</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
