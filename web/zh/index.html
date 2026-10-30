@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/zh/",
       "inLanguage": "zh-CN",
-      "description": "WebBrain 是一款免费的 AI 代理，可以阅读、解释网页并在网页上执行操作。将开源扩展添加到 Chrome、Edge 或 Firefox，或将 WebBrain 添加到您的网站，为访客服务。",
+      "description": "WebBrain 是 Claude 浏览器插件的免费开源替代品。面向 Chrome、Firefox 与 Edge 的 AI 浏览器代理 —— 阅读页面、提取数据、自动化任务。兼容 llama.cpp、OpenAI、Claude、OpenRouter。多语言界面、截图节省 token。GPL-3.0-or-later 许可。",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4247,10 +4250,12 @@
   <div class="hero-split">
     <div class="hero-copy" data-title="short">
       <div class="hero-title">
-        <p class="hero-kicker">浏览器与网站均可免费使用</p>
-        <h1 id="home-title"><span class="title-line">您浏览或构建的每个页面</span> <span class="title-line title-accent">都有一个 AI 代理。</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">免费且开源</p>
+        <h1 id="home-title"><span class="title-line">您浏览的每个页面</span> <span class="title-line title-accent">都有一个 AI 代理。</span></h1>
       </div>
-      <p class="hero-lede">WebBrain 能够阅读、解释网页，并在网页上执行操作。把它添加到浏览器，在任何网站上获得帮助；或添加到您的网站，让访客获得同样的帮助。</p>
+      <p class="hero-lede">WebBrain 能阅读、解释网页并在网页上执行操作。将它添加到 Chrome、Edge 或 Firefox，即可在任何网站获得帮助，支持任何模型，包括本地模型。</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

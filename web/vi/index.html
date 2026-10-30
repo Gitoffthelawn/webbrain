@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/vi/",
       "inLanguage": "vi-VN",
-      "description": "WebBrain là tác nhân AI miễn phí có thể đọc, giải thích và thao tác trên các trang web. Cài tiện ích mã nguồn mở cho Chrome, Edge hoặc Firefox, hoặc thêm WebBrain vào website của bạn cho khách truy cập.",
+      "description": "WebBrain là một giải pháp thay thế mã nguồn mở miễn phí cho plugin trình duyệt của Claude. Tác nhân trình duyệt AI dành cho Chrome, Firefox và Edge — đọc trang, trích xuất dữ liệu, tự động hóa tác vụ. Hoạt động với llama.cpp, OpenAI, Claude, OpenRouter. Giao diện người dùng đa ngôn ngữ, ảnh chụp màn hình có ý thức về mã thông báo. GPL-3.0-or-later được cấp phép.",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4245,12 +4248,14 @@
 <main class="home" id="top">
 <section class="home-hero" aria-labelledby="home-title">
   <div class="hero-split">
-    <div class="hero-copy" data-title="long">
+    <div class="hero-copy" data-title="short">
       <div class="hero-title">
-        <p class="hero-kicker">Miễn phí cho trình duyệt và website</p>
-        <h1 id="home-title"><span class="title-line">Tác nhân AI trên mọi trang</span> <span class="title-line title-accent">bạn truy cập hoặc xây dựng.</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">Miễn phí và mã nguồn mở</p>
+        <h1 id="home-title"><span class="title-line">Tác nhân AI trên mọi trang</span> <span class="title-line title-accent">bạn truy cập.</span></h1>
       </div>
-      <p class="hero-lede">WebBrain đọc, giải thích và thao tác trên các trang web. Thêm vào trình duyệt để được trợ giúp trên mọi trang, hoặc thêm vào website để khách truy cập của bạn cũng được trợ giúp như vậy.</p>
+      <p class="hero-lede">WebBrain đọc, giải thích và thao tác trên trang web. Thêm vào Chrome, Edge hoặc Firefox để được hỗ trợ trên mọi trang, với bất kỳ mô hình nào, kể cả mô hình cục bộ.</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/ms/",
       "inLanguage": "ms-MY",
-      "description": "WebBrain ialah ejen AI percuma yang membaca, menerangkan dan bertindak pada halaman web. Pasang sambungan sumber terbuka pada Chrome, Edge atau Firefox, atau tambah WebBrain pada laman web anda untuk pelawat.",
+      "description": "WebBrain ialah alternatif percuma dan sumber terbuka kepada pemalam pelayar Claude. Ejen pelayar AI untuk Chrome, Firefox dan Edge — membaca halaman, mengekstrak data, mengautomatikkan tugas. Berfungsi dengan llama.cpp, OpenAI, Claude, OpenRouter. UI berbilang bahasa, tangkapan skrin jimat token. Berlesen GPL-3.0-or-later.",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4245,12 +4248,14 @@
 <main class="home" id="top">
 <section class="home-hero" aria-labelledby="home-title">
   <div class="hero-split">
-    <div class="hero-copy" data-title="long">
+    <div class="hero-copy" data-title="short">
       <div class="hero-title">
-        <p class="hero-kicker">Percuma untuk pelayar dan laman web</p>
-        <h1 id="home-title"><span class="title-line">Ejen AI pada setiap halaman</span> <span class="title-line title-accent">yang anda lawati atau bina.</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">Percuma dan sumber terbuka</p>
+        <h1 id="home-title"><span class="title-line">Ejen AI pada setiap halaman</span> <span class="title-line title-accent">yang anda lawati.</span></h1>
       </div>
-      <p class="hero-lede">WebBrain membaca, menerangkan dan bertindak pada halaman web. Tambahkannya pada pelayar anda untuk mendapat bantuan di mana-mana laman, atau pada laman web anda supaya pelawat mendapat bantuan yang sama.</p>
+      <p class="hero-lede">WebBrain membaca, menerangkan dan bertindak pada halaman web. Tambahkannya ke Chrome, Edge atau Firefox dan dapatkan bantuan di mana-mana laman, dengan apa-apa model, termasuk model tempatan.</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
