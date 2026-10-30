@@ -6,6 +6,12 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+## [45.0.4] - 2026-10-30
+
+### Fixed
+- Chrome Web Store review: the bundled PDF.js is now the upstream modern build, unmodified from pdfjs-dist 5.7.284, instead of the legacy build. The legacy build bundled core-js, whose old Internet Explorer fallback (an ActiveX object or a hidden iframe written with `document.write`) the store rejected as obfuscated code. A short `vendor/pdfjs/compat.mjs` adds the few newer JavaScript methods the modern build needs, only when the browser lacks them, so reading and viewing PDFs keeps working on Chrome 128+ and Firefox 140+. Both builds.
+- Submission zips built on a machine with `core.autocrlf=true` keep their LF line endings, so vendored files in the zip match their upstream bytes.
+
 ## [45.0.3] - 2026-10-29
 
 ### Fixed
