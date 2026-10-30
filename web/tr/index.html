@@ -3218,10 +3218,8 @@
     .mcp-tools-label {
       margin-top: 28px;
       color: var(--text-dim);
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
     }
     .mcp-tools {
       display: flex;
@@ -3229,14 +3227,17 @@
       gap: 7px;
       margin-top: 10px;
     }
+    /* The six tools read as real names: full-contrast text on a light
+       tint in both themes, not dim text on a code-black chip. */
     .mcp-tool {
-      padding: 6px 8px;
+      padding: 6px 10px;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--code-bg);
-      color: var(--text-dim);
+      border-radius: 7px;
+      background: var(--tint-soft);
+      color: var(--text);
       font-family: 'SFMono-Regular', Consolas, monospace;
-      font-size: 10px;
+      font-size: 12px;
+      line-height: 1.3;
     }
 
     /* ================================================================
