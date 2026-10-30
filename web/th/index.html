@@ -3126,119 +3126,98 @@
     /* ================================================================
        MCP BRIDGE
        ================================================================ */
-    .mcp-showcase {
-      position: relative;
-      max-width: 980px;
-      margin: 40px auto 0;
+    .mcp-setup {
       overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-      border: 1px solid rgba(108,99,255,0.3);
+      border: 1px solid var(--border);
       border-radius: calc(var(--radius) + 4px);
-      background:
-        radial-gradient(circle at 88% 12%, rgba(52,211,153,0.1), transparent 24rem),
-        linear-gradient(145deg, var(--bg-card), var(--surface));
-      box-shadow: 0 24px 70px var(--shadow-strong);
+      background: var(--bg-card);
+      box-shadow: 0 24px 70px var(--shadow-card);
     }
-    .mcp-showcase::before {
-      content: '127.0.0.1:17374';
-      position: absolute;
-      top: 17px;
-      right: 20px;
-      color: var(--success);
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      opacity: 0.72;
-    }
-    [dir="rtl"] .mcp-showcase::before { right: auto; left: 20px; }
-    .mcp-copy {
-      padding: 42px 36px;
-      border-inline-end: 1px solid var(--border);
-    }
-    .mcp-copy h3 {
-      max-width: 390px;
-      margin: 0 0 14px;
-      font-size: 25px;
-      line-height: 1.2;
-      letter-spacing: -0.025em;
-    }
-    .mcp-copy p {
-      margin: 0 0 24px;
-      color: var(--text-dim);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-    .mcp-command {
-      margin: 0 0 24px;
-      overflow-x: auto;
-      padding: 13px 15px;
-      border: 1px solid rgba(52,211,153,0.2);
-      border-radius: 9px;
-      background: var(--code-bg);
-      color: var(--success);
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: nowrap;
-      text-align: start;
-    }
-    .mcp-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-    .mcp-actions .btn { padding: 10px 16px; font-size: 13px; }
-    .mcp-console { min-width: 0; padding: 62px 34px 34px; }
-    .mcp-rail {
+    .mcp-steps {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1fr) 26px minmax(0, 1fr);
-      align-items: center;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      list-style: none;
+      margin: 0;
+      padding: 0;
     }
-    .mcp-node {
-      min-width: 0;
-      min-height: 112px;
+    .mcp-step { min-width: 0; padding: 34px 36px; }
+    .mcp-step + .mcp-step { border-inline-start: 1px solid var(--border); }
+    .mcp-step h3 { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 20px; line-height: 1.25; letter-spacing: -0.02em; }
+    .mcp-step-n {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .mcp-step > p { margin: 0; color: var(--text-dim); font-size: 14px; line-height: 1.65; }
+    .mcp-prompt {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 15px 10px;
+      gap: 12px;
+      margin-top: 22px;
+      padding: 14px 14px 14px 18px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: var(--tint-soft);
-      text-align: center;
+      background: var(--bg);
     }
-    .mcp-node.is-bridge {
-      border-color: rgba(52,211,153,0.34);
-      box-shadow: inset 0 -3px rgba(52,211,153,0.55);
-    }
-    .mcp-node-icon { color: var(--accent2); font-family: 'SFMono-Regular', Consolas, monospace; font-size: 21px; }
-    .mcp-node.is-bridge .mcp-node-icon { color: var(--success); }
-    .mcp-node strong { min-width: 0; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
-    .mcp-node span:last-child { color: var(--text-dim); font-family: 'SFMono-Regular', Consolas, monospace; font-size: 9px; }
-    .mcp-arrow { color: var(--faint, var(--text-dim)); font-family: 'SFMono-Regular', Consolas, monospace; text-align: center; }
-    .mcp-tools-label {
-      margin-top: 28px;
-      color: var(--text-dim);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .mcp-tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 10px;
-    }
-    /* The six tools read as real names: full-contrast text on a light
-       tint in both themes, not dim text on a code-black chip. */
-    .mcp-tool {
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      background: var(--tint-soft);
+    .mcp-prompt code {
+      flex: 1;
+      min-width: 0;
       color: var(--text);
       font-family: 'SFMono-Regular', Consolas, monospace;
-      font-size: 12px;
-      line-height: 1.3;
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      user-select: all;
     }
+    .mcp-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: 0 0 auto;
+      padding: 9px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 9px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mcp-copy-btn:hover { filter: brightness(1.08); }
+    .mcp-copy-btn:focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; }
+    .mcp-copy-btn svg { width: 15px; height: 15px; }
+    .mcp-copy-btn.is-copied { border-color: var(--success); background: var(--success); }
+    /* What the visitor will type next, drawn as their own chat message. */
+    .mcp-step > .mcp-example {
+      width: fit-content;
+      max-width: 100%;
+      margin: 22px 0 0;
+      padding: 12px 16px;
+      border-radius: 14px 14px 4px 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .mcp-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 14px;
+      padding: 18px 36px;
+      border-top: 1px solid var(--border);
+      background: var(--tint-soft);
+    }
+    .mcp-foot .btn { padding: 10px 16px; font-size: 13px; }
+    .mcp-req { margin: 0 0 0 auto; color: var(--text-dim); font-size: 13px; }
 
     /* ================================================================
        OPEN SOURCE
@@ -3527,9 +3506,6 @@
       .cc-core { width: 64px; height: 64px; font-size: 28px; }
       .video-showcase { max-width: 380px; }
       .video-frame { padding-bottom: 177.78%; }
-      .mcp-showcase { grid-template-columns: 1fr; }
-      .mcp-copy { border-inline-end: 0; border-bottom: 1px solid var(--border); }
-      .mcp-console { padding-top: 50px; }
       .compare-video-card {
         grid-template-columns: 44px minmax(0, 1fr);
         gap: 12px;
@@ -3555,10 +3531,6 @@
          squeezed onto shared lines read worse than one line each. */
       .hero-proof { flex-direction: column; gap: 10px; }
       .hero-proof-cell:not(:last-child)::after { content: none; }
-      .mcp-copy, .mcp-console { padding-inline: 20px; }
-      .mcp-rail { grid-template-columns: 1fr; }
-      .mcp-node { min-height: 86px; }
-      .mcp-arrow { transform: rotate(90deg); }
     }
     @media (max-width: 480px) {
       .hero { padding: 60px 16px 50px; }
@@ -3597,7 +3569,6 @@
     .oss-banner { max-width: none; margin: 0; }
     .oss-banner p { margin-inline: 0; max-width: 560px; }
     .path-browser .hero-proof { justify-content: flex-start; max-width: none; margin-inline: 0; }
-    .mcp-showcase { max-width: none; margin-inline: 0; }
     /* The shared footer lines up with the sections' text column. */
     :root { --wb-footer-width: min(calc(100% - 48px), calc(var(--max-w) - 48px)); }
 
@@ -4093,10 +4064,15 @@
       .section-aside > .section-intro { margin-bottom: 32px; }
       .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .oss-banner { grid-template-columns: 1fr; }
+      .mcp-steps { grid-template-columns: 1fr; }
+      .mcp-step + .mcp-step { border-inline-start: 0; border-top: 1px solid var(--border); }
+      .mcp-step, .mcp-foot { padding-inline: 20px; }
+      .mcp-req { margin-inline-start: 0; flex-basis: 100%; }
       .oss-banner .share-row { grid-column: 1; grid-row: auto; margin-top: 24px; }
     }
     @media (max-width: 640px) {
       .features-grid { grid-template-columns: 1fr; }
+      .mcp-prompt { flex-direction: column; align-items: stretch; }
     }
   </style>
 
@@ -5054,45 +5030,31 @@
     <p class="section-subtitle">เชื่อมต่อ Claude Code, Codex, Cursor, OpenCode หรือไคลเอนต์ MCP แบบ stdio ใด ๆ กับแท็บ Chromium ที่คุณลงชื่อเข้าใช้ไว้ WebBrain ยังคงด่านสิทธิ์ระดับงานไว้ในเบราว์เซอร์ และตอนนี้ส่งคืน JSON แบบมีโครงสร้างได้ด้วย</p>
   </header>
 
-  <div class="mcp-showcase">
-    <div class="mcp-copy">
-      <h3>มอบหมายเป้าหมาย เก็บเซสชันไว้กับคุณ</h3>
-      <p>ไม่ต้องส่งออกคุกกี้ ล็อกอินแบบไร้หน้าจอ หรือใช้ข้อมูลรับรองซ้ำ เซิร์ฟเวอร์ภายในเครื่องส่งงานให้ WebBrain ใน Chrome, Edge, Brave, Opera หรือ Vivaldi สะพาน MCP ไม่รองรับ Firefox</p>
-      <div class="mcp-command" role="region" aria-label="คำสั่งสำหรับเปิดเซิร์ฟเวอร์ WebBrain MCP">$ npx -y @webbrain/mcp-server</div>
-      <div class="mcp-actions">
-        <a href="/docs/mcp/" class="btn btn-primary">เปิดคู่มือ MCP ฉบับสมบูรณ์</a>
-        <a href="https://github.com/webbrain-one/webbrain/tree/main/mcp-server" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
-      </div>
-    </div>
-    <div class="mcp-console" aria-label="ไคลเอนต์ MCP ไปยังเซิร์ฟเวอร์ WebBrain ภายในเครื่อง แล้วไปยังเบราว์เซอร์ Chromium ที่ลงชื่อเข้าใช้">
-      <div class="mcp-rail">
-        <div class="mcp-node">
-          <span class="mcp-node-icon" aria-hidden="true">⌘</span>
-          <strong>เอเจนต์เขียนโค้ดของคุณ</strong>
-          <span>MCP · stdio</span>
+  <!-- How people actually use it: paste one prompt into the coding agent
+       they already run, then ask for browser work in plain words. -->
+  <div class="mcp-setup">
+    <ol class="mcp-steps">
+      <li class="mcp-step">
+        <h3><span class="mcp-step-n" aria-hidden="true">1</span>ให้เอเจนต์ของคุณตั้งค่าให้</h3>
+        <p>วางข้อความนี้ใน Claude Code, Codex, Cursor หรือไคลเอนต์ MCP ในเครื่องตัวใดก็ได้ เอเจนต์จะอ่านคู่มือและเพิ่ม WebBrain ให้คุณ</p>
+        <div class="mcp-prompt">
+          <code id="mcp-prompt-text">อ่าน https://webbrain.one/docs/mcp/ แล้วตั้งค่าเซิร์ฟเวอร์ WebBrain MCP ให้ฉัน</code>
+          <button class="mcp-copy-btn" type="button" id="mcp-copy" data-copied="คัดลอกแล้ว" aria-describedby="mcp-prompt-text">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <span>คัดลอก</span>
+          </button>
         </div>
-        <div class="mcp-arrow" aria-hidden="true">→</div>
-        <div class="mcp-node is-bridge">
-          <span class="mcp-node-icon" aria-hidden="true">◇</span>
-          <strong>WebBrain MCP</strong>
-          <span>loopback only</span>
-        </div>
-        <div class="mcp-arrow" aria-hidden="true">→</div>
-        <div class="mcp-node">
-          <span class="mcp-node-icon" aria-hidden="true">◎</span>
-          <strong>เบราว์เซอร์ที่คุณลงชื่อเข้าใช้</strong>
-          <span>Chrome · Edge · Brave</span>
-        </div>
-      </div>
-      <div class="mcp-tools-label">เครื่องมือระดับงาน 6 รายการ · สิทธิ์ของเบราว์เซอร์ยังคงมีผล</div>
-      <div class="mcp-tools" aria-label="WebBrain MCP tools">
-        <span class="mcp-tool">webbrain_run</span>
-        <span class="mcp-tool">webbrain_extract</span>
-        <span class="mcp-tool">webbrain_status</span>
-        <span class="mcp-tool">webbrain_respond</span>
-        <span class="mcp-tool">webbrain_abort</span>
-        <span class="mcp-tool">webbrain_connection</span>
-      </div>
+      </li>
+      <li class="mcp-step">
+        <h3><span class="mcp-step-n" aria-hidden="true">2</span>จากนั้นสั่งงานในเบราว์เซอร์</h3>
+        <p>เอเจนต์จะส่งงานให้ WebBrain ในเบราว์เซอร์ที่คุณลงชื่อเข้าใช้อยู่แล้ว WebBrain ยังคงถามก่อนทำสิ่งที่สำคัญ</p>
+        <p class="mcp-example">ใช้ WebBrain สรุปแดชบอร์ด CI ที่เปิดอยู่ในเบราว์เซอร์ของฉัน</p>
+      </li>
+    </ol>
+    <div class="mcp-foot">
+      <a href="/docs/mcp/" class="btn btn-primary">เปิดคู่มือ MCP ฉบับสมบูรณ์</a>
+      <a href="https://github.com/webbrain-one/webbrain/tree/main/mcp-server" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
+      <p class="mcp-req">ต้องใช้ Chrome, Edge, Brave, Opera หรือ Vivaldi ที่ติดตั้ง WebBrain และ Node.js 20 ขึ้นไปในเครื่องเดียวกัน</p>
     </div>
   </div>
 
@@ -5492,6 +5454,43 @@
         .then(function () { assistant().open(); })
         .catch(function () { status.textContent = trigger.getAttribute('data-error'); })
         .then(function () { trigger.removeAttribute('aria-busy'); });
+    });
+  })();
+</script>
+
+<!-- MCP: copy the setup prompt for the visitor's coding agent. -->
+<script>
+  (function () {
+    var button = document.getElementById('mcp-copy');
+    var text = document.getElementById('mcp-prompt-text');
+    if (!button || !text) return;
+    var label = button.querySelector('span');
+    var original = label.textContent;
+    var timer = null;
+    function copied() {
+      button.classList.add('is-copied');
+      label.textContent = button.getAttribute('data-copied');
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        button.classList.remove('is-copied');
+        label.textContent = original;
+      }, 2000);
+    }
+    function fallback() {
+      var range = document.createRange();
+      range.selectNodeContents(text);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      try { if (document.execCommand('copy')) copied(); } catch (_) {}
+    }
+    button.addEventListener('click', function () {
+      var value = text.textContent.trim();
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value).then(copied, fallback);
+      } else {
+        fallback();
+      }
     });
   })();
 </script>

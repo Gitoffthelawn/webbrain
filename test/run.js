@@ -44914,6 +44914,21 @@ test('websites page promises free forever and sends visitors to the dashboard', 
   assert.doesNotMatch(page, /hreflang=/, 'websites: English-only page announces no alternates');
 });
 
+test('homepage MCP section gives a prompt to paste into the coding agent', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
+  const mcp = english.slice(english.indexOf('id="mcp"'), english.indexOf('class="developer-frameworks-wrap"'));
+  assert.ok(mcp.length > 0, 'web home: MCP section missing');
+  assert.match(mcp, /<code id="mcp-prompt-text">Read https:\/\/webbrain\.one\/docs\/mcp\/ and set up the WebBrain MCP server for me\.<\/code>/);
+  assert.match(mcp, /<button class="mcp-copy-btn" type="button" id="mcp-copy" data-copied="Copied"/);
+  assert.match(mcp, /class="mcp-example">Use WebBrain to summarize the CI dashboard open in my browser\.<\/p>/);
+  assert.match(mcp, /href="\/docs\/mcp\/" class="btn btn-primary">Open the complete MCP guide<\/a>/);
+  assert.doesNotMatch(template, /mcp-showcase|mcp-tool|mcp-rail/, 'web home: the architecture diagram and tool chips are gone');
+  assert.match(turkish, /<code id="mcp-prompt-text">https:\/\/webbrain\.one\/docs\/mcp\/ adresini oku/, 'web home: the prompt is localized and keeps the guide URL');
+  assert.match(template, /navigator\.clipboard\.writeText\(value\)\.then\(copied, fallback\)/, 'web home: copy uses the clipboard with a selection fallback');
+});
+
 test('new website routes are rewritten on Vercel and listed in the sitemap', () => {
   const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/vercel.json'), 'utf8'));
   const sitemap = fs.readFileSync(path.join(ROOT, 'web/sitemap.xml'), 'utf8');
