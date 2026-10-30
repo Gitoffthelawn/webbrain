@@ -355,7 +355,8 @@ function headlineWidth(text) {
 }
 
 function homeTitleSize(dict) {
-  return headlineWidth(`${dict['home.title_line1'] || ''} ${dict['home.title_line2'] || ''}`) > 45 ? 'long' : 'short';
+  const suffix = WEBSITES_LAUNCHED ? '' : '_browser';
+  return headlineWidth(`${dict[`home.title_line1${suffix}`] || ''} ${dict[`home.title_line2${suffix}`] || ''}`) > 45 ? 'long' : 'short';
 }
 
 function hreflangBlockFor(page) {
@@ -522,7 +523,8 @@ function buildHomeJsonLd(dict, locale) {
         name: 'WebBrain',
         url: homeUrlFor(locale),
         inLanguage: locale.bcp47,
-        description: dict['home.meta.description'],
+        // home.meta.description also pitches WebBrain for websites.
+        description: WEBSITES_LAUNCHED ? dict['home.meta.description'] : dict['meta.description'],
         publisher: { '@id': `${SITE_ORIGIN}/#organization` },
       },
     ],

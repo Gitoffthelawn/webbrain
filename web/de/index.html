@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/de/",
       "inLanguage": "de-DE",
-      "description": "WebBrain ist ein kostenloser KI-Agent, der Webseiten liest, erklärt und auf ihnen handelt. Installieren Sie die Open-Source-Erweiterung in Chrome, Edge oder Firefox, oder binden Sie WebBrain für Ihre Besucher in Ihre Website ein.",
+      "description": "WebBrain ist eine kostenlose Open-Source-Alternative zu Claudes Browser-Plugin. AI-Browser-Agent für Chrome, Firefox und Edge — lesen Sie Seiten, extrahieren Sie Daten, automatisieren Sie Aufgaben. Funktioniert mit llama.cpp, OpenAI, Claude, OpenRouter. Mehrsprachige Benutzeroberfläche, token-bewachte Screenshots. GPL-3.0-or-later-Lizenz.",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4247,10 +4250,12 @@
   <div class="hero-split">
     <div class="hero-copy" data-title="long">
       <div class="hero-title">
-        <p class="hero-kicker">Kostenlos für Browser und Websites</p>
-        <h1 id="home-title"><span class="title-line">Ein KI-Agent auf jeder Seite,</span> <span class="title-line title-accent">die Sie besuchen oder bauen.</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">Kostenlos und Open Source</p>
+        <h1 id="home-title"><span class="title-line">Ein KI-Agent auf jeder Seite,</span> <span class="title-line title-accent">die Sie besuchen.</span></h1>
       </div>
-      <p class="hero-lede">WebBrain liest Webseiten, erklärt sie und handelt auf ihnen. Fügen Sie es Ihrem Browser hinzu, um auf jeder Website Hilfe zu bekommen, oder Ihrer Website, damit Ihre Besucher dieselbe Hilfe erhalten.</p>
+      <p class="hero-lede">WebBrain liest, erklärt und bedient Webseiten. Fügen Sie es zu Chrome, Edge oder Firefox hinzu und erhalten Sie Hilfe auf jeder Website – mit jedem Modell, auch lokalen.</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

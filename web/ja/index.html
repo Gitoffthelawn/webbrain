@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/ja/",
       "inLanguage": "ja-JP",
-      "description": "WebBrain は、ウェブページを読み、説明し、操作までこなす無料の AI エージェントです。オープンソースの拡張機能を Chrome、Edge、Firefox に追加するか、訪問者のために WebBrain をウェブサイトに導入しましょう。",
+      "description": "WebBrain は Claude のブラウザプラグインに代わる無料・オープンソースの選択肢です。Chrome、Firefox、Edge 用の AI ブラウザエージェント — ページを読み、データを抽出し、タスクを自動化。llama.cpp、OpenAI、Claude、OpenRouter に対応。多言語 UI、トークンに配慮したスクリーンショット。GPL-3.0-or-later ライセンス。",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4247,10 +4250,12 @@
   <div class="hero-split">
     <div class="hero-copy" data-title="long">
       <div class="hero-title">
-        <p class="hero-kicker">ブラウザでもウェブサイトでも無料</p>
-        <h1 id="home-title"><span class="title-line">閲覧するページにも、つくるページにも、</span> <span class="title-line title-accent">AI エージェントを。</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">無料でオープンソース</p>
+        <h1 id="home-title"><span class="title-line">閲覧するすべてのページに、</span> <span class="title-line title-accent">AI エージェントを。</span></h1>
       </div>
-      <p class="hero-lede">WebBrain はウェブページを読み、説明し、操作までこなします。ブラウザに追加すればどのサイトでも助けが得られ、ウェブサイトに導入すれば訪問者も同じ助けを受けられます。</p>
+      <p class="hero-lede">WebBrain はウェブページを読み、説明し、操作します。Chrome、Edge、Firefox に追加すれば、どのサイトでも、ローカルモデルを含むあらゆるモデルで手助けを受けられます。</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

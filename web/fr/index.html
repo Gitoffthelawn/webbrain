@@ -374,7 +374,7 @@
       "name": "WebBrain",
       "url": "https://webbrain.one/fr/",
       "inLanguage": "fr-FR",
-      "description": "WebBrain est un agent IA gratuit qui lit, explique et agit sur les pages web. Ajoutez l'extension open source à Chrome, Edge ou Firefox, ou ajoutez WebBrain à votre site web pour vos visiteurs.",
+      "description": "WebBrain est une alternative gratuite et open source au plugin navigateur de Claude. Agent IA pour Chrome, Firefox et Edge : lire des pages, extraire des données, automatiser des tâches. Compatible avec llama.cpp, OpenAI, Claude, OpenRouter. Interface multilingue, captures économes en tokens. Licence GPL-3.0-or-later.",
       "publisher": {
         "@id": "https://webbrain.one/#organization"
       }
@@ -3628,6 +3628,9 @@
       overflow-wrap: break-word;
     }
     .home-hero h1 .title-line { display: block; }
+    /* Break Korean between words and Japanese between phrases, not mid-word. */
+    :lang(ko) .home-hero h1 { word-break: keep-all; }
+    :lang(ja) .home-hero h1 { word-break: auto-phrase; }
     .home-hero h1 .title-accent { color: var(--accent-text); }
     .hero-lede {
       max-width: 420px;
@@ -4245,12 +4248,14 @@
 <main class="home" id="top">
 <section class="home-hero" aria-labelledby="home-title">
   <div class="hero-split">
-    <div class="hero-copy" data-title="long">
+    <div class="hero-copy" data-title="short">
       <div class="hero-title">
-        <p class="hero-kicker">Gratuit pour les navigateurs et les sites web</p>
-        <h1 id="home-title"><span class="title-line">Un agent IA sur chaque page</span> <span class="title-line title-accent">que vous visitez ou créez.</span></h1>
+        <!-- Until WebBrain for websites launches the hero speaks for the browser
+             extension alone (WEBSITES_LAUNCHED in site-footer.mjs). -->
+        <p class="hero-kicker">Gratuit et open source</p>
+        <h1 id="home-title"><span class="title-line">Un agent IA sur chaque page</span> <span class="title-line title-accent">que vous visitez.</span></h1>
       </div>
-      <p class="hero-lede">WebBrain lit, explique et agit sur les pages web. Ajoutez-le à votre navigateur pour être aidé sur n&#39;importe quel site, ou à votre site web pour que vos visiteurs profitent de la même aide.</p>
+      <p class="hero-lede">WebBrain lit, explique et agit sur les pages web. Ajoutez-le à Chrome, Edge ou Firefox et obtenez de l&#39;aide sur n&#39;importe quel site, avec n&#39;importe quel modèle, y compris en local.</p>
       <div class="path-actions hero-actions-row">
         <a href="https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb" target="_blank" rel="noopener noreferrer" class="path-btn" id="hero-install-cta">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
