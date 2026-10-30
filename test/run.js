@@ -44837,7 +44837,13 @@ test('homepage leads with the browser extension and offers WebBrain for websites
   assert.equal(strings['home.browser.badge'], 'Open Source');
   assert.doesNotMatch(template, /home\.browser\.features|View on GitHub|hero\.cta\.github/, 'web home: no Features link and no GitHub hero action');
   assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');
-  assert.match(english, /<a href="#features">Browser extension<\/a>/, 'web home: the nav jumps to the features');
+  const nav = english.match(/<div class="nav-links">([\s\S]*?)<div class="language-picker"/);
+  assert.ok(nav, 'web home: nav links missing');
+  assert.deepEqual(
+    [...nav[1].matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1]),
+    ['For websites', 'Docs', 'Blog', 'Download'],
+    'web home: the nav keeps only the other product, docs, blog and the install shortcut',
+  );
   assert.match(turkish, /href="\/websites\/"/, 'web home: localized homepages link to the English websites page');
   assert.match(english, /<link rel="canonical" href="https:\/\/webbrain\.one\/">/);
   assert.match(turkish, /<link rel="canonical" href="https:\/\/webbrain\.one\/tr\/">/);

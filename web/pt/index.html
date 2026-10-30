@@ -3566,6 +3566,41 @@
     }
 
     /* ================================================================
+       LEFT-ALIGNED LAYOUT — every section starts on the same left edge
+       as the headline and the product cards, like webbrain.cloud.
+       Figures (the provider constellation, the carousel) stay centred
+       in their own frame.
+       ================================================================ */
+    .section-label,
+    .section-title,
+    .section-subtitle,
+    .voices-section h2,
+    .developer-frameworks-heading,
+    .compare-heading,
+    .compare-note,
+    .download-section,
+    .oss-banner { text-align: start; }
+    .section-subtitle { max-width: 620px; margin: 0 0 44px; }
+    .section-title { max-width: 860px; text-wrap: balance; }
+    .compare-heading { margin-bottom: 16px; color: var(--text-dim); font-size: 16px; }
+    .compare-note { max-width: 640px; margin-top: 20px; color: var(--text-dim); font-size: 13px; }
+    .compare-table-wrap { max-width: none; margin: 0; }
+    .voices-section { max-width: var(--max-w); }
+    .features-more,
+    .faq-inline-cta-wrap,
+    .share-row { justify-content: flex-start; }
+    .faq-inline-section { max-width: var(--max-w); }
+    .faq-inline-grid { max-width: 860px; }
+    .faq-bridge { margin-inline: 0; }
+    .download-cards { margin-inline: 0; }
+    .oss-banner { max-width: none; margin: 0; }
+    .oss-banner p { margin-inline: 0; max-width: 560px; }
+    .path-browser .hero-proof { justify-content: flex-start; max-width: none; margin-inline: 0; }
+    .mcp-showcase { max-width: none; margin-inline: 0; }
+    /* The shared footer lines up with the sections' text column. */
+    :root { --wb-footer-width: min(calc(100% - 48px), calc(var(--max-w) - 48px)); }
+
+    /* ================================================================
        HOMEPAGE HERO — headline, then the browser extension at full
        width with the live scene carousel, then WebBrain for websites
        as a smaller strip. The sections below are the extension's.
@@ -4034,10 +4069,8 @@
       <img class="brand-logo" src="/logo-github.png" alt="" aria-hidden="true"> WebBrain<span style="opacity:0.5; font-weight:400; -webkit-text-fill-color:currentColor;">.one</span>
     </a>
     <div class="nav-links">
-      <a href="#features">Extensão para navegador</a>
       <a href="/websites/">Para sites</a>
       <a href="/docs/" class="nav-secondary">Documentos</a>
-      <a href="#faq" class="nav-secondary">Perguntas frequentes</a>
       <a href="/blog/" class="nav-secondary">Blogue</a>
       <a href="#download" class="nav-cta">Baixar</a>
       <div class="language-picker" id="language-picker">
@@ -4701,7 +4734,7 @@
   <p class="section-subtitle">WebBrain fica na interseção de plug-ins de IA nativos do navegador e estruturas completas de agentes. Veja como isso se compara.</p>
 
   <!-- vs Browser Plugins -->
-  <h3 style="font-size:16px; color:var(--text-dim); margin-bottom:16px; text-align:center;">vs. plug-ins de IA do navegador</h3>
+  <h3 class="compare-heading">vs. plug-ins de IA do navegador</h3>
   <div class="compare-table-wrap">
     <table class="compare-table">
       <thead>
@@ -4723,7 +4756,7 @@
     </table>
   </div>
 
-  <p style="text-align:center; color:var(--text-dim); font-size:13px; margin-top:24px; max-width:600px; margin-left:auto; margin-right:auto;">
+  <p class="compare-note">
     WebBrain é uma extensão de navegador para usuários finais que desejam um assistente de IA enquanto navegam. Estruturas de agentes como OpenClaw são ferramentas de desenvolvedor para construir pipelines de navegador automatizados. Ferramentas diferentes para trabalhos diferentes — e você pode usar ambas.
   </p>
 </section>
