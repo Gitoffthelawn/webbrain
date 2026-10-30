@@ -34,10 +34,11 @@
  */
 
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PLAUSIBLE_ANALYTICS } from '../web/build/plausible.mjs';
+import { SITE_FOOTER_STYLES, siteFooter } from '../web/build/site-footer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -50,6 +51,8 @@ const SOCIAL_IMAGE_PATH = '/og-image.png';
 const TWITTER_IMAGE_PATH = '/twitter-image.png';
 const SOCIAL_IMAGE_WIDTH = 1200;
 const SOCIAL_IMAGE_HEIGHT = 630;
+// The blog is English-only; its footer uses the English site strings.
+const ENGLISH_STRINGS = JSON.parse(readFileSync(path.join(REPO_ROOT, 'web', 'build', 'locales', 'en.json'), 'utf8'));
 
 // Labels use each language's own script, matching web/build/template.html's
 // dropdown — keep the two lists in sync when adding a new locale.
@@ -658,6 +661,8 @@ function blogStyle() {
       --radius: 12px;
       --radius-lg: 16px;
       --max-w: 760px;
+      /* Line the shared site footer up with the blog's header. */
+      --wb-footer-width: min(calc(var(--max-w) - 48px), calc(100% - 48px));
       color-scheme: dark;
     }
     :root[data-theme="light"] {
@@ -1009,20 +1014,8 @@ function blogStyle() {
       font-size: 15px;
       line-height: 1.6;
     }
-    footer {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 40px 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      gap: 24px;
-      color: var(--text-dim);
-      font-size: 13px;
-    }
-    footer a { color: var(--text-dim); }
-    footer a:hover { color: var(--text); }
     @media (max-width: 700px) {
+      :root { --wb-footer-width: calc(100% - 40px); }
       body { font-size: 16px; }
       .nav-inner { padding: 14px 20px; align-items: flex-start; }
       .nav-links { gap: 12px; flex-wrap: wrap; }
@@ -1033,7 +1026,6 @@ function blogStyle() {
       h2 { font-size: 20px; margin-top: 36px; }
       .post-card { padding: 20px; }
       .post-title { font-size: 19px; }
-      footer { flex-direction: column; padding: 32px 20px; }
     }
     @media (max-width: 420px) {
       .nav-inner { gap: 12px; }
@@ -1528,6 +1520,7 @@ function sharedHead({ title, description, canonical, ogType = 'website', ogTitle
   <!-- Blog is English-only; alternates point to locale homepages. -->
 ${hreflangLinks(site)}
   ${blogStyle()}${extraHead ? `\n  ${extraHead}` : ''}
+${SITE_FOOTER_STYLES}
   ${themeBootstrapScript()}
 ${PLAUSIBLE_ANALYTICS}
   <script type="application/ld+json">
@@ -1705,10 +1698,7 @@ ${sharedHead({
 }
 
 function footerHtml() {
-  return `<footer>
-    <div>&copy; 2026 WebBrain &middot; <a href="/privacy">Privacy</a></div>
-    <div><a href="https://github.com/webbrain-one/webbrain" target="_blank" rel="noopener">GitHub</a></div>
-  </footer>`;
+  return siteFooter(ENGLISH_STRINGS);
 }
 
 async function writeOutput(filePath, content, dryRun) {
