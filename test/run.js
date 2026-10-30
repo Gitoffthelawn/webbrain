@@ -44897,8 +44897,7 @@ test('homepage plays the product video in a dialog and loads a live websites dem
   assert.doesNotMatch(english, /<script[^>]+src="https:\/\/sites\.webbrain\.one\/embed\.js"/, 'web home: the demo script must not load until the visitor asks');
   assert.match(english, /<p class="path-status" id="home-demo-status" role="status"><\/p>/);
   assert.equal(strings['home.websites.demo'], 'Demo');
-  assert.match(template, /href="\{\{websites_path\}\}#how-it-works" class="path-link">\{\{t:home\.websites\.info\}\}/);
-  assert.equal(strings['home.websites.info'], 'Info');
+  assert.doesNotMatch(template, /home\.websites\.info/, 'web home: the website card has no Info link');
 });
 
 test('websites page promises free forever and sends visitors to the dashboard', () => {
