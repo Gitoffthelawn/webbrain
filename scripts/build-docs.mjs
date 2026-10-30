@@ -93,7 +93,7 @@ function withDocsFooter(html, file, dictionaries) {
   if (normalized.endsWith('/faq/index.html')) return html;
   if (normalized.includes('/web/docs/zh/')) {
     return withSiteFooter(html, dictionaries.zh, {
-      browserPath: '/zh/browser/',
+      browserPath: '/zh/',
       docsPath: '/docs/zh/',
       faqPath: '/docs/zh/faq/',
     });

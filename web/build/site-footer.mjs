@@ -89,7 +89,7 @@ function socialLink(href, label, icon, rel = 'me noopener') {
  * language list that the landing pages reveal from a <noscript> style.
  */
 export function siteFooter(dict, {
-  browserPath = '/browser/',
+  browserPath = '/',
   websitesPath = '/websites/',
   docsPath = '/docs/',
   faqPath = '/docs/faq/',

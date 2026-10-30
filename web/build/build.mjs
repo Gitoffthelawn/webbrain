@@ -2,13 +2,10 @@
 /**
  * WebBrain marketing-site build.
  *
- * Reads web/build/home-template.html, web/build/template.html (the browser
- * extension page), web/build/websites-template.html, web/build/faq-template.html,
- * and web/build/locales/*.json and writes:
- *   web/index.html                       the short homepage (two paths)
- *   web/{es,fr,tr,zh,...}/index.html
- *   web/browser/index.html               the browser extension page
- *   web/{es,fr,tr,zh,...}/browser/index.html
+ * Reads web/build/template.html (the homepage), web/build/websites-template.html,
+ * web/build/faq-template.html, and web/build/locales/*.json and writes:
+ *   web/index.html                       the homepage: the browser extension
+ *   web/{es,fr,tr,zh,...}/index.html     first, then WebBrain for websites
  *   web/websites/index.html              WebBrain for websites (English)
  *   web/docs/faq/index.html
  *   web/docs/{es,fr,tr,zh,...}/faq/index.html
@@ -22,7 +19,8 @@
  *   {{locale_bcp47}}     e.g. "en-US", "es-ES" (used in og:locale)
  *   {{locale_home_url}}  e.g. "https://webbrain.one/" or ".../es/" (brand link)
  *   {{page_url}}         canonical URL of the page being rendered
- *   {{browser_path}}     e.g. "/browser/" or "/es/browser/"
+ *   {{browser_path}}     the browser extension's page: the localized homepage
+ *                        ("/" or "/es/"); /browser/ redirects there
  *   {{websites_path}}    "/websites/"
  *   {{sites_dashboard_url}} the private WebBrain for websites dashboard
  *   {{docs_url}}         English docs, or the secondary Chinese docs for zh
@@ -61,9 +59,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');           // web/
 const BUILD_DIR = __dirname;                          // web/build/
 const LOCALES_DIR = path.join(BUILD_DIR, 'locales');
-// template.html is the browser extension page (it used to be the homepage).
+// template.html is the homepage, led by the browser extension.
 const TEMPLATE_PATH = path.join(BUILD_DIR, 'template.html');
-const HOME_TEMPLATE_PATH = path.join(BUILD_DIR, 'home-template.html');
 const WEBSITES_TEMPLATE_PATH = path.join(BUILD_DIR, 'websites-template.html');
 const FAQ_TEMPLATE_PATH = path.join(BUILD_DIR, 'faq-template.html');
 const SITE_ORIGIN = 'https://webbrain.one';
@@ -270,16 +267,12 @@ function homePathFor(locale) {
   return locale.isDefault ? '/' : `/${locale.code}/`;
 }
 
+// The browser extension lives on the homepage; /browser/ redirects there.
 function browserPathFor(locale) {
-  return locale.isDefault ? '/browser/' : `/${locale.code}/browser/`;
-}
-
-function browserUrlFor(locale) {
-  return `${SITE_ORIGIN}${browserPathFor(locale)}`;
+  return homePathFor(locale);
 }
 
 function pageUrlFor(page, locale) {
-  if (page === 'browser') return browserUrlFor(locale);
   if (page === 'websites') return `${SITE_ORIGIN}${WEBSITES_PATH}`;
   return homeUrlFor(locale);
 }
@@ -309,9 +302,9 @@ function validateFooterLanguageOrder() {
 }
 
 function siteFooterFor(dict, locale, page) {
-  // The homepage and the browser extension page exist in every language, so
-  // their footers also list the other languages for visitors without JS.
-  const languagePathFor = page === 'browser' ? browserPathFor : page === 'home' ? homePathFor : null;
+  // The homepage exists in every language, so its footer also lists the
+  // other languages for visitors without JS.
+  const languagePathFor = page === 'home' ? homePathFor : null;
   const languages = languagePathFor
     ? FOOTER_LANGUAGE_ORDER.map((code) => {
         const target = LOCALES.find((l) => l.code === code);
@@ -352,7 +345,6 @@ function homeTitleSize(dict) {
 }
 
 function hreflangBlockFor(page) {
-  if (page === 'browser') return buildHreflangBlock(browserUrlFor);
   // The websites page is English-only, so it has no alternates to announce.
   if (page === 'websites') return '';
   return buildHreflangBlock(homeUrlFor);
@@ -480,7 +472,7 @@ function buildSoftwareJsonLd(dict, locale) {
     operatingSystem: 'Chrome, Edge, Firefox',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     description: dict['meta.description'],
-    url: browserUrlFor(locale),
+    url: homeUrlFor(locale),
     inLanguage: locale.bcp47,
     downloadUrl: 'https://chromewebstore.google.com/detail/webbrain/ljhijonmfahplgbbacgcfnaihbjljhhb',
     softwareVersion: dict['meta.software_version'],
@@ -675,7 +667,6 @@ function applyTemplate(template, dict, locale, page = 'home') {
 
 async function main() {
   const template = await readFile(TEMPLATE_PATH, 'utf8');
-  const homeTemplate = await readFile(HOME_TEMPLATE_PATH, 'utf8');
   const websitesTemplate = await readFile(WEBSITES_TEMPLATE_PATH, 'utf8');
   const faqTemplate = await readFile(FAQ_TEMPLATE_PATH, 'utf8');
   validateFaqRegistry();
@@ -707,10 +698,9 @@ async function main() {
     }
     // Synthesize per-locale share-intent URLs from the locale's share text
     // and page URL. Computed here (not in the JSON) so URL encoding stays
-    // out of the locale files. The share buttons live on the browser
-    // extension page and describe the extension, so they share that page
-    // in the visitor's language.
-    const shareUrl = browserUrlFor(locale);
+    // out of the locale files. The share buttons share the homepage in the
+    // visitor's language.
+    const shareUrl = homeUrlFor(locale);
     const shareText = dict['share.text'] || '';
     const shareTextWithUrl = `${shareText} ${shareUrl}`.trim();
     dict = {
@@ -723,8 +713,7 @@ async function main() {
 
     const localeDir = locale.isDefault ? ROOT : path.join(ROOT, locale.code);
     const pages = [
-      { page: 'home', source: homeTemplate, outPath: path.join(localeDir, 'index.html') },
-      { page: 'browser', source: template, outPath: path.join(localeDir, 'browser', 'index.html') },
+      { page: 'home', source: template, outPath: path.join(localeDir, 'index.html') },
     ];
     // WebBrain for websites launches in English only.
     if (locale.isDefault) {
@@ -762,11 +751,10 @@ async function main() {
     console.log('✓ updated privacy.html footer');
   }
 
-  // sitemap.xml — localized homes and browser pages, the websites page, plus
+  // sitemap.xml — localized homes, the websites page, plus
   // public utility, blog, and user-doc pages.
   const sitemapUrls = [
     ...LOCALES.map((l) => ({ loc: homeUrlFor(l), alternates: 'home' })),
-    ...LOCALES.map((l) => ({ loc: browserUrlFor(l), alternates: 'browser' })),
     { loc: `${SITE_ORIGIN}${WEBSITES_PATH}` },
     ...LOCALES.map((l) => ({ loc: faqUrlFor(l), alternates: 'faq' })),
     { loc: `${SITE_ORIGIN}/privacy` },
@@ -796,7 +784,7 @@ async function main() {
     ...sitemapUrls.map((u) => {
       const alternateUrlFor = u.alternates === 'faq'
         ? faqUrlFor
-        : u.alternates === 'browser' ? browserUrlFor : homeUrlFor;
+        : homeUrlFor;
       const alts = u.alternates === 'easy-cli-proxy'
         ? [
             `    <xhtml:link rel="alternate" hreflang="en" href="${SITE_ORIGIN}/docs/easy-cli-proxy/"/>`,

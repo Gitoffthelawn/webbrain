@@ -96,7 +96,7 @@ Install WebBrain. Open Apocalypse Mode. Let the text model, vision model, and Wi
 
 The world needs access that survives disasters, wars, infrastructure failures, censorship, and the unexpected. It needs tools that can remain useful when a server cannot be reached. This is our first practical answer: local inference through WebGPU, local knowledge in open formats, and a browser experience designed to keep both close.
 
-[Read the complete Apocalypse Mode setup guide](/docs/apocalypse-mode/), then [download WebBrain while you can](/browser/#download).
+[Read the complete Apocalypse Mode setup guide](/docs/apocalypse-mode/), then [download WebBrain while you can](/#download).
 
 Keep WebBrain in your browser. Keep it ready.
 
