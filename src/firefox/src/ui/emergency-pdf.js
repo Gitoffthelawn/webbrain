@@ -240,8 +240,8 @@ async function initialize() {
     elements['document-source'].href = sourceUrl;
     elements['document-source'].hidden = false;
   }
-  const pdfjs = await import(runtimeApi.runtime.getURL('vendor/pdfjs/pdf.mjs'));
-  pdfjs.GlobalWorkerOptions.workerSrc = runtimeApi.runtime.getURL('vendor/pdfjs/pdf.worker.mjs');
+  const pdfjs = await import(runtimeApi.runtime.getURL('vendor/pdfjs/index.mjs'));
+  pdfjs.GlobalWorkerOptions.workerSrc = runtimeApi.runtime.getURL('vendor/pdfjs/worker.mjs');
   pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), verbosity: 0 }).promise;
   enableControls();
   await renderPage();

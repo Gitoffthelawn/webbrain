@@ -715,8 +715,8 @@ async function initialize() {
   const bytes = await loadPdfBytes(streamInfo);
   if (!bytes.length) throw new Error('Firefox returned an empty PDF stream.');
 
-  state.pdfjs = await import(api.runtime.getURL('vendor/pdfjs/pdf.mjs'));
-  state.pdfjs.GlobalWorkerOptions.workerSrc = api.runtime.getURL('vendor/pdfjs/pdf.worker.mjs');
+  state.pdfjs = await import(api.runtime.getURL('vendor/pdfjs/index.mjs'));
+  state.pdfjs.GlobalWorkerOptions.workerSrc = api.runtime.getURL('vendor/pdfjs/worker.mjs');
   state.pdf = await state.pdfjs.getDocument({ data: bytes, verbosity: 0 }).promise;
   if (state.pdf.numPages > MAX_PDF_PAGES) {
     throw new Error(`This PDF has more than ${MAX_PDF_PAGES} pages, so Firefox's native viewer will be used.`);

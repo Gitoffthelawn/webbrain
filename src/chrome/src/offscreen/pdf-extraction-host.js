@@ -15,9 +15,9 @@ let pdfjsPromise = null;
 
 function getPdfjs() {
   if (!pdfjsPromise) {
-    pdfjsPromise = import(chrome.runtime.getURL('vendor/pdfjs/pdf.mjs')).then((pdfjs) => {
+    pdfjsPromise = import(chrome.runtime.getURL('vendor/pdfjs/index.mjs')).then((pdfjs) => {
       pdfjs.GlobalWorkerOptions.workerSrc =
-        chrome.runtime.getURL('vendor/pdfjs/pdf.worker.mjs');
+        chrome.runtime.getURL('vendor/pdfjs/worker.mjs');
       return pdfjs;
     });
     // The offscreen document outlives any single read, so never memoize a

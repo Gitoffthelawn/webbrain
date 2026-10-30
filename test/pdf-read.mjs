@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -10,6 +11,113 @@ const pdfExtractionModulePath = path.join(root, 'src', 'chrome', 'src', 'agent',
 const pdfToolsModulePath = path.join(root, 'src', 'chrome', 'src', 'agent', 'pdf-tools.js');
 const pdfExtractionHostPath = path.join(root, 'src', 'chrome', 'src', 'offscreen', 'pdf-extraction-host.js');
 const offscreenHtmlPath = path.join(root, 'src', 'chrome', 'src', 'offscreen', 'offscreen.html');
+const pdfjsVendorPath = path.join(root, 'src', 'chrome', 'vendor', 'pdfjs');
+
+function buildSinglePagePdf(text) {
+  const contents = `BT /F1 24 Tf 72 720 Td (${text}) Tj ET`;
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    `<< /Length ${contents.length} >>\nstream\n${contents}\nendstream`,
+  ];
+  let pdf = '%PDF-1.4\n';
+  const offsets = objects.map((body, index) => {
+    const offset = pdf.length;
+    pdf += `${index + 1} 0 obj\n${body}\nendobj\n`;
+    return offset;
+  });
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const offset of offsets) pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+  return new TextEncoder().encode(pdf);
+}
+
+async function testVendoredPdfjsExtractsTextThroughCompatEntryPoints() {
+  // The modern build builds one DOMMatrix while it evaluates. Node has none,
+  // and text extraction never renders, so an empty stand-in is enough.
+  const hadDomMatrix = 'DOMMatrix' in globalThis;
+  if (!hadDomMatrix) globalThis.DOMMatrix = class DOMMatrix {};
+  let pdfjs;
+  try {
+    pdfjs = await import(pathToFileURL(path.join(pdfjsVendorPath, 'index.mjs')).href);
+  } finally {
+    if (!hadDomMatrix) delete globalThis.DOMMatrix;
+  }
+  // Node runs PDF.js's main-thread fallback, which imports workerSrc and reads
+  // WorkerMessageHandler from it, so this also covers worker.mjs's re-export.
+  pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(path.join(pdfjsVendorPath, 'worker.mjs')).href;
+  const { extractPdfTextFromBytes } = await import(pathToFileURL(pdfExtractionModulePath).href);
+
+  const result = await extractPdfTextFromBytes(pdfjs, buildSinglePagePdf('Hello from WebBrain'));
+  assert.equal(result.success, true);
+  assert.equal(result.totalPages, 1);
+  assert.deepEqual(result.pages, ['Hello from WebBrain']);
+}
+
+async function testPdfjsCompatFillsMissingBuiltIns() {
+  // Delete the built-ins in a fresh Node process so the polyfills themselves
+  // run, whatever this Node version already ships.
+  const compatUrl = pathToFileURL(path.join(pdfjsVendorPath, 'compat.mjs')).href;
+  const script = `
+    import assert from 'node:assert/strict';
+    for (const Collection of [Map, WeakMap]) {
+      delete Collection.prototype.getOrInsert;
+      delete Collection.prototype.getOrInsertComputed;
+    }
+    delete Math.sumPrecise;
+    delete Uint8Array.fromBase64;
+    delete Uint8Array.prototype.toBase64;
+    delete Uint8Array.prototype.toHex;
+    delete Response.prototype.bytes;
+    const existing = function getOrInsert() { return 'existing'; };
+    Map.prototype.getOrInsert = existing;
+    await import(${JSON.stringify(compatUrl)});
+
+    assert.equal(Map.prototype.getOrInsert, existing, 'compat must not replace a method the browser has');
+    assert.equal(Object.getOwnPropertyDescriptor(Math, 'sumPrecise').enumerable, false);
+
+    const counts = new Map([['seen', 1]]);
+    let calls = 0;
+    assert.equal(counts.getOrInsertComputed('seen', () => { calls++; return 2; }), 1);
+    assert.equal(counts.getOrInsertComputed('new', (key) => { calls++; return key.length; }), 3);
+    assert.equal(calls, 1);
+    assert.throws(() => counts.getOrInsertComputed('x', null), TypeError);
+    const key = {};
+    const weak = new WeakMap();
+    assert.equal(weak.getOrInsert(key, 'first'), 'first');
+    assert.equal(weak.getOrInsert(key, 'second'), 'first');
+    assert.equal(weak.getOrInsertComputed({}, () => 'computed'), 'computed');
+
+    assert.equal(Math.sumPrecise([0.1, 0.2, 0.3]), 0.6);
+    assert.equal(Math.sumPrecise([1e20, 0.1, -1e20]), 0.1);
+    assert.equal(Math.sumPrecise([1e100, 1, -1e100, 1e-100, 1e50, -1, -1e50]), 1e-100);
+    assert.equal(Math.sumPrecise(new Set([1, 2, 3])), 6);
+    assert.ok(Object.is(Math.sumPrecise([]), -0));
+    assert.ok(Object.is(Math.sumPrecise([-0, -0]), -0));
+    assert.ok(Object.is(Math.sumPrecise([-0, 0]), 0));
+    assert.equal(Math.sumPrecise([Infinity, 1]), Infinity);
+    assert.ok(Number.isNaN(Math.sumPrecise([Infinity, -Infinity])));
+    assert.ok(Number.isNaN(Math.sumPrecise([NaN, 1])));
+    assert.throws(() => Math.sumPrecise([1, '2']), TypeError);
+
+    const hello = new TextEncoder().encode('Hello');
+    assert.equal(hello.toBase64(), 'SGVsbG8=');
+    assert.deepEqual(Uint8Array.fromBase64('SGVsbG8='), hello);
+    const urlSafe = Uint8Array.from([251, 255]);
+    assert.equal(urlSafe.toBase64(), '+/8=');
+    assert.equal(urlSafe.toBase64({ alphabet: 'base64url', omitPadding: true }), '-_8');
+    assert.deepEqual(Uint8Array.fromBase64('-_8', { alphabet: 'base64url' }), urlSafe);
+    const large = Uint8Array.from({ length: 100003 }, (_, i) => (i * 31) % 256);
+    assert.deepEqual(Uint8Array.fromBase64(large.toBase64()), large);
+    assert.equal(Uint8Array.from([0, 1, 254, 255]).toHex(), '0001feff');
+
+    assert.deepEqual(await new Response('abc').bytes(), Uint8Array.from([97, 98, 99]));
+  `;
+  execFileSync(process.execPath, ['--input-type=module', '--eval', script], { stdio: 'pipe' });
+}
 
 async function testMv3PdfExtractionUsesTheSharedOffscreenHost() {
   const pdfTools = await readFile(pdfToolsModulePath, 'utf8');
@@ -20,10 +128,11 @@ async function testMv3PdfExtractionUsesTheSharedOffscreenHost() {
   assert.match(pdfTools, /type: PDF_EXTRACTION_MESSAGE/);
   assert.doesNotMatch(
     pdfTools,
-    /import\(chrome\.runtime\.getURL\('vendor\/pdfjs\/pdf\.mjs'\)\)/,
+    /import\(chrome\.runtime\.getURL\('vendor\/pdfjs\//,
     'MV3 service workers reject dynamic import() at runtime',
   );
-  assert.match(host, /import\(chrome\.runtime\.getURL\('vendor\/pdfjs\/pdf\.mjs'\)\)/);
+  assert.match(host, /import\(chrome\.runtime\.getURL\('vendor\/pdfjs\/index\.mjs'\)\)/);
+  assert.match(host, /chrome\.runtime\.getURL\('vendor\/pdfjs\/worker\.mjs'\)/);
   assert.match(host, /extractPdfTextFromBytes/);
   assert.match(host, /isTrustedPdfExtractionSender\(sender\)/);
   assert.match(offscreenHtml, /<script type="module" src="pdf-extraction-host\.js"><\/script>/);
@@ -231,6 +340,8 @@ const tests = [
   ['PDF extraction rejects unsafe URLs and untrusted senders', testPdfUrlAndSenderBoundaries],
   ['PDF extraction preserves bounded page metadata and truncation', testPdfExtractionPreservesBoundedPageMetadataAndTruncation],
   ['PDF facade waits for host readiness and reuses Claude bytes', testPdfFacadeRequestsOffscreenExtractionAndPreservesClaudeBytes],
+  ['Vendored PDF.js extracts text through the compat entry points', testVendoredPdfjsExtractsTextThroughCompatEntryPoints],
+  ['PDF.js compat fills missing built-ins without replacing native ones', testPdfjsCompatFillsMissingBuiltIns],
 ];
 
 let failed = 0;

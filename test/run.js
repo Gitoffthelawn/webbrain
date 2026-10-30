@@ -24260,17 +24260,36 @@ test('build-zip rejects store-obscuring JavaScript constructions', () => {
     ),
     /inline image fixture contains long inline base64 media payload/,
   );
+  assert.throws(
+    () => assertStoreReviewableJavaScript(
+      "var NullProtoObjectViaActiveX = function (activeXDocument) {};\nnew ActiveXObject('htmlfile');",
+      'core-js fixture',
+    ),
+    /core-js fixture contains core-js Internet Explorer ActiveX\/iframe fallback/,
+  );
 });
 
 test('vendored PDF.js and multimodal probes remain store-reviewable in both builds', () => {
-  const pdfFiles = ['pdf.mjs', 'pdf.worker.mjs'];
+  const pdfFiles = ['compat.mjs', 'index.mjs', 'pdf.mjs', 'pdf.worker.mjs', 'worker.mjs'];
   for (const browser of ['chrome', 'firefox']) {
     for (const filename of pdfFiles) {
       const relativePath = `src/${browser}/vendor/pdfjs/${filename}`;
       const source = fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
       assert.doesNotThrow(() => assertStoreReviewableJavaScript(source, relativePath));
-      assert.match(source, /return '<script>' \+ content \+ '<\/script>';/);
-      assert.match(source, /var JS = 'javascript:';/);
+      if (filename.startsWith('pdf.')) {
+        // The modern PDF.js build ships no core-js; compat.mjs fills the gaps.
+        assert.doesNotMatch(source, /core-js|__webpack_require__\(\d+\)/, `${relativePath} must not bundle core-js`);
+        assert.match(source, /^ \* pdfjsVersion = 5\.7\.284$/m);
+      }
+    }
+
+    const pdfjsDir = `src/${browser}/vendor/pdfjs`;
+    assert.match(fs.readFileSync(path.join(ROOT, pdfjsDir, 'index.mjs'), 'utf8'), /^import '\.\/compat\.mjs';\n\nexport \* from '\.\/pdf\.mjs';$/m);
+    assert.match(fs.readFileSync(path.join(ROOT, pdfjsDir, 'worker.mjs'), 'utf8'), /^import '\.\/compat\.mjs';\n\nexport \* from '\.\/pdf\.worker\.mjs';$/m);
+    const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, `src/${browser}/manifest.json`), 'utf8'));
+    const accessible = manifest.web_accessible_resources.flatMap(entry => (typeof entry === 'string' ? [entry] : entry.resources));
+    for (const filename of pdfFiles) {
+      assert.ok(accessible.includes(`vendor/pdfjs/${filename}`), `${browser} manifest must expose vendor/pdfjs/${filename}`);
     }
 
     const managerPath = `src/${browser}/src/providers/manager.js`;
