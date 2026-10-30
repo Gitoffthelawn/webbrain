@@ -60,6 +60,8 @@ function provider(id, label, baseUrl, model, contextWindow, options = {}) {
 }
 
 const PROVIDERS = [
+  // Conservative application budget, not an advertised model context limit.
+  provider('api-route', 'API Route', 'https://global.api-route.com/v1', 'gpt-6.1-sol', 32768, { apiKeyUrl: 'https://api-route.com', supportsVision: true }),
   provider('302ai', '302.AI', 'https://api.302.ai/v1', 'gpt-5.4-mini-2026-03-17', 400000, { apiKeyUrl: 'https://doc.302.ai', supportsVision: true, inputCostPerMillionUsd: 0.75, outputCostPerMillionUsd: 4.5 }),
   provider('abacus', 'Abacus', 'https://routellm.abacus.ai/v1', 'o3', 200000, { apiKeyUrl: 'https://abacus.ai/help/api', supportsVision: true, inputCostPerMillionUsd: 2, cacheReadCostPerMillionUsd: 0.5, outputCostPerMillionUsd: 8 }),
   provider('aihubmix', 'AIHubMix', 'https://aihubmix.com/v1', 'coding-minimax-m2.7', 204800, { apiKeyUrl: 'https://docs.aihubmix.com', inputCostPerMillionUsd: 0.2, outputCostPerMillionUsd: 0.2 }),
@@ -111,6 +113,7 @@ const PROVIDERS = [
   provider('ollama-cloud', 'Ollama Cloud', 'https://ollama.com/v1', 'deepseek-v4-flash', 1048576, { category: 'cloud', apiKeyUrl: 'https://docs.ollama.com/cloud' }),
   provider('opencode', 'OpenCode Zen', 'https://opencode.ai/zen/v1', 'muse-spark-1.2-contributor-free', 262000, { apiKeyUrl: 'https://opencode.ai/docs/zen', suggestions: ['muse-spark-1.2-contributor-free', 'mimo-v2.5-free', 'ling-3.0-flash-fin-free', 'nemotron-3-ultra-free', 'nemotron-3.5-lightning-free', 'big-pickle'], inputCostPerMillionUsd: 0, outputCostPerMillionUsd: 0, cacheReadCostPerMillionUsd: 0 }),
   provider('opencode-go', 'OpenCode Go', 'https://opencode.ai/zen/go/v1', 'deepseek-v4-flash', 1000000, { apiKeyUrl: 'https://opencode.ai/docs/zen', inputCostPerMillionUsd: 0.14, cacheReadCostPerMillionUsd: 0.0028, outputCostPerMillionUsd: 0.28 }),
+  provider('opper', 'Opper', 'https://api.opper.ai/v3/compat', 'gpt-5.4-mini', 400000, { apiKeyUrl: 'https://platform.opper.ai', supportsVision: true, suggestions: ['gpt-5.4-mini', 'claude-sonnet-4-6', 'gemini-3.8-flash', 'deepseek-v4-flash'] }),
   provider('orcarouter', 'OrcaRouter', 'https://api.orcarouter.ai/v1', 'orcarouter/auto', 128000, { apiKeyUrl: 'https://www.orcarouter.ai/console', supportsVision: true }),
   provider('ovhcloud', 'OVHcloud AI Endpoints', 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1', 'qwen3-coder-30b-a3b-instruct', 262144, { apiKeyUrl: 'https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/', inputCostPerMillionUsd: 0.07, outputCostPerMillionUsd: 0.26 }),
   provider('perplexity', 'Perplexity Sonar', 'https://api.perplexity.ai', 'sonar-reasoning-pro', 128000, { category: 'cloud', apiKeyUrl: 'https://www.perplexity.ai/settings/api', supportsVision: true, supportsTools: false, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 8 }),

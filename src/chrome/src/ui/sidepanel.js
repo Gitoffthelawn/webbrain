@@ -17,7 +17,7 @@ import { t, getLocale, setLocale, LANGUAGES, applyDOMTranslations, translationsF
 import { CAPABILITY_LABEL, PERMISSION_GATE_SESSION_OFF_KEY, uploadApprovalCard } from '../agent/permission-gate.js';
 import { sanitizeMarkdownLinks, linkifyPlainUrls } from './markdown-link.js';
 import { installChatLinkIcons } from './chat-link-icons.js';
-import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceMarkdownCodeFences } from './markdown-render.js';
+import { codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownListsAndRules, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences } from './markdown-render.js';
 import { applyMode, loadMode, watch } from './theme.js';
 import {
   UI_SCALE_LEVELS,
@@ -1854,16 +1854,26 @@ function closePermissionSkipDialog({ restoreFocus = true } = {}) {
   permissionSkipDialogState = null;
   permissionSkipDialogEl?.classList.add('hidden');
   if (appEl) appEl.inert = state.appWasInert;
-  if (restoreFocus && state.previouslyFocusedElement?.isConnected
-      && typeof state.previouslyFocusedElement.focus === 'function') {
-    state.previouslyFocusedElement.focus({ preventScroll: true });
+  if (restoreFocus) {
+    const opener = state.previouslyFocusedElement;
+    if (opener?.isConnected && opener !== document.body && typeof opener.focus === 'function') {
+      opener.focus({ preventScroll: true });
+    } else {
+      inputEl?.focus({ preventScroll: true });
+    }
   }
   return state;
 }
 
 async function skipPermissionsFromDialog(scope) {
-  const state = closePermissionSkipDialog({ restoreFocus: false });
-  if (!state) return;
+  const state = permissionSkipDialogState;
+  if (!state || state.busy) return;
+  // The dialog stays up, its choices disabled, until the switch is saved: a
+  // second click must not reach the card underneath it.
+  state.busy = true;
+  const choices = [...(permissionSkipDialogEl?.querySelectorAll('[data-permission-skip-scope]') || [])];
+  choices.forEach((btn) => { btn.disabled = true; });
+  let failure = null;
   try {
     if (scope === 'session') {
       await writePermissionGateSessionOff(true);
@@ -1873,21 +1883,29 @@ async function skipPermissionsFromDialog(scope) {
       permissionGateStoredOff = true;
     }
   } catch (error) {
+    failure = error;
+  }
+  choices.forEach((btn) => { btn.disabled = false; });
+  if (permissionSkipDialogState === state) closePermissionSkipDialog({ restoreFocus: !!failure });
+  if (failure) {
     // Nothing was switched off, so the card stays for the user to answer.
-    showComposerToast(t('sp.error_prefix', { msg: error?.message || String(error) }), { duration: 5000 });
-    if (state.card.isConnected) state.card.querySelector('.clarify-skip-permissions')?.focus({ preventScroll: true });
+    showComposerToast(t('sp.error_prefix', { msg: failure?.message || String(failure) }), { duration: 5000 });
     return;
   }
   syncAskBeforeConsequential();
   // The card the user clicked is answered as their own choice; the agent
   // re-reads the gate after it, so the rest of the run is not asked again.
-  submitClarify(state.card, state.tabId, state.clarifyId, 'once', 'option');
+  // A chat that was rendered again since shows a copy of the card: answer that.
+  const card = state.card.isConnected ? state.card
+    : document.querySelector(`.clarify-card[data-permission="1"][data-clarify-id="${CSS.escape(String(state.clarifyId))}"]`) || state.card;
+  submitClarify(card, state.tabId, state.clarifyId, 'once', 'option');
   resolvePendingPermissionPromptsForTab(state.tabId);
-  if (sameTabId(currentTabId, state.tabId)) {
-    addPersistentSlashMessage(systemHtml(t(scope === 'session'
-      ? 'sp.permissions.disabled_session_html'
-      : 'sp.permissions.disabled_html')));
-  }
+  // The notice goes to the chat that showed the card (a scheduled task's card
+  // belongs to another tab) and says how long prompts stay off: a stored
+  // "off" outlives the browser session.
+  addPersistentSlashMessage(systemHtml(t(permissionGateStoredOff
+    ? 'sp.permissions.disabled_html'
+    : 'sp.permissions.disabled_session_html')));
   inputEl?.focus({ preventScroll: true });
 }
 
@@ -1904,7 +1922,8 @@ function handlePermissionSkipDialogKeydown(event) {
     if (!first) {
       event.preventDefault();
       permissionSkipDialogEl.focus({ preventScroll: true });
-    } else if (event.shiftKey && (activeElement === first || !permissionSkipDialogEl.contains(activeElement))) {
+    } else if (event.shiftKey && (activeElement === first || activeElement === permissionSkipDialogEl
+        || !permissionSkipDialogEl.contains(activeElement))) {
       event.preventDefault();
       last.focus({ preventScroll: true });
     } else if (!event.shiftKey && (activeElement === last || !permissionSkipDialogEl.contains(activeElement))) {
@@ -3352,6 +3371,11 @@ function queuedComposerSubmissionIsCurrent(item) {
 
 function drainQueuedComposerMessageForCurrentTab() {
   if (isProcessing || currentTabId == null || renderedTabId !== currentTabId) return false;
+  // A hidden panel cannot start the run (sendMessage needs the tab on screen),
+  // and moving the message into its composer would strand it there: the
+  // composer is no longer empty when the panel is shown again. Becoming
+  // visible drains it instead (requestVisibleSidePanelStateRefresh).
+  if (document.visibilityState === 'hidden') return false;
   if (inputEl.value !== '') return false;
   if (steeringRequestsByTab.has(Number(currentTabId))) return false;
   const tabId = currentTabId;
@@ -5830,6 +5854,7 @@ async function switchToTab(newTabId) {
   // to the already-rendered tab must also invalidate an older pending switch.
   const switchGeneration = ++tabSwitchGeneration;
   const interruptedTransition = tabSwitchTransitionId != null;
+  let stayedOnRenderedTab = false;
   tabSwitchTransitionId = newTabId;
   queuedTabSwitchMessages = queuedTabSwitchMessages.filter(msg => msg?.tabId === newTabId);
   syncSendButtonState();
@@ -5839,6 +5864,7 @@ async function switchToTab(newTabId) {
     historyPopover?.hidePopover();
     if (newTabId === currentTabId && renderedTabId === newTabId) {
       if (interruptedTransition) await restoreActiveRunState(newTabId);
+      stayedOnRenderedTab = true;
       return;
     }
     let state = null;
@@ -5871,6 +5897,8 @@ async function switchToTab(newTabId) {
         && !sameTabId(newConversationConfirmationState.tabId, newTabId)) {
       settleNewConversationConfirmation(false, { restoreFocus: false });
     }
+    // The skip dialog decides for a card in the chat being left.
+    closePermissionSkipDialog({ restoreFocus: false });
     // The activity strip is a single panel-wide DOM node, unlike the tab-scoped
     // chat and run journals. Clear the outgoing tab's transient status before
     // any async restore work can yield; restoreActiveRunState (or a queued target
@@ -5929,6 +5957,13 @@ async function switchToTab(newTabId) {
       tabSwitchTransitionId = null;
       if (currentTabId === renderedTabId) drainQueuedAgentUpdatesForTab(currentTabId);
       if (visibleStateRefreshPending) requestVisibleSidePanelStateRefresh();
+      // Only a full switch reaches the drain after this block. A run of this
+      // tab may have ended while the panel showed another tab, when its own
+      // drain had to give up; an activation for the tab already rendered (a
+      // second event while switching back, the window regaining focus) is
+      // then the landing that starts the tab's queued messages. A run this
+      // panel still follows drains them itself when it ends.
+      if (stayedOnRenderedTab && !isTabProcessing(newTabId)) void drainQueuedPromptsAfterRunSettles(newTabId);
     }
     syncSendButtonState();
   }
@@ -6001,7 +6036,16 @@ function requestVisibleSidePanelStateRefresh() {
   }).catch(() => {});
   refreshPromise.then((refreshed) => {
     if (!refreshed || refreshPromise !== visibleStateRefreshPromise) return;
-    consumePendingContextMenuPrompt().then(() => drainQueuedContextMenuPrompts()).catch(() => {});
+    const refreshedTabId = currentTabId;
+    consumePendingContextMenuPrompt().then(() => {
+      // Queued composer messages come first, as after a run. One whose run
+      // ended while this panel was hidden or showed another tab is still
+      // waiting for its tab to be on screen.
+      if (nextAutomaticQueuedComposerMessage(refreshedTabId) && !isTabProcessing(refreshedTabId)) {
+        return drainQueuedPromptsAfterRunSettles(refreshedTabId);
+      }
+      drainQueuedContextMenuPrompts();
+    }).catch(() => {});
     newtabHandoff.consume().catch(() => {});
   }).catch(() => {});
   return refreshPromise;
@@ -8627,7 +8671,10 @@ function appendProviderPickerOption(id, name, meta, iconProviderId = id) {
       return;
     }
     providerSelect.value = id;
-    syncProviderPickerButton();
+    // "More providers…" only opens Settings, and the change handler puts the
+    // current provider back. Syncing the button to it first would drop the
+    // logo and the connection status, which nothing checks again.
+    if (id !== MORE_PROVIDERS_OPTION_VALUE) syncProviderPickerButton();
     providerSelect.dispatchEvent(new Event('change', { bubbles: true }));
   });
 
@@ -11357,9 +11404,15 @@ function handleAgentUpdateMessage(msg) {
   // Fallback queues belong to their source tab even while another tab is visible.
   if (msg.type === 'steering_queued') {
     if (isConversationClearInProgress(msg.tabId)) return;
-    queueUnconsumedSteeringMessages(msg.tabId, msg.data?.messages, {
-      held: msg.data?.stopped === true || isTabAbortRequested(msg.tabId),
-    });
+    const held = msg.data?.stopped === true || isTabAbortRequested(msg.tabId);
+    queueUnconsumedSteeringMessages(msg.tabId, msg.data?.messages, { held });
+    // A finishing run hands back the corrections it did not apply. This update
+    // can arrive after the run's own end-of-run drain, so it asks for one too;
+    // the drain waits until the background reports the tab idle. Before then,
+    // a run this panel follows drains them itself when it ends.
+    if (!held && sameTabId(currentTabId, msg.tabId) && !isTabProcessing(msg.tabId)) {
+      void drainQueuedPromptsAfterRunSettles(msg.tabId);
+    }
   }
   // A run stopped outside this panel (page Stop button) also holds its queue.
   if (msg.type === 'run_complete' && ['stopped', 'cancelled'].includes(msg.data?.status)) {
@@ -12340,7 +12393,6 @@ function renderClarifyCard(data) {
       const skip = document.createElement('button');
       skip.type = 'button';
       skip.className = 'clarify-skip-permissions';
-      skip.dataset.i18n = 'sp.perm.skip_all';
       skip.textContent = t('sp.perm.skip_all');
       bindPermissionSkipButton(skip, card, tabId, clarifyId);
       optionsEl.appendChild(skip);
@@ -15017,11 +15069,11 @@ function scheduleMathRender() {
       const target = document.getElementById('messages');
       if (!target) return;
       window.renderMathInElement(target, {
-        // Delimiters in order of precedence. We deliberately do NOT enable
-        // single-`$...$` as an inline-math delimiter: LLM responses very
-        // often contain dollar amounts ("$1,263 ... $2,526") and KaTeX
-        // would pair them up and italicize the prose between them. Users
-        // who genuinely want inline math can use \\( ... \\) or $$...$$.
+        // Delimiters in order of precedence. Single `$...$` is NOT one:
+        // LLM responses often contain dollar amounts ("$1,263 ... $2,526")
+        // and KaTeX would pair them up and italicize the prose between them.
+        // formatMarkdown turns $...$ that reads as TeX into \\( ... \\)
+        // first (replaceInlineDollarMath).
         delimiters: [
           { left: '$$', right: '$$', display: true },
           { left: '\\[', right: '\\]', display: true },
@@ -15069,28 +15121,49 @@ function formatMarkdown(text, options = {}) {
     return placeholders.add(`<code>${escaped}</code>`, code);
   });
 
+  // 2b. Inline $...$ that reads as TeX ($\rightarrow$, $O(n^2)$) becomes
+  // \(...\) text for the KaTeX pass, kept away from emphasis and escaping.
+  // Prices stay text (replaceInlineDollarMath has the rules).
+  if (enhance) {
+    text = replaceInlineDollarMath(text, tex => placeholders.add(escapeHtml(`\\(${tex}\\)`), `$${tex}$`));
+  }
+
   // 3. Escape HTML in the remaining text
   text = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // 4. Tables, then headings, inline formatting, markdown link sanitization,
-  // then newline → <br>. Headings swallow their trailing newline, so tables
-  // must run first or a table on the next line is glued onto the heading.
+  // 4. Tables, then lists and --- rules, quotes, headings, inline formatting,
+  // markdown link sanitization, then newline → <br>. Quotes and headings
+  // swallow their trailing newline, so tables and lists must run first or a
+  // table or list on the next line is glued onto them.
   // Code and inline-code placeholders were extracted above, so
   // Markdown-looking source inside them is not interpreted here.
-  text = renderMarkdownTables(text);
-  text = renderMarkdownBlockquotes(text);
-  text = renderMarkdownHeadings(text);
   const emphasis = value => value
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>');
   // Protect destinations from emphasis (a URL can itself contain '*').
-  text = linkifyPlainUrls(sanitizeMarkdownLinks(text)).replace(/(<a\b[^>]*>)([\s\S]*?)(<\/a>)/g, (_match, open, label, close) => (
+  const inline = value => emphasis(linkifyPlainUrls(sanitizeMarkdownLinks(value)).replace(/(<a\b[^>]*>)([\s\S]*?)(<\/a>)/g, (_match, open, label, close) => (
     placeholders.add(`${open}${/^https?:\/\/\S+$/i.test(label) ? label : emphasis(label)}${close}`)
-  ));
-  text = emphasis(text).replace(/\n/g, '<br>');
+  )));
+  text = renderMarkdownTables(text);
+  // Each list item is formatted on its own, so a * bullet never pairs with an
+  // emphasis marker in another item.
+  const blocks = [];
+  text = renderMarkdownListsAndRules(text, {
+    renderItem: value => inline(value).replace(/\n/g, '<br>'),
+    wrap: html => {
+      const token = placeholders.add(html);
+      blocks.push(token);
+      return token;
+    },
+  });
+  text = renderMarkdownBlockquotes(text);
+  text = renderMarkdownHeadings(text);
+  // A list or rule is a block: the newline after it is not a line break.
+  for (const token of blocks) text = text.split(`${token}\n`).join(token);
+  text = inline(text).replace(/\n/g, '<br>');
   text = placeholders.restore(text);
 
   // Schedule KaTeX rendering of any math expressions in the messages area.

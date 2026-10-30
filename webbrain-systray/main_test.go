@@ -2,14 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
 
+	"github.com/esokullu/webbrain-systray/internal/instance"
 	"github.com/esokullu/webbrain-systray/internal/paths"
 	"github.com/esokullu/webbrain-systray/internal/settings"
 )
@@ -69,5 +72,30 @@ func TestExistingInstanceRejectsAnotherInstallation(t *testing.T) {
 	}
 	if got, ok := existingInstance(settings.Settings{Port: port, PanelToken: "this-panel-token"}); ok {
 		t.Fatalf("accepted unrelated companion on port %d", got)
+	}
+}
+
+// A version started by an update waits for the previous one to quit.
+func TestAcquireLockWaitsForThePreviousVersion(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "companion.lock")
+	previous, err := instance.TryAcquire(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := acquireLock(path, 0); !errors.Is(err, instance.ErrHeld) {
+		t.Fatalf("without waiting: err = %v, want ErrHeld", err)
+	}
+	go func() {
+		time.Sleep(400 * time.Millisecond)
+		_ = previous.Close()
+	}()
+	started := time.Now()
+	next, err := acquireLock(path, 5*time.Second)
+	if err != nil {
+		t.Fatalf("after the previous version quit: %v", err)
+	}
+	defer next.Close()
+	if waited := time.Since(started); waited < 300*time.Millisecond {
+		t.Fatalf("took the lock after %v, while the previous version still held it", waited)
 	}
 }

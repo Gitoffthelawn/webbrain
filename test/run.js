@@ -27,8 +27,15 @@ async function loadLocaleWithComposerCopy(localeDir, language) {
   const { composerDeliveryTranslations } = await import(
     pathToFileURL(path.join(localeDir, 'composer-delivery-copy.mjs')).href
   );
-  // i18n.js applies this translated settings overlay to the base dictionaries.
-  return { ...base, ...(composerDeliveryTranslations[language] || {}) };
+  const { permissionSkipTranslations } = await import(
+    pathToFileURL(path.join(localeDir, 'permission-skip-copy.mjs')).href
+  );
+  // i18n.js applies these translated overlays to the base dictionaries.
+  return {
+    ...base,
+    ...(composerDeliveryTranslations[language] || {}),
+    ...(permissionSkipTranslations[language] || {}),
+  };
 }
 
 function escapeRegExpLiteral(value) {
@@ -21852,9 +21859,132 @@ test('chrome screenshot tool saves pre-budget data URL when save:true', () => {
   );
   assert.match(
     body,
-    /wantSave[\s\S]*captureScreenshot[\s\S]*scale: 1[\s\S]*_shrinkImageForBudget/,
-    'save:true non-coord path should full-capture then shrink for the model',
+    /wantSave[\s\S]*_captureViewportImage\(tabId, probe, cssW, cssH, \{ format: 'png' \}\)[\s\S]*_shrinkImageForBudget/,
+    'save:true non-coord path should capture native device pixels, then shrink for the model',
   );
+});
+
+test('chrome tree-mode viewport captures read the tab surface without a clip and scale it locally', async () => {
+  // A CDP clip makes Chromium resize the tab's view to clip x scale while it
+  // captures, which a visible tab shows as a shrunken page: at scale 1/DPR on
+  // a retina screen, and in every budget-scaled capture. Only a pinch-zoomed
+  // page, or a capture whose local crop fails, still uses one.
+  const originalAttach = cdpClientCh.attach;
+  const originalSendCommand = cdpClientCh.sendCommand;
+  const shots = [];
+  const crops = [];
+  let viewport = { innerWidth: 1263, innerHeight: 760, scrollX: 0, scrollY: 600, dpr: 2 };
+  let visual = { zoom: 1, scale: 1 };
+  let failCrop = false;
+  try {
+    cdpClientCh.attach = async () => ({ attached: true });
+    cdpClientCh.sendCommand = async (_tabId, method, params) => {
+      if (method === 'Page.captureScreenshot') {
+        shots.push(params);
+        return { data: 'c3VyZmFjZQ==' };
+      }
+      if (method === 'Runtime.evaluate') return { result: { value: { readyState: 'complete', ...viewport } } };
+      if (method === 'Page.getLayoutMetrics') return { cssVisualViewport: visual };
+      return {};
+    };
+    const agent = new AgentCh({
+      getActive: () => ({ name: 'vision-test', supportsVision: true }),
+      getVisionProvider: async () => null,
+    });
+    agent._withIndicatorsHidden = async (_tabId, capture) => capture();
+    agent._cropAndScaleImage = async (dataUrl, rect, width, height, options) => {
+      crops.push({ dataUrl, rect, width, height, options });
+      if (failCrop) throw new Error('no canvas');
+      return `data:${options.mimeType};base64,Y3JvcA==`;
+    };
+    const surfaceJpeg = { format: 'jpeg', quality: 90, fromSurface: true };
+    const next = () => { shots.length = 0; crops.length = 0; };
+
+    // Coordinate-aligned: the CSS-sized JPEG at q60, cut from the DPR 2 surface.
+    const aligned = await agent._captureAutoScreenshot(51, { coordAligned: true });
+    assert.deepEqual(shots, [surfaceJpeg]);
+    assert.deepEqual(crops, [{
+      dataUrl: 'data:image/jpeg;base64,c3VyZmFjZQ==',
+      rect: { x: 0, y: 0, width: 2526, height: 1520 },
+      width: 1263,
+      height: 760,
+      options: { mimeType: 'image/jpeg', quality: 0.6 },
+    }]);
+    assert.deepEqual(aligned, { dataUrl: 'data:image/jpeg;base64,Y3JvcA==', width: 1263, height: 760, coordAligned: true });
+
+    // Budget: the planned size and JPEG quality, from the same surface.
+    viewport = { ...viewport, innerWidth: 1728, innerHeight: 1080 };
+    const [targetW, targetH] = AgentCh._fitImageDimensions(1728, 1080, agent._budgetForCapture());
+    assert.ok(targetW < 1728, `the budget scales this viewport down (${targetW}x${targetH})`);
+    next();
+    const budgeted = await agent._captureAutoScreenshot(51);
+    assert.deepEqual(shots, [surfaceJpeg]);
+    assert.deepEqual(crops.map(({ rect, width, height, options }) => ({ rect, width, height, options })), [{
+      rect: { x: 0, y: 0, width: 3456, height: 2160 },
+      width: targetW,
+      height: targetH,
+      options: { mimeType: 'image/jpeg', quality: 0.75 },
+    }]);
+    assert.deepEqual(budgeted, { dataUrl: 'data:image/jpeg;base64,Y3JvcA==', width: targetW, height: targetH, coordAligned: false });
+
+    // The screenshot tool: lossless at CSS size for coord_aligned, the budget otherwise.
+    viewport = { ...viewport, innerWidth: 1263, innerHeight: 760 };
+    next();
+    const tool = await agent.executeTool(51, 'screenshot', { coord_aligned: true });
+    assert.equal(tool.success, true, JSON.stringify(tool));
+    assert.deepEqual(shots, [{ format: 'png', fromSurface: true }]);
+    assert.deepEqual(crops.map(({ rect, width, height, options }) => ({ rect, width, height, options })), [{
+      rect: { x: 0, y: 0, width: 2526, height: 1520 }, width: 1263, height: 760, options: { mimeType: 'image/png' },
+    }]);
+    next();
+    assert.equal((await agent.executeTool(51, 'screenshot', {})).success, true);
+    assert.deepEqual(shots, [surfaceJpeg]);
+    assert.deepEqual(crops.map(({ width, height, options }) => ({ width, height, options })), [{
+      width: 1263, height: 760, options: { mimeType: 'image/jpeg', quality: 0.75 },
+    }]);
+
+    // Visible-media localization keeps a CSS-sized PNG.
+    next();
+    const media = await agent._captureVisibleMediaScreenshot(51);
+    assert.deepEqual(shots, [{ format: 'png', fromSurface: true }]);
+    assert.equal(media.cropDataUrl, 'data:image/png;base64,Y3JvcA==');
+    assert.deepEqual([media.width, media.height], [1263, 760]);
+
+    // Native device pixels (screenshot save:true) are the surface itself.
+    const probe = await agent._captureViewportProbe(51);
+    next();
+    assert.deepEqual(await agent._captureViewportImage(51, probe, 1263, 760, { format: 'png' }), { data: 'c3VyZmFjZQ==' });
+    assert.deepEqual(shots, [{ format: 'png', fromSurface: true }]);
+    assert.equal(crops.length, 0);
+
+    // A crop that fails falls back to the clipped capture.
+    failCrop = true;
+    next();
+    const fallback = await agent._captureAutoScreenshot(51, { coordAligned: true });
+    assert.deepEqual(shots, [surfaceJpeg, {
+      format: 'jpeg', quality: 60, fromSurface: true,
+      clip: { x: 0, y: 600, width: 1263, height: 760, scale: 0.5 },
+    }]);
+    assert.equal(fallback.dataUrl, 'data:image/jpeg;base64,c3VyZmFjZQ==');
+    failCrop = false;
+
+    // A pinch-zoomed page: its surface shows the magnified visual viewport,
+    // so the layout viewport is still captured with a clip.
+    visual = { zoom: 1, scale: 2 };
+    next();
+    await agent._captureAutoScreenshot(51, { coordAligned: true });
+    const pinched = await agent._captureViewportProbe(51);
+    assert.equal(pinched.pageScale, 2);
+    await agent._captureViewportImage(51, pinched, 1263, 760, { format: 'png' });
+    assert.deepEqual(shots, [
+      { format: 'jpeg', quality: 60, fromSurface: true, clip: { x: 0, y: 600, width: 1263, height: 760, scale: 0.5 } },
+      { format: 'png', fromSurface: true, clip: { x: 0, y: 600, width: 1263, height: 760, scale: 1 } },
+    ]);
+    assert.equal(crops.length, 0);
+  } finally {
+    cdpClientCh.attach = originalAttach;
+    cdpClientCh.sendCommand = originalSendCommand;
+  }
 });
 
 test('existing dims under caps stay within the monotonic bound', () => {
@@ -22375,10 +22505,10 @@ test('sidepanels wire highlighting and heading rendering into fenced Markdown', 
   ]) {
     const panel = fs.readFileSync(path.join(ROOT, panelRel), 'utf8');
     const css = fs.readFileSync(path.join(ROOT, cssRel), 'utf8');
-    assert.match(panel, /import \{ codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownTables, replaceMarkdownCodeFences \} from '\.\/markdown-render\.js';/, `${label}: renderer helpers should be imported`);
+    assert.match(panel, /import \{ codeFenceLanguage, createMarkdownPlaceholders, highlightCode, renderMarkdownBlockquotes, renderMarkdownHeadings, renderMarkdownListsAndRules, renderMarkdownTables, replaceInlineDollarMath, replaceMarkdownCodeFences \} from '\.\/markdown-render\.js';/, `${label}: renderer helpers should be imported`);
     assert.match(panel, /const lang = codeFenceLanguage\(info\);/, `${label}: fenced code should tolerate metadata after its language token`);
     assert.match(panel, /const highlighted = enhance \? highlightCode\(code, lang\) : escapeHtml\(code\);/, `${label}: completed fenced code should be highlighted by its language while live code stays lightweight`);
-    assert.match(panel, /text = renderMarkdownTables\(text\);\s*text = renderMarkdownBlockquotes\(text\);\s*text = renderMarkdownHeadings\(text\);/, `${label}: pipe tables and quotes must render before headings swallow the following newline`);
+    assert.match(panel, /text = renderMarkdownTables\(text\);[\s\S]{0,400}?text = renderMarkdownListsAndRules\(text, \{[\s\S]{0,400}?text = renderMarkdownBlockquotes\(text\);\s*text = renderMarkdownHeadings\(text\);/, `${label}: pipe tables, lists and quotes must render before headings swallow the following newline`);
     assert.match(css, /\.message-content blockquote \{[\s\S]*?border-left: 3px solid var\(--border\);/, `${label}: rendered quotes should be visually distinct`);
     assert.match(css, /\.message-content table \{[\s\S]*?border-collapse: collapse;/, `${label}: rendered tables should have readable borders`);
     assert.match(css, /\.syntax-keyword[\s\S]*?var\(--syntax-keyword\)/, `${label}: token colors should be styled`);
@@ -49173,8 +49303,10 @@ test('sidepanel composer permission switch drives the Settings gate in both buil
     assert.doesNotMatch(block, /resolvePendingPermissionPrompt/, `${label}: the composer switch must never approve a pending permission card`);
     assert.match(block, /permissionGateWriteQueue = write\.catch\(\(\) => renderPermissionGateControl\(\)\)/, `${label}: a failed write should restore the stored state`);
     assert.match(block, /runtime\.getURL\('src\/ui\/permissions\.html'\)/, `${label}: the popover should open the site permission page`);
-    assert.match(panel, /if \(changes\[PERMISSION_GATE_KEY\]\) \{[\s\S]*?renderPermissionGateControl\(\);/, `${label}: changes made in Settings or by the command should update the switch`);
-    assert.match(panel, /storage\.local\.get\(\[PERMISSION_GATE_KEY, ACT_WARNING_DISMISSED_KEY\]\)\.then\([\s\S]*?renderPermissionGateControl\(\);/, `${label}: the stored gate should hydrate the switch`);
+    assert.match(panel, /if \(changes\[PERMISSION_GATE_KEY\]\) \{\s*permissionGateStoredOff = [^;]+;\s*syncAskBeforeConsequential\(\);/, `${label}: changes made in Settings or by the command should update the switch`);
+    assert.match(panel, /if \(changes\[PERMISSION_GATE_SESSION_OFF_KEY\]\) \{\s*permissionGateSessionOff = [^;]+;\s*syncAskBeforeConsequential\(\);/, `${label}: a session skip should update the switch`);
+    assert.match(panel, /function syncAskBeforeConsequential\(\) \{[^}]*renderPermissionGateControl\(\);/, `${label}: the gate sync should render the switch`);
+    assert.match(panel, /storage\.local\.get\(\[PERMISSION_GATE_KEY, ACT_WARNING_DISMISSED_KEY\]\),[\s\S]*?storage\.session\.get\(PERMISSION_GATE_SESSION_OFF_KEY\)[\s\S]*?syncAskBeforeConsequential\(\);/, `${label}: the stored gate should hydrate the switch`);
     assert.match(panel, /if \(closeUiScalePopover\(\)\) \{[\s\S]*?\}\n\s*if \(closePermissionGatePopover\(\)\) \{[\s\S]*?permissionGateBtn\?\.focus\(\);\s*return;/, `${label}: Escape should close the switch instead of aborting the active run`);
     assert.match(css, /#btn-permission-gate\.is-gate-off \{\s*color: var\(--warning\);/, `${label}: prompts off should keep the trigger in the warning color`);
     assert.match(css, /#btn-attach,\n#btn-mic \{[\s\S]*?width: 28px;\n  height: 28px;/, `${label}: the composer icon buttons keep their size`);
@@ -52824,7 +52956,8 @@ test('sidepanel exposes dangerously-skip-permissions in both builds', () => {
     assert.notEqual(commandIdx, -1, `${label}: parser missing /dangerously-skip-permissions`);
     const commandBody = panel.slice(commandIdx, panel.indexOf("if (command.value === '/compact')", commandIdx));
     assert.match(commandBody, /storage\.local\.set\(\{ \[PERMISSION_GATE_KEY\]: false \}\)/, `${label}: command should disable the same storage-backed gate as settings`);
-    assert.match(commandBody, /askBeforeConsequential = false;[\s\S]*?updateActWarning\(\);/, `${label}: command should update the local Act-mode warning immediately`);
+    assert.match(commandBody, /permissionGateStoredOff = true;\s*syncAskBeforeConsequential\(\);/, `${label}: command should update the local Act-mode warning immediately`);
+    assert.match(panel, /function syncAskBeforeConsequential\(\) \{[^}]*updateActWarning\(\);/, `${label}: the gate sync should refresh the Act-mode warning`);
     assert.match(commandBody, /resolvePendingPermissionPromptsForTab\(tabId\);/, `${label}: command should unblock the active permission prompt after disabling prompts`);
     assert.match(commandBody, /sp\.permissions\.disabled_html/, `${label}: command should warn visibly after disabling prompts`);
     const resolverIdx = panel.indexOf('function resolvePendingPermissionPromptsForTab(tabId) {');
@@ -76370,14 +76503,14 @@ test('_defaultConfigs: every entry carries an explicit category', () => {
 
 test('extended provider catalog is complete, mirrored, safe, and excluded-provider clean', async () => {
   const expectedIds = `
-    302ai abacus aihubmix alibaba-coding-plan alibaba-coding-plan-cn
+    api-route 302ai abacus aihubmix alibaba-coding-plan alibaba-coding-plan-cn
     azure-cognitive-services bailing baseten berget cerebras cheaperinference chutes clarifai
     cloudferro-sherlock cohere cortecs deepinfra digitalocean dinference drun
     evroc fastrouter freebuff2api friendli google-vertex google-vertex-anthropic helicone
     iflowcn inception inference io-net jiekou kilo kimi-for-coding
     kuae-cloud-coding-plan llama lucidquery meganova minimax-cn-coding-plan
     minimax-coding-plan moark modelscope morph nano-gpt nearai nebius nova novita-ai
-    ollama-cloud opencode opencode-go orcarouter ovhcloud perplexity
+    ollama-cloud opencode opencode-go opper orcarouter ovhcloud perplexity
     perplexity-agent poe pollinations privatemode-ai qihang-ai qiniu-ai requesty scaleway siliconflow
     siliconflow-cn stackit stepfun submodel synthetic tencent-coding-plan
     upstage v0 venice vercel vivgrid vultr wandb xiaomi zai-coding-plan zenmux
@@ -76385,7 +76518,7 @@ test('extended provider catalog is complete, mirrored, safe, and excluded-provid
   `.trim().split(/\s+/);
   const excluded = ['github-models', 'github-copilot', 'gitlab', 'sap-ai-core'];
 
-  assert.equal(expectedIds.length, 81);
+  assert.equal(expectedIds.length, 83);
   assert.deepEqual(ProviderCatalogCh.ADDITIONAL_PROVIDER_IDS, expectedIds);
   assert.deepEqual(ProviderCatalogFx.ADDITIONAL_PROVIDER_IDS, expectedIds);
   assert.deepEqual(
@@ -76400,8 +76533,8 @@ test('extended provider catalog is complete, mirrored, safe, and excluded-provid
   ]) {
     const defaults = new PM()._defaultConfigs();
     // Includes the sidepanel-only WebBrain Compass XL runtime profile, which is
-    // deliberately omitted from the 115/114 Settings provider cards.
-    const expectedDefaultCount = label === 'chrome' ? 116 : 115;
+    // deliberately omitted from the 117/116 Settings provider cards.
+    const expectedDefaultCount = label === 'chrome' ? 118 : 117;
     assert.equal(
       Object.keys(defaults).length,
       expectedDefaultCount,
@@ -76420,6 +76553,11 @@ test('extended provider catalog is complete, mirrored, safe, and excluded-provid
       );
       assert.ok(config.model || config.requiresModel === true || id === 'azure-cognitive-services', `${label}: ${id} missing model`);
 
+      if (id === 'api-route') {
+        const icon = fs.readFileSync(path.join(ROOT, prefix, 'icons/providers/api-route.png'));
+        assert.deepEqual([...icon.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+        continue;
+      }
       const icon = path.join(ROOT, prefix, 'icons/providers', `${id}.svg`);
       assert.equal(fs.existsSync(icon), true, `${label}: missing icon for ${id}`);
       const svg = fs.readFileSync(icon, 'utf8');
@@ -76547,6 +76685,54 @@ test('extended provider catalog is complete, mirrored, safe, and excluded-provid
   assert.deepEqual(
     ProviderCatalogCh.ADDITIONAL_PROVIDER_UI.cheaperinference.suggestions,
     ['gpt-5.4-mini', 'claude-sonnet-5', 'gemini-3.5-flash', 'deepseek-v4-flash'],
+  );
+  assert.deepEqual(
+    {
+      baseUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.baseUrl,
+      model: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.model,
+      contextWindow: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.contextWindow,
+      supportsVision: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.supportsVision,
+      supportsTools: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.supportsTools,
+      supportsAskStreaming: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.supportsAskStreaming,
+      apiKeyUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS.opper.apiKeyUrl,
+    },
+    {
+      baseUrl: 'https://api.opper.ai/v3/compat',
+      model: 'gpt-5.4-mini',
+      contextWindow: 400000,
+      supportsVision: true,
+      supportsTools: true,
+      supportsAskStreaming: true,
+      apiKeyUrl: 'https://platform.opper.ai',
+    },
+  );
+  assert.deepEqual(
+    ProviderCatalogCh.ADDITIONAL_PROVIDER_UI.opper.suggestions,
+    ['gpt-5.4-mini', 'claude-sonnet-4-6', 'gemini-3.8-flash', 'deepseek-v4-flash'],
+  );
+  assert.deepEqual(
+    {
+      baseUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].baseUrl,
+      model: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].model,
+      contextWindow: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].contextWindow,
+      supportsVision: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].supportsVision,
+      supportsTools: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].supportsTools,
+      supportsAskStreaming: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].supportsAskStreaming,
+      apiKeyUrl: ProviderCatalogCh.ADDITIONAL_PROVIDER_DEFAULTS['api-route'].apiKeyUrl,
+    },
+    {
+      baseUrl: 'https://global.api-route.com/v1',
+      model: 'gpt-6.1-sol',
+      contextWindow: 32768,
+      supportsVision: true,
+      supportsTools: true,
+      supportsAskStreaming: true,
+      apiKeyUrl: 'https://api-route.com',
+    },
+  );
+  assert.deepEqual(
+    ProviderCatalogCh.ADDITIONAL_PROVIDER_UI['api-route'].suggestions,
+    ['gpt-6.1-sol'],
   );
   assert.deepEqual(
     ProviderCatalogCh.ADDITIONAL_PROVIDER_UI['kimi-for-coding'].suggestions,

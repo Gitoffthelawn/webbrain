@@ -21,7 +21,7 @@ import {
   VISION_PROFILES, planVisionImageSize, planZoomImageSize, estimateVisionTokens, visionEncodingFor,
   normalizeVisionQuality,
 } from './vision-budget.js';
-import { rasterizeFrame, encodeCanvasRegion, supportsWebpEncoding } from './vision-encoder.js';
+import { rasterizeFrame, encodeCanvasRegion, cropImage, supportsWebpEncoding } from './vision-encoder.js';
 import {
   VISION_NATIVE_TOOLS, VISION_TRANSLATED_TOOLS, VISION_NO_OBSERVE_TOOLS, VISION_TOOL_NAMES,
   VISION_SCROLL_STEP_CSS_PX, VISION_DEFAULT_SCROLL_STEPS, VISION_MAX_WAIT_SECONDS,
@@ -599,14 +599,16 @@ export function installVisionRuntime(AgentClass, { trace = null } = {}) {
   /**
    * Capture the viewport at the planned model size. The platform capture may
    * return any size (device pixels, emulated DPR, zoom); rasterizeFrame
-   * resamples to the plan so the coordinate map is exact.
+   * resamples to the plan so the coordinate map is exact. `hold` is a screen
+   * update's (_visionCaptureSettled), which shows WebBrain's page UI again
+   * after its last capture.
    */
-  proto._visionCaptureFrame = async function _visionCaptureFrame(tabId, state, { redactionRetry = true } = {}) {
+  proto._visionCaptureFrame = async function _visionCaptureFrame(tabId, state, { redactionRetry = true, hold = null } = {}) {
     const probe = await this._visionBounded(tabId, 'viewport measurement', () => this._visionPlatformProbe(tabId));
     if (!probe || !(probe.cssWidth > 0) || !(probe.cssHeight > 0)) throw new Error('The page viewport could not be measured.');
     const profile = VISION_PROFILES[state.profileId] || VISION_PROFILES.default;
     const size = planVisionImageSize({ cssWidth: probe.cssWidth, cssHeight: probe.cssHeight, profile, quality: state.quality });
-    let dataUrl = await this._visionBounded(tabId, 'screenshot', () => this._visionPlatformCapture(tabId, { probe, outWidth: size.width, outHeight: size.height }));
+    let dataUrl = await this._visionBounded(tabId, 'screenshot', () => this._visionPlatformCapture(tabId, { probe, outWidth: size.width, outHeight: size.height, hold }));
     if (!dataUrl) throw new Error('The browser returned no screenshot.');
     let redaction = null;
     if (this.screenshotRedaction && typeof this._redactScreenshotDataUrl === 'function') {
@@ -628,7 +630,7 @@ export function installVisionRuntime(AgentClass, { trace = null } = {}) {
       // scan and the image show the same page.
       if (outcome.status === 'scan_unavailable' && redactionRetry && await this._visionTabLoading?.(tabId) === true) {
         await this._visionAwaitRedactionScan(tabId);
-        return this._visionCaptureFrame(tabId, state, { redactionRetry: false });
+        return this._visionCaptureFrame(tabId, state, { redactionRetry: false, hold });
       }
       redaction = outcome.status || 'error';
     }
@@ -645,6 +647,11 @@ export function installVisionRuntime(AgentClass, { trace = null } = {}) {
 
   proto._visionEncodeRegion = function _visionEncodeRegion(canvas, region, options) {
     return encodeCanvasRegion(canvas, region, options);
+  };
+
+  /** Chrome's capture cuts the viewport out of the tab surface here (agent _visionPlatformCapture). */
+  proto._visionCropImage = function _visionCropImage(dataUrl, rect, width, height) {
+    return cropImage(dataUrl, rect, width, height);
   };
 
   /**
@@ -737,21 +744,34 @@ export function installVisionRuntime(AgentClass, { trace = null } = {}) {
   /**
    * Capture until two consecutive frames match (bounded). Micro changes (a
    * caret, a clock, a spinner) count as a match: they never stop, and waiting
-   * for them only cost the full settle time on every step.
+   * for them only cost the full settle time on every step. WebBrain's own
+   * page UI (border, cursor, Stop button) stays hidden from the first
+   * capture to the last (`hold`, agent _withIndicatorsHidden) and is shown
+   * again once at the end, also when a capture fails or is given up on, so
+   * it does not blink on every step.
    */
   proto._visionCaptureSettled = async function _visionCaptureSettled(tabId, state) {
     await sleep(SETTLE_INITIAL_DELAY_MS);
-    let frame = await this._visionCaptureFrame(tabId, state);
-    for (let attempt = 0; attempt < SETTLE_MAX_EXTRA_CAPTURES; attempt++) {
-      await sleep(SETTLE_POLL_MS);
-      let next;
-      try { next = await this._visionCaptureFrame(tabId, state); } catch { break; }
-      const sameShape = next.size.width === frame.size.width && next.size.height === frame.size.height;
-      const moving = !sameShape || !isMicroScreenChange(diffFrames(frame.raster.pixels, next.raster.pixels, next.size.width, next.size.height));
-      frame = next;
-      if (!moving) break;
+    this._throwIfAborted?.(this._runAbortSignal?.(tabId));
+    const hold = { ended: false };
+    try {
+      let frame = await this._visionCaptureFrame(tabId, state, { hold });
+      for (let attempt = 0; attempt < SETTLE_MAX_EXTRA_CAPTURES; attempt++) {
+        await sleep(SETTLE_POLL_MS);
+        let next;
+        try { next = await this._visionCaptureFrame(tabId, state, { hold }); } catch { break; }
+        const sameShape = next.size.width === frame.size.width && next.size.height === frame.size.height;
+        const moving = !sameShape || !isMicroScreenChange(diffFrames(frame.raster.pixels, next.raster.pixels, next.size.width, next.size.height));
+        frame = next;
+        if (!moving) break;
+      }
+      return frame;
+    } finally {
+      // Sent after every hide of the update, even one still unanswered:
+      // the page handles them in order.
+      hold.ended = true;
+      this._showIndicatorsAfterToolUse?.(tabId);
     }
-    return frame;
   };
 
   /**

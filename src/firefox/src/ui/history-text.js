@@ -19,6 +19,20 @@ const BLOCK_TAGS = new Set([
 
 const SKIPPED_TAGS = new Set(['SCRIPT', 'STYLE', 'TEMPLATE']);
 
+// The TeX source KaTeX keeps in <annotation encoding="application/x-tex">.
+function texAnnotation(node) {
+  for (const child of Array.from(node?.childNodes || [])) {
+    if (!child || child.nodeType !== ELEMENT_NODE) continue;
+    if (String(child.tagName || '').toUpperCase() === 'ANNOTATION'
+      && child.getAttribute?.('encoding') === 'application/x-tex') {
+      return String(child.textContent ?? '');
+    }
+    const found = texAnnotation(child);
+    if (found !== null) return found;
+  }
+  return null;
+}
+
 function elementChildren(node) {
   return Array.from(node?.childNodes || []).filter((child) => child && child.nodeType === ELEMENT_NODE);
 }
@@ -102,6 +116,17 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
     const tagName = String(node.tagName || '').toUpperCase();
     if (SKIPPED_TAGS.has(tagName)) return;
     if (node.classList?.contains?.('code-block-header')) return;
+    // KaTeX output holds the formula three times (MathML, its TeX source and
+    // the visible HTML). Save the source with delimiters the panel renders
+    // again.
+    const display = node.classList?.contains?.('katex-display');
+    if (display || node.classList?.contains?.('katex')) {
+      const tex = texAnnotation(node);
+      if (tex !== null) {
+        output += display ? `$$${tex}$$` : `\\(${tex}\\)`;
+        return;
+      }
+    }
     if (tagName === 'BR') {
       // Every rendered <br> represents a source newline, including consecutive
       // <br>s used for blank lines. Do not deduplicate these hard breaks.
@@ -109,9 +134,11 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
       return;
     }
     if (tagName === 'HR') {
+      // Blank lines around it keep a saved rule from reading as the underline
+      // of a heading on the line above.
       ensureBreak();
-      output += '---';
-      appendHardBreak();
+      if (output && !output.endsWith('\n\n')) output += '\n';
+      output += '---\n\n';
       return;
     }
 
@@ -167,6 +194,28 @@ export function historyTextFromElement(root, { markdown = true } = {}) {
       if (href) output += '[';
       for (const child of Array.from(node.childNodes || [])) visit(child, false, inPre);
       if (href) output += `](${href})`;
+      return;
+    }
+    if (markdown && (tagName === 'UL' || tagName === 'OL')) {
+      // A rendered list goes back to Markdown the panel renders as one: a
+      // marker per item, and its further lines and nested lists indented
+      // under the marker.
+      const ordered = tagName === 'OL';
+      let number = Number.parseInt(String(node.getAttribute?.('start') ?? '1'), 10);
+      if (!Number.isSafeInteger(number) || number < 0) number = 1;
+      const items = [];
+      for (const item of elementChildren(node)) {
+        if (String(item.tagName || '').toUpperCase() !== 'LI') continue;
+        const marker = ordered ? `${number++}. ` : '- ';
+        const body = historyTextFromElement(item, { markdown: true }).replace(/^\n+|\s+$/g, '');
+        items.push(marker + body.split('\n')
+          .map((line, index) => (index && line ? ' '.repeat(marker.length) + line : line)).join('\n'));
+      }
+      if (items.length) {
+        ensureBreak();
+        output += items.join('\n');
+        ensureBreak();
+      }
       return;
     }
     if (markdown && (tagName === 'TABLE' || node.classList?.contains?.('markdown-table-wrapper'))) {

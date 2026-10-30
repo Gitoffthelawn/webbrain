@@ -6,11 +6,64 @@ This changelog was generated from the repository Git history and release tags. V
 
 ## [Unreleased]
 
+## [45.0.3] - 2026-10-29
+
+### Fixed
+- Side panel answers show bullet and numbered lists, nested by indentation, and `---` rules as lists and dividers instead of literal `*`, `-` and `---` lines. Each list item gets its own emphasis, so a `*` bullet no longer pairs with an asterisk in another item, and saved history keeps the lists as Markdown that renders the same way. Both builds.
+- Faster steps on long pages: the page snapshot taken before every model call, which binds the visible controls the model may act on, scanned the page's main landmark once for every control and read every ancestor's style again for each element. On a GitHub README page this took 3.4 to 4.5 s per step, about 30 s of a 100 s Summarize this page run. The landmark is now scanned once per snapshot, about 12 times faster in testing on that page, with the same snapshot. Both builds.
+
+## [45.0.2] - 2026-10-29
+
 ### Added
-- Settings → General → **Agent activity effect** chooses how a tab looks while WebBrain works on it: **Neural circuit**, the new default, where circuit traces grow in from the edges and signals run along them toward each element WebBrain acts on; **Aurora**, a soft purple band that drifts around the frame; **Scan**, corner brackets with a slow scanning beam; **Gears**, meshing cog trains turning in the corners; or **Classic glow**, the pulsing border used until now. Every style lets clicks, typing and scrolling through to the page, is hidden while WebBrain takes a screenshot, and holds still when your system asks to reduce motion. A new choice applies to a running task at once and is included in settings export and import. Chrome and Firefox.
+- WebBrain Companion updates itself from 0.1.3 on. Every six hours it checks GitHub for a newer Companion release, downloads it, and installs it only when the package matches the release's SHA256SUMS. It installs once nothing has used it for ten minutes, then restarts in the background. *Settings, Updates* turns automatic installs off, *Update now* in the tray menu or the panel installs at once, and `webbrain-companion --update` updates from the command line (`--headless` copies only report new versions). See `webbrain-systray/README.md`.
 
 ### Changed
+- Shorter planner requests: the planner and the intent check now ask for one-line JSON, include the Instagram carousel, Gmail count and CMS recipe rules only on turns that involve those sites or an enabled CMS recipe, and send the latest request, the page address and the prior request once each instead of two or three times.
+- WebBrain Companion planning: planner and classifier calls now ask for no thinking (`reasoning_effort: "none"`). Companion maps it per model (off where the model allows it, the lowest level where it cannot, dropped for models without thinking), and its local Bonsai 2 model now accepts it, so planning there no longer runs at the model's default xhigh reasoning.
+
+### Fixed
+- Side panel math: inline formulas written between single dollar signs, such as `$\rightarrow$`, `$W \cdot S \cdot H$` or `$O(n^2)$`, now render with KaTeX instead of showing the raw TeX. A `$...$` span renders only when it reads as TeX (a command, `^`, `_` or braces, or a single letter), so prices such as $5 to $10 stay text, and saved history keeps each formula as its TeX source. Both builds.
+- **Summarize this page** on a long page no longer stops after eight `read_page` windows and returns its summary as partial. Each further window of the same page that adds unread text is now progress through the page and does not count toward the eight-observation delivery checkpoint, which had cut off the read of a 43,000-character GitHub README just as it reached the end. The first window of each page, rereads and other observations still count, and a run gets at most 16 uncounted windows. Both builds.
+- WebBrain Companion: its local Bonsai 2 model no longer fails a request that asks for `high` reasoning effort, which clients such as Cline, Kilo and Open WebUI send. Bonsai 2's chat template accepts only `low`, `medium` and `xhigh`, so Companion now declares just those, and its proxy sends `high` as `medium`, the nearest declared level.
+
+## [45.0.1] - 2026-10-29
+
+### Added
+- New tab Companion invitation: An invitation card under the task box on the New Tab page (occupying the slot when there is no active bulletin to display) invites users to install WebBrain Companion. The card showcases the supported plan marks (Claude Max, ChatGPT Pro, Google AI Pro, SuperGrok, Kimi), localized text across all 23 languages, and a direct link to the Companion page. It respects responsive widths down to mobile viewports, stays permanently hidden once dismissed or when a Companion provider with a configured model is present, and honors reduced motion preferences. Both builds.
+
+### Fixed
+- Side panel queued messages: Messages queued while a run was active no longer remain stranded if you switch tabs before the run finishes. Previously, the end-of-run queue drain gave up while the panel rendered another tab, leaving queued messages stuck in an un-sent state upon your return. The panel now drains the tab's queue when returning to the tab (on tab reactivation and when the panel becomes visible again), prevents queued messages from leaking into a hidden panel's composer, and requests a drain when a finishing run hands back corrections. Both builds.
+- Vision mode file attachments: The vision Act prompt now explicitly explains how file attachments work (clicking the page's file upload control once to trigger the file-chooser guard handoff to `upload_file`). Site-specific notes for X, Bluesky, GitHub, Instagram, Hugging Face, Greenhouse, and Workday now instruct vision models to click the upload control once rather than advising the user to attach files manually. Both builds.
+
+## [45.0.0] - 2026-10-29
+
+### Added
+- Settings → General → **Agent activity effect** chooses how a tab looks while WebBrain works on it: **Neural circuit**, the new default, where circuit traces grow in from the edges and signals run along them toward each element WebBrain acts on; **Aurora**, a soft purple band that drifts around the frame; **Scan**, corner brackets with a slow scanning beam; **Gears**, meshing cog trains turning in the corners; or **Classic glow**, the pulsing border used until now. Every style lets clicks, typing and scrolling through to the page, is hidden while WebBrain takes a screenshot, and holds still when your system asks to reduce motion. A new choice applies to a running task at once and is included in settings export and import. Chrome and Firefox.
+- Extended provider catalog: Added **Opper** (an EU-hosted OpenAI-compatible AI gateway offering 700+ models from 50+ providers), **API Route**, and **Cheaper Inference** cards with full Chrome and Firefox parity.
+- CAPTCHA providers: Added **Solvecha** as a supported CAPTCHA solver provider with schema verification and fallback integration.
+- Permission card: Added **Dangerously skip permissions** to the permission prompt card, allowing users to temporarily (for the session) or permanently bypass permission prompts on trusted environments, matching Turbo mode behavior.
+- Active provider branding: The closed model picker in the composer's bottom bar now shows the active provider's logo (including Compass Max and duplicated provider instances) rather than model-family badges.
+- WebBrain Companion: Simplified card layout showing Title, Model, and Share queries at top level, with connection and parameter knobs under a collapsible Details section and automated preferred model selection when collapsed.
+
+### Changed
+- Settings → Advanced → **Vision mode** now carries a monochrome Tesla mark and is explained as "Tesla" mode: on, Act runs work from screenshots alone, like a Tesla driving on cameras; Off works more like Waymo and reads the page's accessibility tree too. The setting, its values and saved configurations are unchanged. Chrome and Firefox.
 - The agent cursor no longer disappears three seconds after an action. It now keeps one, smaller size: it glides from target to target, presses once with a ripple when WebBrain clicks, and between actions stays where it last acted, slowly fading in and out until the task ends. The ring around the target still fades after a moment. Chrome and Firefox.
+- Guarded actions: Allow explicit user approval and confirmation overrides on guarded actions and form submissions.
+- Quota card: Paused the Compass $0.50 sharing reward promo.
+
+### Fixed
+- Vision mode no longer makes the page flicker in Chrome. Each screenshot made Chrome redraw the tab shrunk into its top-left corner for a moment, several times after every action; WebBrain now captures the tab as it is on screen and crops and scales the image itself. Only a `zoom` that needs more detail than the screen has, as most do on a display at 100% scaling, still re-renders the page for its capture. Right-to-left pages wider than the window are now captured as they appear rather than as a blank frame.
+- While the screen settles after an action, WebBrain's border, cursor and Stop button now disappear once and come back after the last screenshot, instead of blinking around each one, and the Stop button keeps its layout afterwards. Chrome and Firefox.
+- Screenshots outside vision mode no longer make the page flicker in Chrome either. Automatic screenshots (after each navigation by default), the **screenshot** and **inspect_viewport** tools and the screenshot crop of **download_social_media** redrew the tab shrunk into its top-left corner for a moment: on retina displays, and on any display when the image budget scales the screenshot down. They now capture the tab as it is on screen and crop and scale the image in WebBrain; image sizes, coordinates and redaction are unchanged. A right-to-left page wider than the window, which came out blank, is now captured as shown.
+- Keeping a stalled screenshot from permanently hiding the page UI by bounding indicator hide requests by capture deadline and abort signal.
+
+### Security
+- File upload binding: `upload_file` approvals are bound to the exact local file path and display the resolved file name, local path, and download source in the permission card; host-wide upload grants no longer approve arbitrary local files.
+- Download tools scope: `list_downloads` and `read_downloaded_file` are restricted to files downloaded during the current conversation session, requiring explicit user confirmation before accessing other files.
+- Frame origin authorization: Coordinate clicks, untargeted text typing, and key dispatches are resolved and charged to the specific receiving document and frame origin, preventing cross-origin target confusion.
+- Bridge peer authentication: The extension must complete an HMAC-SHA256 challenge-response handshake to pair with the MCP and LM Studio loopback bridges before trusting connections, and Cloud Bridge controllers authenticate before receiving tokens.
+- DNS rebinding & private network protection: Outbound network tools verify the resolved connection IP address and block responses from private/internal network addresses unless explicitly enabled by the user setting. LM Studio plugin pins fetches to verified DNS answers.
+- Untrusted content wrapping: Tab URLs and document titles are wrapped with untrusted data boundaries in the action model's context to defend against prompt injection.
 
 ## [44.0.0] - 2026-10-27
 

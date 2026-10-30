@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-29T10:10:43.959Z",
+  "id": "023",
+  "model": "webbrain-one/lfm3-vld-2b",
+  "endpoint": "http://127.0.0.1:18080/v1/chat/completions",
+  "promptMode": "production",
+  "question": {
+    "schemaVersion": 1,
+    "id": "023",
+    "difficulty": {
+      "level": 2,
+      "slug": "basic",
+      "label": "Basic"
+    },
+    "category": "checkout",
+    "title": "Checkout",
+    "image": "images/023.png",
+    "question": "What is the exact total, and can the visible purchase action proceed? Focus on the “Checkout” screen.",
+    "defaultPromptMode": "production"
+  },
+  "image": {
+    "path": "images/023.png",
+    "bytes": 111667,
+    "sha256": "84afef3f467792f7256a21762aec83caa40f070a44cd7573367620f855faad10"
+  },
+  "request": {
+    "systemPrompt": "You are the vision subsystem of a web-automation agent. A screenshot of the current browser viewport is attached. Describe what is on screen so the planning agent can decide its next action.\n\nFormat — keep it terse, structured, no flowery prose:\n\n1) Page purpose: one line (e.g. \"GitHub repo issue list\", \"Gmail compose\", \"Stripe checkout form\").\n2) Visible text: list the EXACT strings on buttons, links, headings, tabs, and menu items. Quote them verbatim. Do not paraphrase.\n3) Inputs: list each visible form field with its label, placeholder, current value, and whether it is focused/disabled.\n4) State signals: loading spinners, toasts, modals, error banners, success messages, CAPTCHAs, cookie/consent banners, overlays.\n5) Blockers: anything that would prevent the next likely action (overlay, disabled submit, missing data, auth prompt).\n6) Unknowns: if you cannot read something clearly, say so. Do not guess numbers, names, or identifiers.\n\nRules: no prose intro, no conclusion, no \"this screenshot shows...\", no layout description unless it matters (e.g. \"left nav is collapsed\"). If the page is blank or still loading, say that in one line and stop.",
+    "userText": "Describe this screenshot of the current browser viewport for a web-automation agent. Follow the format in the system prompt.",
+    "foldSystem": false,
+    "temperature": 0,
+    "maxTokens": 800,
+    "chatTemplateKwargs": {
+      "enable_thinking": false,
+      "think": false,
+      "thinking": false
+    }
+  },
+  "response": {
+    "status": 200,
+    "content": "1) Web scene checkout\n2) \"Home\", \"Workspace\", \"Activity\" ( navigation tabs)\n3) \"Add a delivery address\" button, \" Place order\" button\n4) None\n5) None\n6) None\n",
+    "reasoningChars": 0,
+    "usage": {
+      "completion_tokens": 51,
+      "prompt_tokens": 1208,
+      "total_tokens": 1259,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": null,
+    "provider": null,
+    "finishReason": "stop",
+    "raw": "data: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"1\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" Web\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" scene\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" checkout\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"2\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Home\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\",\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Work\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"space\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\",\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Activity\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" (\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" navigation\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" tabs\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"3\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"Add\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" a\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" delivery\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" address\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" button\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\",\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" \\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" Place\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" order\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\\"\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" button\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"4\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" None\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"5\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" None\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"6\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\")\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\" None\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"content\":\"\\n\"}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"delta\":{}}],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\"}\n\ndata: {\"choices\":[],\"created\":1793268643,\"id\":\"chatcmpl-beSZqdlvFXogSNyXSGiA7VO9Egwz83CJ\",\"model\":\"/home/emre/models/webbrain-one/lfm3-vld-2b-gguf/LFM3-VL-2B-VLDR-Q4_K_M.gguf\",\"system_fingerprint\":\"b0-unknown\",\"object\":\"chat.completion.chunk\",\"usage\":{\"completion_tokens\":51,\"prompt_tokens\":1208,\"total_tokens\":1259,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"timings\":{\"cache_n\":0,\"prompt_n\":1208,\"prompt_ms\":189.332,\"prompt_per_token_ms\":0.1567317880794702,\"prompt_per_second\":6380.326622018465,\"predicted_n\":51,\"predicted_ms\":320.506,\"predicted_per_token_ms\":6.410119999999999,\"predicted_per_second\":156.0033197506443}}\n\ndata: [DONE]\n\n"
+  },
+  "latencyMs": {
+    "headers": 36,
+    "total": 546
+  },
+  "score": {
+    "success": false,
+    "ratio": 0.23076923076923078,
+    "earned": 3,
+    "possible": 13,
+    "threshold": 0.72,
+    "sectionCount": 6,
+    "criticalFailures": [
+      "total",
+      "button",
+      "banner",
+      "blocked"
+    ],
+    "dimensions": {
+      "page_purpose": {
+        "earned": 1,
+        "possible": 1,
+        "ratio": 1
+      },
+      "visible_text": {
+        "earned": 0,
+        "possible": 6,
+        "ratio": 0
+      },
+      "state_signals": {
+        "earned": 0,
+        "possible": 2,
+        "ratio": 0
+      },
+      "blockers": {
+        "earned": 0,
+        "possible": 2,
+        "ratio": 0
+      }
+    },
+    "checks": [
+      {
+        "id": "purpose",
+        "dimension": "page_purpose",
+        "section": 1,
+        "kind": "any",
+        "values": [
+          "checkout",
+          "cart",
+          "order",
+          "purchase"
+        ],
+        "weight": 1,
+        "critical": true,
+        "passed": true,
+        "matched": [
+          "checkout"
+        ],
+        "scopeFound": true
+      },
+      {
+        "id": "heading",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "Checkout",
+        "weight": 1,
+        "critical": false,
+        "caseSensitive": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      },
+      {
+        "id": "item",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "Desk lamp",
+        "weight": 1,
+        "critical": false,
+        "caseSensitive": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      },
+      {
+        "id": "total",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "$67.40",
+        "weight": 2,
+        "critical": true,
+        "caseSensitive": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      },
+      {
+        "id": "button",
+        "dimension": "visible_text",
+        "section": 2,
+        "kind": "literal",
+        "value": "Place order",
+        "weight": 2,
+        "critical": true,
+        "caseSensitive": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      },
+      {
+        "id": "banner",
+        "dimension": "state_signals",
+        "section": 4,
+        "kind": "literal",
+        "value": "Add a delivery address",
+        "weight": 2,
+        "critical": true,
+        "caseSensitive": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      },
+      {
+        "id": "blocked",
+        "dimension": "blockers",
+        "section": 5,
+        "kind": "any",
+        "values": [
+          "delivery",
+          "address"
+        ],
+        "weight": 2,
+        "critical": true,
+        "passed": false,
+        "matched": [],
+        "scopeFound": true
+      }
+    ]
+  },
+  "error": null
+}

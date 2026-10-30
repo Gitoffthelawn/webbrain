@@ -16,7 +16,9 @@ decision switches. See [the settings guide](https://webbrain.one/docs/settings/#
 and [data flow](privacy-and-data-flow.md#decision-models-and-completion-verification)
 for setup and disclosure details. Existing `#multimodal` settings links still work.
 
-In the side panel's composer, the model menu is an engine icon. The dot on the
+In the side panel's composer, the model menu shows the selected provider's logo,
+the same as its row in the menu (Compass Max uses the Compass logo), and an
+engine icon while the logo loads or when the provider has none. The dot on the
 icon's corner shows the selected provider's latest connection check: green when
 it answered, red when it failed, amber while it runs. The dot is part of the
 menu button, so clicking it opens the menu, and the button's accessible
@@ -504,18 +506,18 @@ times the standard rate.
 
 ### Extended provider catalog
 
-WebBrain also ships 81 disabled-by-default provider cards. Most are sourced
+WebBrain also ships 83 disabled-by-default provider cards. Most are sourced
 from the OpenCode provider catalog snapshot at commit
 `62e4641235d7847dadc60da37cca8a023dd54fc1`; provider-specific additions use
 their official API documentation. Together with the original cards, the
-Providers page lists **115 built-in providers on Chromium** and **114 on Firefox**; the
+Providers page lists **117 built-in providers on Chromium** and **116 on Firefox**; the
 difference is the Chromium-only in-browser WebGPU runtime.
 
 | IDs                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `302ai`, `abacus`, `aihubmix`, `alibaba-coding-plan`, `alibaba-coding-plan-cn`, `azure-cognitive-services`, `bailing`, `baseten`, `berget`, `cerebras`, `cheaperinference`, `chutes`, `clarifai`, `cloudferro-sherlock`, `cohere`, `cortecs`, `deepinfra`, `digitalocean`, `dinference`, `drun`, `evroc`, `fastrouter`, `friendli` |
+| `api-route`, `302ai`, `abacus`, `aihubmix`, `alibaba-coding-plan`, `alibaba-coding-plan-cn`, `azure-cognitive-services`, `bailing`, `baseten`, `berget`, `cerebras`, `cheaperinference`, `chutes`, `clarifai`, `cloudferro-sherlock`, `cohere`, `cortecs`, `deepinfra`, `digitalocean`, `dinference`, `drun`, `evroc`, `fastrouter`, `friendli` |
 | `freebuff2api`, `google-vertex`, `google-vertex-anthropic`, `helicone`, `iflowcn`, `inception`, `inference`, `io-net`, `jiekou`, `kilo`, `kimi-for-coding`, `kuae-cloud-coding-plan`, `llama`, `lucidquery`, `meganova`, `minimax-cn-coding-plan`, `minimax-coding-plan`, `moark`, `modelscope`, `morph`                       |
-| `nano-gpt`, `nearai`, `nebius`, `nova`, `novita-ai`, `ollama-cloud`, `opencode`, `opencode-go`, `orcarouter`, `ovhcloud`, `perplexity`, `perplexity-agent`, `poe`, `pollinations`, `privatemode-ai`, `qihang-ai`, `qiniu-ai`, `requesty`, `scaleway`, `siliconflow`, `siliconflow-cn`, `stackit`                               |
+| `nano-gpt`, `nearai`, `nebius`, `nova`, `novita-ai`, `ollama-cloud`, `opencode`, `opencode-go`, `opper`, `orcarouter`, `ovhcloud`, `perplexity`, `perplexity-agent`, `poe`, `pollinations`, `privatemode-ai`, `qihang-ai`, `qiniu-ai`, `requesty`, `scaleway`, `siliconflow`, `siliconflow-cn`, `stackit`                      |
 | `stepfun`, `submodel`, `synthetic`, `tencent-coding-plan`, `upstage`, `v0`, `venice`, `vercel`, `vivgrid`, `vultr`, `wandb`, `xiaomi`, `zai-coding-plan`, `zenmux`, `zhipuai`, `zhipuai-coding-plan`                                                                                                                       |
 
 Most use the OpenAI-compatible Chat Completions contract and bearer API keys.
@@ -581,6 +583,33 @@ In WebBrain, open **Providers -> LLM -> Cheaper Inference**. Paste an API key
 into the card, keep the default `gpt-5.4-mini` model (400000 tokens), then
 click **Test Connection**. Interactive Ask streaming, tool calls, and vision
 work through the existing OpenAI-compatible path.
+
+#### Opper
+
+[Opper](https://opper.ai) is an EU-hosted, OpenAI-compatible AI gateway at
+`https://api.opper.ai/v3/compat`. One API key gives access to 700+ models from
+50+ providers; model IDs are bare pool names (such as `gpt-5.4-mini`,
+`claude-sonnet-4-6`, `gemini-3.8-flash`, and `deepseek-v4-flash`), and a
+`provider/model` ID such as `anthropic/claude-sonnet-4-6` pins one route. See
+the [docs](https://docs.opper.ai).
+
+In WebBrain, open **Providers -> LLM -> Opper**. Create an API key at
+[platform.opper.ai](https://platform.opper.ai), paste it into the card, keep
+the default `gpt-5.4-mini` model (400000 tokens), then click **Test
+Connection**. Interactive Ask streaming, tool calls, and vision work through
+the existing OpenAI-compatible path.
+
+#### API Route
+
+[API Route](https://api-route.com) is an OpenAI-compatible provider at
+`https://global.api-route.com/v1`. Open **Providers -> LLM -> API Route**, enter
+your own API key, keep the default model `gpt-6.1-sol`, and click **Test
+Connection**. API Route bills usage separately. The card starts disabled.
+
+Interactive Ask streaming, tool calls, and vision work through the existing
+OpenAI-compatible path. The 32768-token context setting is a conservative
+application budget, not an advertised model context limit; adjust it to a limit
+verified for your selected model and account.
 
 ### Ask response streaming
 

@@ -22,7 +22,7 @@ import { SOCIAL_PLATFORMS, socialPublicationApiPlatform, normalizePublicationCon
 import { mastodonPublicationIntentMessages, normalizeMastodonPublicationIntent, captureNativeMastodonPublication, mastodonPublicationBinding, mastodonPublicationReceipt, mastodonPublicationNavigation } from './mastodon-publication.js';
 import { AGENT_TOOLS, AGENT_TOOL_NAMES, RESERVED_AGENT_TOOL_NAMES, RETIRED_AGENT_TOOL_NAMES, getToolsForMode, SYSTEM_PROMPT_BATCHING, SYSTEM_PROMPT_ASK, SYSTEM_PROMPT_ACT, SYSTEM_PROMPT_ACT_COMPACT, SYSTEM_PROMPT_ACT_MID, SYSTEM_PROMPT_LEAN_NOTE, SYSTEM_PROMPT_GENERATIVE_MEDIA, SYSTEM_PROMPT_DEV_APPENDIX, SYSTEM_PROMPT_WEBMCP_ASK, SYSTEM_PROMPT_WEBMCP_ACT, getVisionActPrompt } from './tools.js';
 import { installVisionRuntime } from './vision-runtime.js';
-import { VISION_CAPTCHA_MANUAL_NOTE, VISION_CAPTCHA_UNAPPLIED_NOTE, VISION_NATIVE_TOOLS, VISION_SITE_NOTES_PREFACE, visionCaptchaSolverNote, visionFilePickerBlockedResult, visionUniversalPreamble } from './vision-tools.js';
+import { VISION_CAPTCHA_MANUAL_NOTE, VISION_CAPTCHA_UNAPPLIED_NOTE, VISION_NATIVE_TOOLS, visionCaptchaSolverNote, visionFilePickerBlockedResult, visionSiteNotesPreface, visionUniversalPreamble } from './vision-tools.js';
 import { visionDomProbeExpression } from './vision-dom-probe.js';
 import { normalizeVisionModeSetting } from './vision-mode.js';
 import { rejectedCompletionRecovery } from './completion-recovery.js';
@@ -43,8 +43,10 @@ import { applyReadPageWindow, fitReadPageWindowResult, isReadPageWindowResult } 
 import { STANDARD_TOOL_RESULT_CHARS, createReadCompletenessState, isCommunicationThreadContext, normalizeReadScope, readCompletenessBlock, readCompletenessLimitation, readCompletenessMadeProgress, readWindowLimits, recordReadCompleteness, requirePlannerReadCompleteness, requiresCompleteThreadRead } from './read-completeness.js';
 import { LoopDetector } from './loop-detector.js';
 import { recordCollectionReadProgress } from './collection-read-progress.js';
+import { recordDocumentReadProgress } from './document-read-progress.js';
 import { parseToolCallsFromText } from './tool-call-parser.js';
 import { IMAGE_BUDGET, estimateImageTokens, fitImageDimensions } from './image-budget.js';
+import { cropImage } from './vision-encoder.js';
 import { BROWSER_MUTATION_TOOLS, STATE_CHANGE_TOOLS as SHARED_STATE_CHANGE_TOOLS } from './mutation-tools.js';
 import { guardRecentSubmitClick } from './submit-click-guard.js';
 import { isExplicitGuardOverrideRequest } from './guard-override.js';
@@ -1221,8 +1223,9 @@ export class Agent extends LoopDetector {
     this._cloudflareManagedChallenges = new Map(); // tabId -> sanitized response-backed interstitial state
     this._cloudflareManagedChallengeTransitions = new Map(); // tabId -> serialized transition promise
     // Pre-execution planner (Settings → Plan before Act). Default "try";
-    // attempts a read-only planning LLM call and degrades the current turn to
-    // Ask/read-only if structured planning itself fails. "strict" fails closed.
+    // attempts a read-only planning LLM call, and if planning still fails after
+    // its retry, continues the turn without a plan and with its intent unknown
+    // (_plannerActContinuation). "strict" fails closed.
     this.planBeforeActMode = 'try';
     this.planBeforeAct = true; // legacy boolean mirror for older call sites/tests
     this.planReviewMode = 'confidence'; // confidence | always | never
@@ -1259,6 +1262,7 @@ export class Agent extends LoopDetector {
     this.deliveryObservationStreaks = new Map(); // tabId -> count
     this.deliveryActionableDiscoveryResets = new Set(); // tabIds that used their one discovery reset since meaningful progress
     this.deliveryCollectionReads = new Map(); // tabId -> task-bound finite source coverage
+    this.deliveryDocumentReads = new Map(); // tabId -> read_page windows read this run
     this.lastAutoScreenshotTs = new Map(); // tabId -> ms — defensive debounce
     // tabId -> { toolName, streak }. Burst state must not leak across tabs or
     // be consumed by read-only preflight checks.
@@ -1367,6 +1371,14 @@ export class Agent extends LoopDetector {
         }
         if (changes.askBeforeConsequentialActions) {
           this._permissionGateOffStored = changes.askBeforeConsequentialActions.newValue === false;
+          // Turning prompts on, from any writer (the composer switch, Settings,
+          // an imported configuration), also ends a "this session only" skip.
+          if (!this._permissionGateOffStored) {
+            this._permissionGateOffForSession = false;
+            void Promise.resolve()
+              .then(() => chrome.storage.session.remove(PERMISSION_GATE_SESSION_OFF_KEY))
+              .catch(() => {});
+          }
           this._skipPermissionGate = this._permissionGateOffStored || this._permissionGateOffForSession;
         }
         if (changes[COST_ALLOWANCE_SESSION_KEY]) {
@@ -8991,15 +9003,15 @@ export class Agent extends LoopDetector {
     const force = options?.force === true;
     if (this._gateSettingLoaded && !force) return this._skipPermissionGate;
     this._gateSettingLoaded = true;
-    try {
-      const o = await chrome.storage.local.get('askBeforeConsequentialActions');
-      this._permissionGateOffStored = o?.askBeforeConsequentialActions === false;
-    } catch { /* default: gate on */ }
-    try {
-      const o = await chrome.storage.session.get(PERMISSION_GATE_SESSION_OFF_KEY);
-      this._permissionGateOffForSession = o?.[PERMISSION_GATE_SESSION_OFF_KEY] === true;
-    } catch { /* default: gate on */ }
-    this._skipPermissionGate = this._permissionGateOffStored || this._permissionGateOffForSession;
+    // Both areas at once. A switch whose area cannot be read keeps its value,
+    // and with neither readable the gate stays as it is (on by default).
+    const [stored, session] = await Promise.all([
+      Promise.resolve().then(() => chrome.storage.local.get('askBeforeConsequentialActions')).then(o => o || {}, () => null),
+      Promise.resolve().then(() => chrome.storage.session.get(PERMISSION_GATE_SESSION_OFF_KEY)).then(o => o || {}, () => null),
+    ]);
+    if (stored) this._permissionGateOffStored = stored.askBeforeConsequentialActions === false;
+    if (session) this._permissionGateOffForSession = session[PERMISSION_GATE_SESSION_OFF_KEY] === true;
+    if (stored || session) this._skipPermissionGate = this._permissionGateOffStored || this._permissionGateOffForSession;
     return this._skipPermissionGate;
   }
 
@@ -10602,6 +10614,7 @@ export class Agent extends LoopDetector {
   _clearRunLoopState(tabId) {
     super._clearRunLoopState(tabId);
     this.deliveryCollectionReads.delete(tabId);
+    this.deliveryDocumentReads.delete(tabId);
   }
 
   /**
@@ -11468,11 +11481,20 @@ export class Agent extends LoopDetector {
     return recordCollectionReadProgress(coverage, args, result).madeProgress;
   }
 
+  _deliveryCheckpointDocumentReadProgress(tabId, name, result) {
+    if (name !== 'read_page') return false;
+    const recorded = recordDocumentReadProgress(this.deliveryDocumentReads.get(tabId), result);
+    this.deliveryDocumentReads.set(tabId, recorded.state);
+    return recorded.madeProgress;
+  }
+
   _checkDeliveryObservationStreak(tabId, name, args = {}, result = null, options = {}) {
     const observation = this.constructor.DELIVERY_OBSERVATION_TOOLS.has(name)
       && !isNetworkMutation(name, args);
     const collectionReadProgress = observation
       && this._deliveryCheckpointCollectionReadProgress(tabId, name, args, result);
+    const documentReadProgress = observation && !collectionReadProgress
+      && this._deliveryCheckpointDocumentReadProgress(tabId, name, result);
     if (observation
       && options.discoveredActionableTargets === true
       && !this.deliveryActionableDiscoveryResets.has(tabId)) {
@@ -11502,6 +11524,11 @@ export class Agent extends LoopDetector {
       // post-action verification debt is meaningful progress. Start the next
       // research streak from zero instead of charging this verification read.
       this.deliveryObservationStreaks.delete(tabId);
+      return { kind: 'none' };
+    }
+    if (documentReadProgress) {
+      // The next window of a long page (document-read-progress.js) is not
+      // counted. It does not clear the streak either: it is not task progress.
       return { kind: 'none' };
     }
     if (!observation) {
@@ -12969,7 +12996,7 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
         const heading = adapter.category === 'finance'
           ? `[Site guidance for ${adapter.name} — FINANCE / HIGH-STAKES]`
           : `[Site guidance for ${adapter.name}]`;
-        const visionNote = this._visionRunState(tabId).active ? `${VISION_SITE_NOTES_PREFACE}\n` : '';
+        const visionNote = this._visionRunState(tabId).active ? `${visionSiteNotesPreface(adapter.notes)}\n` : '';
         contextLine += `${heading}\n${visionNote}${adapter.notes.trim()}\n\n`;
       }
       if (adapter) this._queueAdapterMatchTrace(tabId, adapter, !!shouldInjectAdapter);
@@ -13708,7 +13735,7 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
     const heading = adapter.category === 'finance'
       ? `[Site context changed → now on ${adapter.name} — FINANCE / HIGH-STAKES. Apply these rules from now on:]`
       : `[Site context changed → now on ${adapter.name}. Apply these notes from now on:]`;
-    const visionNote = this._visionRunState(tabId).active ? `${VISION_SITE_NOTES_PREFACE}\n` : '';
+    const visionNote = this._visionRunState(tabId).active ? `${visionSiteNotesPreface(adapter.notes)}\n` : '';
     messages.push({
       role: 'user',
       content: `${heading}\n${visionNote}${adapter.notes.trim()}`,
@@ -19538,25 +19565,51 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
    * chrome-extension:// / file:// pages), the sendMessage rejects and
    * we capture as-is. Same on tabs the user opened before the extension
    * had a chance to inject.
+   *
+   * A vision screen update keeps the indicator hidden across all of its
+   * captures (vision-runtime.js _visionCaptureSettled) and passes them its
+   * `hold`. Each capture still hides, which a hidden indicator ignores but
+   * a page that navigated in between needs, and leaves the show to the
+   * update, which sends it once at its end instead of blinking around
+   * every capture. Nothing is counted per tab: a capture that outlives its
+   * update (one _visionBounded gave up on) shows by itself if it ever
+   * finishes, and one that never finishes holds nothing back.
+   *
+   * The hide is bounded by the capture deadline and run abort signal so an
+   * unresponsive renderer or stop request cannot leave the run hung.
    */
-  async _withIndicatorsHidden(tabId, fn) {
-    let needsRestore = false;
+  async _withIndicatorsHidden(tabId, fn, { hold = null } = {}) {
+    let hidden = false;
     try {
-      await chrome.tabs.sendMessage(tabId, { type: 'WB_HIDE_FOR_TOOL_USE' });
-      needsRestore = true;
-      // One paint frame for Chrome to apply the display:none the
-      // content script just set, before CDP grabs the surface.
-      await new Promise((r) => setTimeout(r, 16));
-    } catch { /* content script absent — that's fine, no UI to hide */ }
-    try {
+      try {
+        const sendHide = () => chrome.tabs.sendMessage(tabId, { type: 'WB_HIDE_FOR_TOOL_USE' });
+        const reply = typeof this._visionBounded === 'function'
+          ? await this._visionBounded(tabId, 'screenshot', sendHide)
+          : await sendHide();
+        hidden = true;
+        // One paint frame for Chrome to apply the display:none the
+        // content script just set, before CDP grabs the surface (none
+        // when it was hidden already).
+        if (reply?.changed !== false) await new Promise((r) => setTimeout(r, 16));
+      } catch (error) {
+        if (error?.name === 'AbortError' || error?.code === 'vision_capture_timeout' || this._runAbortSignal?.(tabId)?.aborted) {
+          // The hide may still arrive, so a show must follow it.
+          hidden = true;
+          throw error;
+        }
+        /* content script absent — that's fine, no UI to hide */
+      }
       return await fn();
     } finally {
-      if (needsRestore) {
-        try {
-          chrome.tabs.sendMessage(tabId, { type: 'WB_SHOW_AFTER_TOOL_USE' }).catch(() => {});
-        } catch { /* ignore */ }
-      }
+      if (hidden && (!hold || hold.ended)) this._showIndicatorsAfterToolUse(tabId);
     }
+  }
+
+  /** Brings back what _withIndicatorsHidden hid; with nothing hidden it changes nothing. */
+  _showIndicatorsAfterToolUse(tabId) {
+    try {
+      chrome.tabs.sendMessage(tabId, { type: 'WB_SHOW_AFTER_TOOL_USE' }).catch(() => {});
+    } catch { /* ignore */ }
   }
 
   _showAgentTarget(tabId, rect, source = 'interaction') {
@@ -19836,7 +19889,8 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
    * document coordinates (a clip at 0,0 on a scrolled page captures the
    * unrendered top of the document: a blank frame), and the output is
    * clip x scale x devicePixelRatio (scale 1 on a retina screen is twice the
-   * CSS size), so the scale divides the DPR out.
+   * CSS size), so the scale divides the DPR out. Only pinch-zoomed pages and
+   * failed local crops still capture with a clip (_captureViewportImage).
    */
   _viewportCaptureClip(probe, cssW, cssH, scale = 1) {
     const dpr = Math.max(0.25, Number(probe?.dpr) || 1);
@@ -19852,15 +19906,64 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
     };
   }
 
+  /**
+   * The visible viewport, cssW x cssH CSS px from its top left, as a
+   * `width` x `height` image, or at native device pixels without `width`.
+   * Returns what Page.captureScreenshot does ({ data }).
+   *
+   * The tab's surface is captured as it is on screen and the viewport is
+   * cut out and scaled locally. Given a clip, Chromium instead resizes the
+   * tab's view to clip x scale and re-renders the page into it until the
+   * capture ends (page_handler.cc CaptureScreenshot): a visible tab flashes
+   * a shrunken page in its top-left corner whenever that size differs from
+   * the view, as at scale 1 / DPR on a retina screen or in a budget-scaled
+   * capture. The surface starts at the viewport's top left (Chromium keeps
+   * the page scrollbar on the right, in RTL pages too) and has
+   * devicePixelRatio pixels per CSS pixel, as in _visionPlatformCapture.
+   *
+   * A pinch-zoomed page keeps the clip: its surface shows the magnified
+   * visual viewport, not the layout viewport these CSS sizes describe. So
+   * does a capture whose local crop fails.
+   */
+  async _captureViewportImage(tabId, probe, cssW, cssH, { format = 'png', quality, width, height } = {}) {
+    const dpr = Math.max(0.25, Number(probe?.dpr) || 1);
+    const jpeg = format === 'jpeg';
+    const capture = params => this._withIndicatorsHidden(tabId, () =>
+      cdpClient.sendCommand(tabId, 'Page.captureScreenshot', { format, fromSurface: true, ...params }));
+    const clipped = () => capture({
+      ...(jpeg ? { quality } : {}),
+      clip: this._viewportCaptureClip(probe, cssW, cssH, width ? width / cssW : dpr),
+    });
+    if (Math.abs((Number(probe?.pageScale) || 1) - 1) > 0.01) return clipped();
+    // Native device pixels are the surface itself. A scaled image is cut
+    // from a finer JPEG and encoded once more at the caller's quality.
+    const shot = await capture(jpeg ? { quality: width ? 90 : quality } : {});
+    if (!shot?.data || !width) return shot;
+    const mimeType = jpeg ? 'image/jpeg' : 'image/png';
+    try {
+      const dataUrl = await this._cropAndScaleImage(`data:${mimeType};base64,${shot.data}`,
+        { x: 0, y: 0, width: cssW * dpr, height: cssH * dpr }, width, height,
+        { mimeType, ...(jpeg ? { quality: quality / 100 } : {}) });
+      return { data: dataUrl.slice(dataUrl.indexOf(',') + 1) };
+    } catch {
+      return clipped();
+    }
+  }
+
+  /** cropImage (vision-encoder.js); tests without a canvas stand in for it. */
+  _cropAndScaleImage(dataUrl, rect, width, height, options) {
+    return cropImage(dataUrl, rect, width, height, options);
+  }
+
   async _captureAutoScreenshot(tabId, { coordAligned = false } = {}) {
     try {
       await cdpClient.attach(tabId);
       await cdpClient.sendCommand(tabId, 'Page.enable');
       await this._preparePageForCapture(tabId);
 
-      // Probe the CSS viewport first so we can either (a) clip exactly
-      // to it for pixel-accurate captures, or (b) compute a budget-aware
-      // CDP-side scale that downsizes during capture rather than after.
+      // Probe the CSS viewport first so we can either (a) capture it at
+      // exactly its CSS size for pixel-accurate captures, or (b) compute
+      // budget-aware target dims to capture it at.
       const probe = await this._captureViewportProbe(tabId);
       const cssW = Math.max(1, Math.round(probe?.innerWidth || 1024));
       const cssH = Math.max(1, Math.round(probe?.innerHeight || 768));
@@ -19872,13 +19975,12 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
         // #311 review). When a side exceeds the cap, resize and report scale.
         const budget = this._budgetForCoordAlignedCapture();
         const captureOnce = async () => {
-          const shot = await this._withIndicatorsHidden(tabId, () =>
-            cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-              format: 'jpeg',
-              quality: 60,
-              clip: this._viewportCaptureClip(probe, cssW, cssH, 1),
-            })
-          );
+          const shot = await this._captureViewportImage(tabId, probe, cssW, cssH, {
+            format: 'jpeg',
+            quality: 60,
+            width: cssW,
+            height: cssH,
+          });
           if (!shot?.data) return null;
           const rawDataUrl = `data:image/jpeg;base64,${shot.data}`;
           const needsResize = cssW > budget.maxTargetPx || cssH > budget.maxTargetPx;
@@ -19909,27 +20011,24 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
       }
 
       // Non-coord-aligned mode: pre-compute target dims via the budget
-      // binary-search, then ask CDP to capture + scale in one pass. This
-      // avoids ever materializing a multi-MB native-DPR JPEG that we'd
-      // then have to decode and resize in the service worker.
+      // binary-search, then capture the viewport at them. The tab's surface
+      // is scaled to them in the service worker (_captureViewportImage):
+      // a CDP-side scale would resize the visible tab while it captures.
       const budget = this._budgetForCapture();
       const [targetW, targetH] = Agent._fitImageDimensions(cssW, cssH, budget);
-      const scale = targetW < cssW ? targetW / cssW : 1;
       const captureOnce = async () => {
-        const shot = await this._withIndicatorsHidden(tabId, () =>
-          cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-            format: 'jpeg',
-            quality: Math.round(budget.initialJpegQuality * 100),
-            fromSurface: true,
-            clip: this._viewportCaptureClip(probe, cssW, cssH, scale),
-          })
-        );
+        const shot = await this._captureViewportImage(tabId, probe, cssW, cssH, {
+          format: 'jpeg',
+          quality: Math.round(budget.initialJpegQuality * 100),
+          width: targetW,
+          height: targetH,
+        });
         if (!shot?.data) return null;
         const rawDataUrl = `data:image/jpeg;base64,${shot.data}`;
 
-        // CDP-side resize + JPEG q=75 usually fits. Iterative quality
-        // downgrade is the safety net for high-DPR screens where the
-        // captured image can still exceed the base64 ceiling.
+        // Resize + JPEG q=75 usually fits. Iterative quality downgrade is
+        // the safety net for detailed pages whose image can still exceed
+        // the base64 ceiling.
         const shrunk = await this._compressJpegToByteCeiling(rawDataUrl, budget);
         const redacted = await this._redactScreenshotDataUrl(tabId, shrunk, { coordinateSpace: 'viewport' });
         return {
@@ -20373,13 +20472,11 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
       const cssW = Math.max(1, Math.round(probe?.innerWidth || 1024));
       const cssH = Math.max(1, Math.round(probe?.innerHeight || 768));
       const captureOnce = async () => {
-        const shot = await this._withIndicatorsHidden(tabId, () =>
-          cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-            format: 'png',
-            fromSurface: true,
-            clip: this._viewportCaptureClip(probe, cssW, cssH, 1),
-          })
-        );
+        const shot = await this._captureViewportImage(tabId, probe, cssW, cssH, {
+          format: 'png',
+          width: cssW,
+          height: cssH,
+        });
         if (!shot?.data) return null;
         const cropDataUrl = `data:image/png;base64,${shot.data}`;
         // Model-facing path honors maxImageDimension (issue #311). Keep the raw
@@ -20667,9 +20764,13 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
       const value = probe?.result?.value || null;
       if (value) {
         // Browser zoom: capture clips are in CSS px x zoom (_viewportCaptureClip).
+        // Pinch zoom: the surface is not the layout viewport (_captureViewportImage).
         try {
-          const zoom = Number((await cdpClient.sendCommand(tabId, 'Page.getLayoutMetrics'))?.cssVisualViewport?.zoom);
+          const visual = (await cdpClient.sendCommand(tabId, 'Page.getLayoutMetrics'))?.cssVisualViewport;
+          const zoom = Number(visual?.zoom);
           if (zoom > 0) value.zoom = zoom;
+          const pageScale = Number(visual?.scale);
+          if (pageScale > 0) value.pageScale = pageScale;
         } catch {}
       }
       return value;
@@ -20744,6 +20845,8 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
   //   (2) capturing at that reduced size via CDP's clip.scale — and if
   //       the resulting JPEG is still over a byte ceiling, iteratively
   //       dropping JPEG quality (0.75 → 0.1 in 0.05 steps) until it fits.
+  // WebBrain scales the tab's surface to that size itself instead
+  // (_captureViewportImage): a clip resizes the visible tab while it captures.
   //
   // Defaults below match Anthropic's exactly (pxPerToken=28, 1568/1568,
   // initial 0.75, step 0.05, min 0.1, ~1.4 MB base64 ceiling) — those
@@ -21160,19 +21263,35 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
       devicePixelRatio: Number(value.dpr) || 1,
       // Browser zoom (CSS px -> device-independent px); part of the DPR.
       zoom: Number(visual?.zoom) > 0 ? Number(visual.zoom) : 1,
+      // Pinch zoom of the visual viewport (_visionPlatformCapture).
+      pageScale: Number(visual?.scale) > 0 ? Number(visual.scale) : 1,
       url,
     };
   }
 
   /**
    * Capture the viewport (or `cssRegion` of it) close to outWidth x
-   * outHeight. The clip is in device-independent pixels (CSS px x browser
-   * zoom) and the compositor renders clip x scale x device scale factor, so
-   * with the DPR (= device scale factor x zoom) divided out of the scale the
-   * output is outWidth wide. Whatever size actually comes back is resampled
-   * to the plan by the runtime.
+   * outHeight.
+   *
+   * The tab's surface is captured as it is on screen, and the region is
+   * cut out and scaled locally (_visionCropImage). Given a `clip`,
+   * Chromium instead resizes the tab's view to clip x scale and re-renders
+   * the page into it for the capture (page_handler.cc CaptureScreenshot):
+   * a visible tab flashes a shrunken page in its top-left corner, on each
+   * of the captures of a screen update. The surface starts at the visual
+   * viewport's top left (Chromium keeps the page scrollbar on the right,
+   * in RTL pages too) and has devicePixelRatio pixels per CSS pixel.
+   *
+   * A clip is still used where the surface cannot serve: a zoom that asks
+   * for more detail than the screen has (more image pixels per CSS pixel
+   * than the DPR), which only a re-render provides, and a pinch-zoomed page.
+   * The clip is in device-independent pixels (CSS px x browser zoom) and the
+   * compositor renders clip x scale x device scale factor, so with the DPR
+   * (= device scale factor x zoom) divided out of the scale the output is
+   * outWidth wide. Whatever size actually comes back is resampled to the
+   * plan by the runtime.
    */
-  async _visionPlatformCapture(tabId, { probe, cssRegion = null, outWidth, outHeight }) {
+  async _visionPlatformCapture(tabId, { probe, cssRegion = null, outWidth, outHeight, hold = null }) {
     await cdpClient.attach(tabId);
     await cdpClient.sendCommand(tabId, 'Page.enable').catch(() => {});
     await this._preparePageForCapture(tabId);
@@ -21180,9 +21299,24 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
     // (vision-runtime.js _visionBounded no longer waits for it).
     this._throwIfAborted(this._runAbortSignal(tabId));
     const region = cssRegion || { x: 0, y: 0, width: probe.cssWidth, height: probe.cssHeight };
+    const width = Math.max(1, region.width);
+    const height = Math.max(1, region.height);
     const dpr = Math.max(0.25, Number(probe?.devicePixelRatio) || 1);
+    const pinched = Math.abs((Number(probe?.pageScale) || 1) - 1) > 0.01;
+    // 2% slack: a zoom planned at the DPR itself is a crop.
+    const needsDetail = !!cssRegion && Number(outWidth) > width * dpr * 1.02;
+    if (!pinched && !needsDetail) {
+      const shot = await this._withIndicatorsHidden(tabId, () => cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
+        format: 'jpeg',
+        quality: 90,
+        fromSurface: true,
+      }), { hold });
+      if (!shot?.data) return null;
+      return this._visionCropImage(`data:image/jpeg;base64,${shot.data}`,
+        { x: region.x * dpr, y: region.y * dpr, width: width * dpr, height: height * dpr }, outWidth, outHeight);
+    }
     const zoom = Math.max(0.25, Number(probe?.zoom) || 1);
-    const scale = Math.max(0.05, Math.min(4, Number(outWidth) / (Math.max(1, region.width) * dpr)));
+    const scale = Math.max(0.05, Math.min(4, Number(outWidth) / (width * dpr)));
     const shot = await this._withIndicatorsHidden(tabId, () => cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
       format: 'jpeg',
       quality: 90,
@@ -21190,11 +21324,11 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
       clip: {
         x: ((Number(probe?.scrollX) || 0) + region.x) * zoom,
         y: ((Number(probe?.scrollY) || 0) + region.y) * zoom,
-        width: Math.max(1, region.width) * zoom,
-        height: Math.max(1, region.height) * zoom,
+        width: width * zoom,
+        height: height * zoom,
         scale,
       },
-    }));
+    }), { hold });
     return shot?.data ? `data:image/jpeg;base64,${shot.data}` : null;
   }
 
@@ -48970,13 +49104,11 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
               // maxImageDimension (sides), not the token budget (issue #311).
               // PNG capture (lossless) so glyph edges stay sharp before re-encode.
               const budget = this._budgetForCoordAlignedCapture();
-              const screenshot = await this._withIndicatorsHidden(tabId, () =>
-                cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-                  format: 'png',
-                  fromSurface: true,
-                  clip: this._viewportCaptureClip(probe, cssW, cssH, 1),
-                })
-              );
+              const screenshot = await this._captureViewportImage(tabId, probe, cssW, cssH, {
+                format: 'png',
+                width: cssW,
+                height: cssH,
+              });
               if (!screenshot?.data) return null;
               const rawUrl = `data:image/png;base64,${screenshot.data}`;
               const needsResize = cssW > budget.maxTargetPx || cssH > budget.maxTargetPx;
@@ -49007,14 +49139,8 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
             // shrink a model-facing copy (mirrors full_page_screenshot).
             const budget = this._budgetForCapture();
             if (wantSave) {
-              const screenshot = await this._withIndicatorsHidden(tabId, () =>
-                cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-                  format: 'png',
-                  fromSurface: true,
-                  // Downloads keep native device pixels (scale 1 is CSS px x DPR).
-                  clip: { ...this._viewportCaptureClip(probe, cssW, cssH), scale: 1 },
-                })
-              );
+              // Downloads keep native device pixels: the tab's surface as it is.
+              const screenshot = await this._captureViewportImage(tabId, probe, cssW, cssH, { format: 'png' });
               if (!screenshot?.data) return null;
               const rawUrl = `data:image/png;base64,${screenshot.data}`;
               const shrunk = await this._shrinkImageForBudget(rawUrl, cssW, cssH, budget);
@@ -49028,21 +49154,18 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
               };
             }
 
-            // No save: pick target dims via binary search, ask CDP to capture
-            // + scale in one pass, then iterative-quality fallback if needed.
+            // No save: pick target dims via binary search, capture the
+            // viewport at them, then iterative-quality fallback if needed.
             const [targetW, targetH] = Agent._fitImageDimensions(cssW, cssH, budget);
-            const scale = targetW < cssW ? targetW / cssW : 1;
-            const screenshot = await this._withIndicatorsHidden(tabId, () =>
-              cdpClient.sendCommand(tabId, 'Page.captureScreenshot', {
-                format: 'jpeg',
-                quality: Math.round(budget.initialJpegQuality * 100),
-                fromSurface: true,
-                clip: this._viewportCaptureClip(probe, cssW, cssH, scale),
-              })
-            );
+            const screenshot = await this._captureViewportImage(tabId, probe, cssW, cssH, {
+              format: 'jpeg',
+              quality: Math.round(budget.initialJpegQuality * 100),
+              width: targetW,
+              height: targetH,
+            });
             if (!screenshot?.data) return null;
             const rawUrl = `data:image/jpeg;base64,${screenshot.data}`;
-            const resized = scale < 1 ? ` (resized ${cssW}×${cssH} → ${targetW}×${targetH} for vision-token budget)` : '';
+            const resized = targetW < cssW ? ` (resized ${cssW}×${cssH} → ${targetW}×${targetH} for vision-token budget)` : '';
             return {
               dataUrl: await this._compressJpegToByteCeiling(rawUrl, budget),
               description: `Screenshot captured via CDP (${screenshot.data.length} bytes, JPEG)${resized}`,

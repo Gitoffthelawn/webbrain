@@ -530,6 +530,10 @@ Steer or grant authorization. Enter and Alt+Enter retain their existing behavior
   target-specific reason codes and bounded counts without URLs or page labels.
   `page_action_binding_capture` reports capture availability, bounded target
   count, focus eligibility and local capture time without tokens or field data.
+  The capture certifies every visible control. The controls in the page's
+  primary landmark (`main`) share one scan of it per capture, which reads each
+  element's style once: a synchronous capture sees one unchanging page, so
+  the work grows with the page rather than with the page times its controls.
   No warmup delay, heuristic DOM-location suppression or extra model call is
   required to distinguish irrelevant updates from changed action context.
 

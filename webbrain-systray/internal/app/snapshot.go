@@ -56,6 +56,7 @@ type Snapshot struct {
 	QuotaBusy     bool                `json:"quota_busy"`
 	Welcomed      bool                `json:"welcomed"`
 	LocalContext  int                 `json:"local_context"`
+	Update        UpdateStatus        `json:"update"`
 }
 
 func (a *App) Snapshot() Snapshot {
@@ -86,6 +87,7 @@ func (a *App) Snapshot() Snapshot {
 		OS:           runtime.GOOS,
 		Welcomed:     s.Welcomed,
 		LocalContext: s.Local.Context,
+		Update:       a.UpdateStatus(),
 	}
 	snap.Decision.Endpoint = base + "/companion/v1/decide"
 	if snap.Network {

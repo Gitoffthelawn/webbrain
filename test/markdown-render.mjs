@@ -235,7 +235,7 @@ for (const build of ['chrome', 'firefox']) {
       [
         'numbered list',
         '1. ```python\n   value = "**literal**"\n   ```\n\n2. Start the server.',
-        /2\. Start the server\./,
+        /<\/pre><\/div><\/li><li>Start the server\.<\/li><\/ol>/,
         /<ol><li><pre><code>value = &quot;\*\*literal\*\*&quot;\n<\/code><\/pre><\/li><\/ol><br><br><ol><li>Start the server\.<\/li><\/ol>/,
       ],
       [
@@ -674,6 +674,217 @@ for (const build of ['chrome', 'firefox']) {
     const source = `${saved}\n## After`;
     assert.deepEqual(preContents(formatMarkdown(source)), [helpers.escapeCodeHtml(code)]);
     assert.match(formatMarkdown(source), /<h2>After<\/h2>/);
+  });
+
+  test(`${build}: single-dollar math is found only where it reads as TeX`, () => {
+    const mark = source => helpers.replaceInlineDollarMath(source, tex => `[${tex}]`);
+    for (const [source, expected] of [
+      ['traces $\\rightarrow$ rotation $\\rightarrow$ GPTQ', 'traces [\\rightarrow] rotation [\\rightarrow] GPTQ'],
+      ['in $O(n^2)$ time for $x$ items, $a_{i}$ and $\\alpha$', 'in [O(n^2)] time for [x] items, [a_{i}] and [\\alpha]'],
+      ['about $\\sim$5 GB', 'about [\\sim]5 GB'],
+      // Prices, shell variables, escaped and unclosed dollars stay text.
+      ['It costs $1,263 and then $2,526 more.', null],
+      ['from $5 to $10, $5-$10, $5,$10', null],
+      ['$HOME/$USER and $PATH', null],
+      ['a \\$5$ fee, $ 5$, open $x', null],
+      ['across $a\nb$ lines', null],
+      // Display math belongs to the KaTeX pass.
+      ['see $$a^2$$ here', null],
+    ]) assert.equal(mark(source), expected ?? source, source);
+  });
+
+  test(`${build}: inline TeX math goes to KaTeX as \\(...\\); prices and code stay text`, () => {
+    const html = formatMarkdown('traces $\\rightarrow$ rotation, about $\\sim$5 GB, $\\alpha*\\beta*$ and `$\\rightarrow$`');
+    assert.match(html, /traces \\\(\\rightarrow\\\) rotation, about \\\(\\sim\\\)5 GB, \\\(\\alpha\*\\beta\*\\\) and <code>\$\\rightarrow\$<\/code>/);
+    assert.doesNotMatch(html, /<em>/);
+    const prices = 'It costs $1,263 and then $2,526 more.';
+    assert.equal(formatMarkdown(prices), prices);
+    assert.equal(formatMarkdown('a $\\rightarrow$ b', { enhance: false }), 'a $\\rightarrow$ b');
+  });
+
+  test(`${build}: history saves rendered formulas as their TeX source`, () => {
+    const text = value => ({ nodeType: 3, nodeValue: value, textContent: value });
+    const element = (tagName, className, ...childNodes) => ({
+      nodeType: 1, tagName, childNodes,
+      classList: { contains: name => String(className || '').split(' ').includes(name) },
+      getAttribute: () => null,
+      get textContent() { return childNodes.map(child => child.textContent).join(''); },
+    });
+    // KaTeX keeps MathML with the TeX source, and the visible HTML.
+    const katex = (tex, shown) => {
+      const annotation = { ...element('annotation', '', text(tex)), getAttribute: name => (name === 'encoding' ? 'application/x-tex' : null) };
+      return element('SPAN', 'katex',
+        element('SPAN', 'katex-mathml', element('math', '', element('semantics', '', element('mrow', '', text(shown)), annotation))),
+        element('SPAN', 'katex-html', text(shown)));
+    };
+    const saved = historyTextFromElement(element('DIV', '',
+      text('traces '), katex('\\rightarrow', '→'), text(' rotation, '), element('SPAN', 'katex-display', katex('a^2', 'a2'))));
+    assert.equal(saved, 'traces \\(\\rightarrow\\) rotation, $$a^2$$');
+    // Read back, the panel renders them again.
+    assert.match(formatMarkdown(saved), /traces \\\(\\rightarrow\\\) rotation, \$\$a\^2\$\$/);
+  });
+
+  test(`${build}: bullet and numbered lists nest by indentation; --- is a rule`, () => {
+    const blocks = [];
+    const render = source => helpers.renderMarkdownListsAndRules(source, {
+      renderItem: value => value.replace(/\n/g, '<br>'),
+      wrap: html => { blocks.push(html); return `[${html}]`; },
+    });
+    assert.equal(render('- a\n* b\n+ c'), '[<ul><li>a</li><li>b</li><li>c</li></ul>]');
+    assert.equal(render('3. three\n4) four'), '[<ol start="3"><li>three</li><li>four</li></ol>]');
+    assert.equal(
+      render('* parent\n  1. first\n  2. second\n    - deep\n* next'),
+      '[<ul><li>parent<ol><li>first</li><li>second<ul><li>deep</li></ul></li></ol></li><li>next</li></ul>]',
+    );
+    assert.equal(render('-\tTab item\n\t- nested'), '[<ul><li>Tab item<ul><li>nested</li></ul></li></ul>]');
+    assert.equal(render('1. one\n   more of one\n2. two'), '[<ol><li>one<br>more of one</li><li>two</li></ol>]');
+    assert.equal(render('1. one\n\n2. two\n\nAfter'), '[<ol><li>one</li><li>two</li></ol>]\n\nAfter');
+    assert.equal(render('- a\n- b\nAfter'), '[<ul><li>a</li><li>b</li></ul>]\nAfter');
+    assert.equal(render('- a\n\n1. one'), '[<ul><li>a</li></ul><ol><li>one</li></ol>]');
+    assert.equal(render('Intro\n\n---\n\n### Next'), 'Intro\n[<hr>]\n### Next');
+    for (const rule of ['***', '* * *', '___', '- - -', '----------']) assert.equal(render(rule), '[<hr>]', rule);
+    assert.equal(render('- a\n---\n- b'), '[<ul><li>a</li></ul>]\n[<hr>]\n[<ul><li>b</li></ul>]');
+    for (const prose of ['*emphasis* here', '**Bold:** text', '-1 degrees', '2.5 GB', '--flag', '+1 vote', '- ', '*', '-- dash']) {
+      assert.equal(render(prose), prose, prose);
+    }
+    assert.ok(blocks.length > 0);
+  });
+
+  test(`${build}: side panel lists render items on their own, around headings, quotes and tables`, () => {
+    const source = [
+      'Answers below.', '', '---', '', '### 1. Status',
+      '* **Ready:** the pipeline runs end to end, and `run` exports $\\alpha$ checkpoints.',
+      '* **Limits:**', '  * one * star here', '  * another * star', '  1. first step', '  2. second step',
+      '> quoted note', '| A | B |', '| --- | --- |', '| 1 | 2 |',
+      '- after the table', '## Next', '1. Ship it.',
+    ].join('\n');
+    const html = formatMarkdown(source);
+    assert.match(html, /^Answers below\.<br><hr><h3>1\. Status<\/h3><ul><li><strong>Ready:<\/strong> the pipeline runs end to end, and <code>run<\/code> exports \\\(\\alpha\\\) checkpoints\.<\/li><li><strong>Limits:<\/strong><ul><li>one \* star here<\/li><li>another \* star<\/li><\/ul><ol><li>first step<\/li><li>second step<\/li><\/ol><\/li><\/ul><blockquote>quoted note<\/blockquote>/);
+    assert.match(html, /<\/table><\/div><br><ul><li>after the table<\/li><\/ul><h2>Next<\/h2><ol><li>Ship it\.<\/li><\/ol>$/);
+    assert.doesNotMatch(html, /<em>/, 'a bullet or a lone * paired with another item');
+    // Streaming renders the same blocks, without the finishing passes.
+    assert.match(formatMarkdown('- a\n- b', { enhance: false }), /^<ul><li>a<\/li><li>b<\/li><\/ul>$/);
+  });
+
+  test(`${build}: history saves rendered lists and rules as Markdown that renders the same`, () => {
+    const text = value => ({ nodeType: 3, nodeValue: value, textContent: value });
+    const element = (tagName, attributes, ...childNodes) => ({
+      nodeType: 1, tagName, childNodes,
+      classList: { contains: () => false },
+      getAttribute: name => attributes?.[name] ?? null,
+      get textContent() { return childNodes.map(child => child.textContent).join(''); },
+    });
+    // formatMarkdown('Intro\n\n---\n\n* **a** one\n  continued\n  3. three\n  4. four\n* b\n\nAfter')
+    const source = 'Intro\n\n---\n\n* **a** one\n  continued\n  3. three\n  4. four\n* b\n\nAfter';
+    const rendered = formatMarkdown(source);
+    assert.equal(rendered, 'Intro<br><hr><ul><li><strong>a</strong> one<br>continued<ol start="3"><li>three</li><li>four</li></ol></li><li>b</li></ul><br>After');
+    const dom = element('DIV', null,
+      text('Intro'), element('BR'), element('HR'),
+      element('UL', null,
+        element('LI', null, element('STRONG', null, text('a')), text(' one'), element('BR'), text('continued'),
+          element('OL', { start: '3' }, element('LI', null, text('three')), element('LI', null, text('four')))),
+        element('LI', null, text('b'))),
+      element('BR'), text('After'));
+    const saved = historyTextFromElement(dom);
+    assert.equal(saved, 'Intro\n\n---\n\n- **a** one\n  continued\n  3. three\n  4. four\n- b\n\nAfter');
+    assert.equal(formatMarkdown(saved), rendered);
+    assert.equal(historyTextFromElement(dom, { markdown: false }).includes('- '), false, 'plain roles gain no list markers');
+  });
+
+  if (process.env.WEBBRAIN_MARKDOWN_DOM === '1') test(`${build}: browser renders inline TeX with KaTeX and saves it back`, async () => {
+    const { chromium, firefox } = await import('playwright');
+    const browser = await (build === 'chrome' ? chromium : firefox).launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      await page.route('http://markdown.test/**', async route => {
+        const name = new URL(route.request().url()).pathname.slice(1);
+        if (/^[\w-]+\.js$/.test(name)) {
+          await route.fulfill({ contentType: 'text/javascript', body: readUi(build, name) });
+        } else if (/^katex\/[\w.-]+\.js$/.test(name)) {
+          await route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(new URL(`../src/${build}/vendor/${name}`, import.meta.url), 'utf8') });
+        } else {
+          await route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><head><script src="/katex/katex.min.js"></script><script src="/katex/auto-render.min.js"></script></head><body><div id="messages"><div class="message-text" id="message"></div></div></body></html>' });
+        }
+      });
+      await page.goto('http://markdown.test/');
+      const result = await page.evaluate(async ({ formatter, scheduler, source }) => {
+        const helpers = await import('/markdown-render.js');
+        const { sanitizeMarkdownLinks, linkifyPlainUrls } = await import('/markdown-link.js');
+        const { escapeHtml } = await import('/utils.js');
+        const { historyTextFromElement } = await import('/history-text.js');
+        const scheduleMathRender = new Function(`let _mathRenderTimer = null; return (${scheduler})`)();
+        const dependencies = { ...helpers, sanitizeMarkdownLinks, linkifyPlainUrls, escapeHtml, t: key => key, scheduleMathRender };
+        const format = new Function(...Object.keys(dependencies), `return (${formatter})`)(...Object.values(dependencies));
+        const message = document.querySelector('#message');
+        const render = async markdown => {
+          message.innerHTML = format(markdown);
+          await new Promise(resolve => setTimeout(resolve, 150));
+        };
+        await render(source);
+        const formulas = message.querySelectorAll('.katex').length;
+        const shown = message.querySelector('.katex-html')?.textContent;
+        const saved = historyTextFromElement(message);
+        await render(saved);
+        return { formulas, shown, saved, again: message.querySelectorAll('.katex').length, errors: message.querySelectorAll('.katex-error').length };
+      }, { formatter: panelFormatter(build), scheduler: panelFunction(build, 'scheduleMathRender'), source: 'traces $\\rightarrow$ export. It costs $1,263 and then $2,526.' });
+      assert.deepEqual(result, { formulas: 1, shown: '→', saved: 'traces \\(\\rightarrow\\) export. It costs $1,263 and then $2,526.', again: 1, errors: 0 });
+    } finally {
+      await browser.close();
+    }
+  });
+
+  if (process.env.WEBBRAIN_MARKDOWN_DOM === '1') test(`${build}: browser shows lists and rules and saves them back`, async () => {
+    const { chromium, firefox } = await import('playwright');
+    const browser = await (build === 'chrome' ? chromium : firefox).launch({ headless: true });
+    try {
+      const page = await browser.newPage({ viewport: { width: 420, height: 900 } });
+      await page.route('http://markdown.test/**', async route => {
+        const name = new URL(route.request().url()).pathname.slice(1);
+        if (/^[\w-]+\.js$/.test(name)) {
+          await route.fulfill({ contentType: 'text/javascript', body: readUi(build, name) });
+        } else {
+          await route.fulfill({ contentType: 'text/html', body: '<!doctype html><html data-theme="light"><body><div id="messages"><div class="message assistant"><div class="message-content"><div class="message-text" id="message"></div></div></div></div></body></html>' });
+        }
+      });
+      await page.goto('http://markdown.test/');
+      await page.addStyleTag({ content: fs.readFileSync(new URL(`../src/${build}/styles/sidepanel.css`, import.meta.url), 'utf8') });
+      const source = [
+        'Answers below.', '', '---', '', '### 1. Status',
+        '* **Ready:** the pipeline runs end to end.',
+        '* **Limits:**', '  * one validated model', '  * slow with thinking on',
+        '', '---', '', '### 2. Next steps', '1. **Set up:** run `setup.sh`.', '2. **Smoke test:** run the tiny model.',
+      ].join('\n');
+      const result = await page.evaluate(async ({ formatter, source }) => {
+        const helpers = await import('/markdown-render.js');
+        const { sanitizeMarkdownLinks, linkifyPlainUrls } = await import('/markdown-link.js');
+        const { escapeHtml } = await import('/utils.js');
+        const { historyTextFromElement } = await import('/history-text.js');
+        const dependencies = { ...helpers, sanitizeMarkdownLinks, linkifyPlainUrls, escapeHtml, t: key => key, scheduleMathRender() {} };
+        const format = new Function(...Object.keys(dependencies), `return (${formatter})`)(...Object.values(dependencies));
+        const message = document.querySelector('#message');
+        message.innerHTML = format(source);
+        const first = message.innerHTML;
+        const rule = message.querySelector('hr');
+        const shown = {
+          lists: message.querySelectorAll('ul').length,
+          ordered: message.querySelectorAll('ol').length,
+          items: message.querySelectorAll('li').length,
+          rules: message.querySelectorAll('hr').length,
+          bullet: getComputedStyle(message.querySelector('ul > li')).listStyleType,
+          number: getComputedStyle(message.querySelector('ol > li')).listStyleType,
+          ruleShown: rule.getBoundingClientRect().width > 100 && getComputedStyle(rule).borderTopStyle === 'solid',
+          literalMarkers: /(^|\n)\s*(\*|-{3})\s/.test(message.innerText),
+        };
+        message.innerHTML = format(historyTextFromElement(message));
+        return { ...shown, roundTrip: message.innerHTML === first };
+      }, { formatter: panelFormatter(build), source });
+      assert.deepEqual(result, { lists: 2, ordered: 1, items: 6, rules: 2, bullet: 'disc', number: 'decimal', ruleShown: true, literalMarkers: false, roundTrip: true });
+      if (process.env.WEBBRAIN_MARKDOWN_SCREENSHOT_DIR) {
+        await page.locator('#messages').screenshot({ path: `${process.env.WEBBRAIN_MARKDOWN_SCREENSHOT_DIR}/${build}-lists.png` });
+      }
+    } finally {
+      await browser.close();
+    }
   });
 
   // Opt-in native DOM checks: WEBBRAIN_MARKDOWN_DOM=1 npm run test:markdown.

@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/esokullu/webbrain-systray/internal/accounts"
@@ -23,6 +24,7 @@ import (
 	"github.com/esokullu/webbrain-systray/internal/osutil"
 	"github.com/esokullu/webbrain-systray/internal/quota"
 	"github.com/esokullu/webbrain-systray/internal/settings"
+	"github.com/esokullu/webbrain-systray/internal/update"
 )
 
 type login struct {
@@ -65,6 +67,19 @@ type App struct {
 	OnProxyStart func(port int)
 	// OpenPanel opens the panel window (set by main).
 	OpenPanel func(fragment string)
+	// Headless: no tray icon (servers, CI). Updates are reported, never
+	// installed by the companion itself.
+	Headless bool
+
+	upd updater
+	// exe is the running program, which an update replaces; exec starts the
+	// installed version in its place (update.Exec; tests replace it).
+	exe  string
+	exec func(exe string, args ...string) error
+	// activeReqs and lastActive (Unix nanoseconds) track use for the
+	// automatic update (activity).
+	activeReqs atomic.Int64
+	lastActive atomic.Int64
 
 	// internalKey authenticates apps on this computer with the proxy; it never
 	// leaves the process.
@@ -86,6 +101,10 @@ func New(version string, store *settings.Store) *App {
 		internalKey: "wbc-local-" + settings.RandomSecret(),
 	}
 	a.ctx, a.cancel = context.WithCancel(context.Background())
+	a.upd.kick = make(chan struct{}, 1)
+	a.exe = osutil.Executable()
+	a.exec = update.Exec
+	a.lastActive.Store(time.Now().UnixNano())
 	a.Local = localmodel.NewManager(store, a.registerLocal, a.changed)
 	a.D1 = d1.NewManager(store, a.changed)
 	return a
@@ -179,6 +198,7 @@ func (a *App) Start() error {
 		_ = osutil.SetAutostart(s.Autostart)
 	}
 	go a.loop()
+	go a.updateLoop()
 	go func() {
 		if s.Local.AutoStart {
 			if err := a.Local.Start(); err != nil {
@@ -507,7 +527,7 @@ func (a *App) proxyOptionsOn(s settings.Settings, local []core.LocalUpstream, po
 		APIKeys:       []string{s.APIKey, a.internalKey},
 		Routes:        a.routes,
 		Local:         local,
-		Middleware:    []gin.HandlerFunc{noCORS, a.access},
+		Middleware:    []gin.HandlerFunc{a.activity, noCORS, a.access},
 	}
 }
 
