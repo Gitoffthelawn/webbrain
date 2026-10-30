@@ -170,6 +170,11 @@ export function assertStoreReviewableJavaScript(source, label) {
   }
 }
 
+// Archiving a subtree (HEAD:src/chrome) hides the root .gitattributes, so a
+// machine with core.autocrlf=true would write CRLF text files into the zip.
+// Keep the committed LF bytes, so vendored files stay identical to upstream.
+const GIT_ARCHIVE_AS_COMMITTED = ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf'];
+
 function readTextAtHead(relativePath) {
   return execFileSync('git', ['show', `HEAD:${relativePath}`], {
     cwd: root,
@@ -243,7 +248,7 @@ function runCli() {
     // so this runs identically on bash, zsh, cmd, and PowerShell.
     execFileSync(
       'git',
-      ['archive', '--format=zip', '-o', out, `HEAD:src/${sourceDir}`],
+      [...GIT_ARCHIVE_AS_COMMITTED, 'archive', '--format=zip', '-o', out, `HEAD:src/${sourceDir}`],
       { stdio: 'inherit', cwd: root }
     );
     const packageEntries = listZipEntryNames(out);
@@ -263,6 +268,7 @@ function runCli() {
     execFileSync(
       'git',
       [
+        ...GIT_ARCHIVE_AS_COMMITTED,
         'archive',
         '--format=zip',
         '-o',
