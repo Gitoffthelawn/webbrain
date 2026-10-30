@@ -44849,8 +44849,7 @@ test('homepage leads with the browser extension and offers WebBrain for websites
 
   assert.match(template, /id="hero-install-cta"[\s\S]*?\{\{t:hero\.cta\.install\}\}/, 'web home: the browser card installs the extension');
   assert.match(template, /href="\{\{websites_path\}\}" class="path-btn path-btn-ink" id="hero-websites-cta"/, 'web home: the website card adds WebBrain to a website');
-  assert.match(template, /class="path-badge path-badge-open">\{\{t:home\.browser\.badge\}\}/, 'web home: browser card has an Open Source pill');
-  assert.equal(strings['home.browser.badge'], 'Open Source');
+  assert.match(template, /<section class="path path-browser" aria-label="\{\{t:home\.browser\.title\}\}">\s*<!-- Browser mockup/, 'web home: the browser card opens straight on the carousel tabs');
   assert.doesNotMatch(template, /home\.browser\.features|View on GitHub|hero\.cta\.github/, 'web home: no Features link and no GitHub hero action');
   assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');
   const nav = english.match(/<div class="nav-links">([\s\S]*?)<div class="language-picker"/);
