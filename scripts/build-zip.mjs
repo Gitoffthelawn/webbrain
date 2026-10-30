@@ -133,12 +133,21 @@ export function assertStoreSafeFlagLicenseEntries(entries, label) {
 }
 
 const STORE_REVIEWED_JAVASCRIPT_PATHS = [
+  'vendor/pdfjs/compat.mjs',
+  'vendor/pdfjs/index.mjs',
   'vendor/pdfjs/pdf.mjs',
   'vendor/pdfjs/pdf.worker.mjs',
+  'vendor/pdfjs/worker.mjs',
   'src/providers/manager.js',
 ];
 
 const STORE_REJECTION_PATTERNS = [
+  {
+    // core-js's Object.create fallback for old IE (shipped in the PDF.js legacy
+    // build); Chrome Web Store rejected it as obfuscated code.
+    pattern: /\bActiveXObject\b|\bNullProtoObjectVia(?:ActiveX|IFrame)\b/,
+    reason: 'core-js Internet Explorer ActiveX/iframe fallback',
+  },
   {
     pattern: /\bLT\s*\+\s*SCRIPT\s*\+\s*GT\s*\+\s*content\s*\+\s*LT\s*\+\s*['"]\/['"]\s*\+\s*SCRIPT\s*\+\s*GT\b/,
     reason: 'split PDF.js <script> construction',
@@ -160,6 +169,11 @@ export function assertStoreReviewableJavaScript(source, label) {
     }
   }
 }
+
+// Archiving a subtree (HEAD:src/chrome) hides the root .gitattributes, so a
+// machine with core.autocrlf=true would write CRLF text files into the zip.
+// Keep the committed LF bytes, so vendored files stay identical to upstream.
+const GIT_ARCHIVE_AS_COMMITTED = ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf'];
 
 function readTextAtHead(relativePath) {
   return execFileSync('git', ['show', `HEAD:${relativePath}`], {
@@ -234,7 +248,7 @@ function runCli() {
     // so this runs identically on bash, zsh, cmd, and PowerShell.
     execFileSync(
       'git',
-      ['archive', '--format=zip', '-o', out, `HEAD:src/${sourceDir}`],
+      [...GIT_ARCHIVE_AS_COMMITTED, 'archive', '--format=zip', '-o', out, `HEAD:src/${sourceDir}`],
       { stdio: 'inherit', cwd: root }
     );
     const packageEntries = listZipEntryNames(out);
@@ -254,6 +268,7 @@ function runCli() {
     execFileSync(
       'git',
       [
+        ...GIT_ARCHIVE_AS_COMMITTED,
         'archive',
         '--format=zip',
         '-o',

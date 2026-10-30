@@ -9,51 +9,56 @@ parse it with pdfjs in the background page.
 ## Source
 
 - Package: `pdfjs-dist` v5.7.284
-- Files: `legacy/build/pdf.mjs` + `legacy/build/pdf.worker.mjs`
+- Upstream files: `build/pdf.mjs` + `build/pdf.worker.mjs` (the modern build),
+  byte-identical to the npm package
 - Origin: <https://github.com/mozilla/pdf.js>
 - Upstream license: Apache-2.0 (see `LICENSE` in this folder)
 
-## Store-review patch
+## Files we add
 
-The upstream legacy files split the strings `<script>`, `</script>`, and
-`javascript:` across constants in an old `core-js` null-prototype fallback.
-Chrome Web Store classifies that string splitting as obfuscation. Our vendored
-copies spell those strings directly; the resulting values and fallback logic
-are unchanged.
+- `compat.mjs`: feature-detected polyfills for the few recent JavaScript
+  methods the modern build calls without a fallback (`Map`/`WeakMap`
+  `getOrInsertComputed`, `Math.sumPrecise`, `Uint8Array` base64/hex,
+  `Response.prototype.bytes`). Each one is installed only when the browser
+  lacks it.
+- `index.mjs`: page entry point. Loads `compat.mjs`, then re-exports `pdf.mjs`.
+- `worker.mjs`: worker entry point. Loads `compat.mjs`, then re-exports
+  `pdf.worker.mjs`, so the PDF.js worker gets the same polyfills.
 
-## Why the legacy build
+## Why the modern build
 
-The legacy build targets older JS runtimes than the default modern
-build. The MV2 background page in Firefox supports modern JS but the
-legacy bundle's polyfills smooth over surprises in extension contexts
-(URL.createObjectURL etc.). Worth the size for the resilience and to
-keep parity with the Chrome extension build.
+The legacy build bundles `core-js`, including old Internet Explorer fallbacks
+(an ActiveX/iframe `document.write` path) that Chrome Web Store review rejects
+as obfuscated code. The modern build contains no `core-js` at all. With
+`compat.mjs`, PDF reading works on Chrome 128+ and Firefox 140+.
 
 ## How it's loaded
 
 `pdf-tools.js` does a lazy dynamic import on the first PDF read:
 
 ```js
-const pdfjs = await import(browser.runtime.getURL('vendor/pdfjs/pdf.mjs'));
+const pdfjs = await import(browser.runtime.getURL('vendor/pdfjs/index.mjs'));
 ```
 
 The worker URL is resolved the same way:
 
 ```js
 pdfjs.GlobalWorkerOptions.workerSrc =
-  browser.runtime.getURL('vendor/pdfjs/pdf.worker.mjs');
+  browser.runtime.getURL('vendor/pdfjs/worker.mjs');
 ```
 
-Both files are listed in `manifest.json`'s `web_accessible_resources`
-so `browser.runtime.getURL` returns a fetchable URL.
+The PDF.js entry points and modules are listed in `manifest.json`'s
+`web_accessible_resources` so `browser.runtime.getURL` returns a fetchable URL.
 
 ## Updating
 
 1. `npm pack pdfjs-dist@latest` (in any scratch directory).
-2. `tar xzf pdfjs-dist-*.tgz package/legacy/build/pdf.mjs
-    package/legacy/build/pdf.worker.mjs package/LICENSE`
+2. `tar xzf pdfjs-dist-*.tgz package/build/pdf.mjs
+    package/build/pdf.worker.mjs package/LICENSE`
 3. Move them over `pdf.mjs`, `pdf.worker.mjs`, `LICENSE` here.
-4. Reapply the store-review patch described above to both JavaScript files.
+4. Do not edit the upstream files. If the new version calls another recent
+   built-in without a fallback, add a feature-detected polyfill to
+   `compat.mjs` instead.
 5. Update the version line at the top of this README.
 6. Smoke-test by opening a real PDF tab in the loaded extension and
    running a `read_pdf` from the side panel.
