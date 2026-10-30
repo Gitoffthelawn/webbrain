@@ -374,6 +374,7 @@
   "footer.tagline": "웹을 더 똑똑하게 만드는 것이 우리의 미션입니다.",
   "footer.copyright_html": "© 2026 WebBrain. <a href=\"https://emresokullu.com\" target=\"_blank\">Emre Sokullu</a>와 <a href=\"https://github.com/webbrain-one/webbrain/graphs/contributors\" target=\"_blank\">기여자</a>들이 만들었습니다.",
   "footer.link_github": "GitHub",
+  "footer.link_companion": "데스크톱 Companion",
   "footer.link_privacy": "개인정보 처리방침",
   "footer.link_report_bug": "버그 신고",
   "footer.link_license": "GPL-3.0 라이선스",

@@ -45015,6 +45015,9 @@ test('every webbrain.one page shares one footer', () => {
     assert.equal(footerOf(rel), reference, `${rel}: footer differs from the homepage footer`);
   }
   assert.match(footerOf('web/tr/index.html'), /<a href="\/tr\/">/, 'localized footers link to their own homepage for the extension');
+  assert.match(reference, /<a href="\/companion\/">Desktop Companion<\/a>/, 'the footer links the desktop Companion');
+  assert.match(footerOf('web/tr/index.html'), /<a href="\/companion\/tr\/">Masaüstü Companion<\/a>/, 'localized footers link the Companion page in their language');
+  assert.match(footerOf('web/docs/zh/index.html'), /<a href="\/companion\/zh\/">/, 'Chinese docs link the Chinese Companion page');
   assert.match(footerOf('web/docs/zh/index.html'), /href="\/docs\/zh\/faq\/"/, 'Chinese docs link to the Chinese FAQ');
   assert.match(
     fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8'),

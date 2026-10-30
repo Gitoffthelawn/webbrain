@@ -374,6 +374,7 @@
   "footer.tagline": "Notre mission : rendre le web plus intelligent.",
   "footer.copyright_html": "© 2026 WebBrain. Créé par <a href=\"https://emresokullu.com\" target=\"_blank\">Emre Sokullu</a> et les <a href=\"https://github.com/webbrain-one/webbrain/graphs/contributors\" target=\"_blank\">contributeurs</a>.",
   "footer.link_github": "GitHub",
+  "footer.link_companion": "Companion pour ordinateur",
   "footer.link_privacy": "Politique de confidentialité",
   "footer.link_report_bug": "Signaler un bug",
   "footer.link_license": "Licence GPL-3.0",

@@ -277,6 +277,11 @@ function pageUrlFor(page, locale) {
   return homeUrlFor(locale);
 }
 
+// The desktop Companion app's page exists in every site language.
+function companionPathFor(locale) {
+  return locale.isDefault ? '/companion/' : `/companion/${locale.code}/`;
+}
+
 function faqPathFor(locale) {
   return locale.isDefault ? '/docs/faq/' : `/docs/${locale.code}/faq/`;
 }
@@ -314,6 +319,7 @@ function siteFooterFor(dict, locale, page) {
   return siteFooter(dict, {
     browserPath: browserPathFor(locale),
     websitesPath: WEBSITES_PATH,
+    companionPath: companionPathFor(locale),
     docsPath: docsPathFor(locale),
     faqPath: faqPathFor(locale),
     languages,
@@ -764,7 +770,7 @@ async function main() {
     { loc: `${SITE_ORIGIN}/docs/settings/` },
     { loc: `${SITE_ORIGIN}/docs/captcha/` },
     { loc: `${SITE_ORIGIN}/docs/providers/` },
-    ...LOCALES.map((locale) => ({ loc: `${SITE_ORIGIN}/companion/${locale.isDefault ? '' : `${locale.code}/`}` })),
+    ...LOCALES.map((locale) => ({ loc: `${SITE_ORIGIN}${companionPathFor(locale)}` })),
     { loc: `${SITE_ORIGIN}/docs/easy-cli-proxy/`, alternates: 'easy-cli-proxy' },
     { loc: `${SITE_ORIGIN}/docs/safety/` },
     { loc: `${SITE_ORIGIN}/docs/apocalypse-mode/` },

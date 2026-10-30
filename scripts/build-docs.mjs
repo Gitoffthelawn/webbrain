@@ -94,6 +94,7 @@ function withDocsFooter(html, file, dictionaries) {
   if (normalized.includes('/web/docs/zh/')) {
     return withSiteFooter(html, dictionaries.zh, {
       browserPath: '/zh/',
+      companionPath: '/companion/zh/',
       docsPath: '/docs/zh/',
       faqPath: '/docs/zh/faq/',
     });
