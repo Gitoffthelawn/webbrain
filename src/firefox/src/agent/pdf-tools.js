@@ -77,17 +77,17 @@ export function isPdfHandlerTabUrl(value, runtime = globalThis.browser?.runtime 
 }
 
 /**
- * Lazy-load pdfjs only on first PDF read. The legacy bundle is ~1 MB
- * and the worker is ~2.3 MB; we don't want to pay that startup cost
+ * Lazy-load pdfjs only on first PDF read. The bundle is ~0.8 MB
+ * and the worker is ~2.2 MB; we don't want to pay that startup cost
  * for users who never open a PDF.
  */
 async function getPdfjs() {
   if (pdfjsModule) return pdfjsModule;
-  pdfjsModule = await import(browser.runtime.getURL('vendor/pdfjs/pdf.mjs'));
+  pdfjsModule = await import(browser.runtime.getURL('vendor/pdfjs/index.mjs'));
   // Worker URL must be set BEFORE the first getDocument() call. We resolve
   // it via runtime.getURL so it works at any extension-id deploy target.
   pdfjsModule.GlobalWorkerOptions.workerSrc =
-    browser.runtime.getURL('vendor/pdfjs/pdf.worker.mjs');
+    browser.runtime.getURL('vendor/pdfjs/worker.mjs');
   return pdfjsModule;
 }
 

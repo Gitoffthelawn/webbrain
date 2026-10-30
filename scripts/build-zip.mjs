@@ -133,12 +133,21 @@ export function assertStoreSafeFlagLicenseEntries(entries, label) {
 }
 
 const STORE_REVIEWED_JAVASCRIPT_PATHS = [
+  'vendor/pdfjs/compat.mjs',
+  'vendor/pdfjs/index.mjs',
   'vendor/pdfjs/pdf.mjs',
   'vendor/pdfjs/pdf.worker.mjs',
+  'vendor/pdfjs/worker.mjs',
   'src/providers/manager.js',
 ];
 
 const STORE_REJECTION_PATTERNS = [
+  {
+    // core-js's Object.create fallback for old IE (shipped in the PDF.js legacy
+    // build); Chrome Web Store rejected it as obfuscated code.
+    pattern: /\bActiveXObject\b|\bNullProtoObjectVia(?:ActiveX|IFrame)\b/,
+    reason: 'core-js Internet Explorer ActiveX/iframe fallback',
+  },
   {
     pattern: /\bLT\s*\+\s*SCRIPT\s*\+\s*GT\s*\+\s*content\s*\+\s*LT\s*\+\s*['"]\/['"]\s*\+\s*SCRIPT\s*\+\s*GT\b/,
     reason: 'split PDF.js <script> construction',
