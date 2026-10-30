@@ -3625,6 +3625,11 @@
     .path-browser .scene-arrow { display: none; }
     .path-browser .scene-nav { margin-top: 16px; }
     .path-websites { margin-top: 48px; }
+    /* The carousel sits straight on the page: no card, border or shadow
+       around it, so the browser mockup reads as part of the hero. */
+    .path-browser { background: none; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+    .path-browser .hero-visual { padding: 0; }
+    .path-browser .scene-dot.is-active { background: var(--bg-card); }
     @media (max-width: 1100px) {
       .hero-split { grid-template-columns: 1fr; gap: 44px; }
       .hero-split .hero-lede { max-width: 640px; }
