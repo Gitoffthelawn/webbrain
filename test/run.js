@@ -44823,13 +44823,29 @@ test('homepage leads with the browser extension and offers WebBrain for websites
     'id="voices"',
     '<section class="section" id="providers"',
     '<section class="section" id="features"',
-    '<section class="section faq-inline-section" id="faq"',
+    'id="faq"',
     'id="download"',
     'id="mcp"',
     'id="apocalypse"',
   ].map((marker) => template.indexOf(marker));
   assert.ok(order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])), `web home: sections out of order (${order.join(', ')})`);
   assert.doesNotMatch(template, /<section class="section" id="demo"|<section class="hero">/, 'web home: the old hero and demo sections are gone');
+
+  // Like webbrain.cloud: the pitch beside the extension, intros beside their
+  // titles, and the FAQ and install cards beside their intros.
+  assert.match(template, /<div class="hero-split">\s*<div class="hero-copy"[\s\S]*?id="hero-install-cta"[\s\S]*?<section class="path path-browser"/);
+  assert.equal((template.match(/<header class="section-intro">/g) || []).length, 6, 'web home: every section intro is split');
+  assert.match(template, /class="section faq-inline-section section-aside" id="faq"/);
+  assert.match(template, /class="section download-section section-aside" id="download"/);
+  // The carousel names its scenes as tabs.
+  for (const key of ['followup', 'form', 'spacing', 'video', 'products']) {
+    assert.match(template, new RegExp(`role="tab"[^>]*title="\\{\\{t:hero\\.mockup\\.scene_label\\.${key}\\}\\}">\\{\\{t:hero\\.mockup\\.tab\\.${key}\\}\\}</button>`));
+  }
+  assert.match(english, /role="tab" aria-selected="true" title="Follow-up question demo">Summarize<\/button>/);
+  for (const file of fs.readdirSync(path.join(ROOT, 'web/build/locales')).filter((name) => name.endsWith('.json'))) {
+    const dict = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales', file), 'utf8'));
+    assert.ok(String(dict['hero.mockup.tab.video'] || '').trim(), `${file}: carousel tab labels missing`);
+  }
 
   assert.match(template, /id="hero-install-cta"[\s\S]*?\{\{t:hero\.cta\.install\}\}/, 'web home: the browser card installs the extension');
   assert.match(template, /href="\{\{websites_path\}\}" class="path-btn path-btn-ink" id="hero-websites-cta"/, 'web home: the website card adds WebBrain to a website');

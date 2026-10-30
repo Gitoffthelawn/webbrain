@@ -4005,6 +4005,98 @@
     @media (max-width: 640px) {
       .hero-split .hero-proof { align-items: flex-start; }
     }
+
+    /* ================================================================
+       SECTION RHYTHM ON THE WIDE PAGE
+       ================================================================ */
+    /* Section intros: label and title on the left, the intro on the
+       right, bottoms aligned — as on webbrain.cloud. */
+    .section-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      align-items: end;
+      gap: 20px 64px;
+      margin-bottom: 44px;
+    }
+    .section-title { line-height: 1.12; }
+    .section-intro .section-title { margin-bottom: 0; }
+    .section-intro .section-subtitle { max-width: 520px; margin: 0; }
+
+    /* FAQ and install: the intro stays beside the questions and the
+       download cards instead of above them. */
+    .section-aside {
+      display: grid;
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+      grid-auto-rows: min-content;
+      column-gap: clamp(40px, 6vw, 88px);
+      align-items: start;
+    }
+    .section-aside > .section-intro { grid-column: 1; grid-row: 1; display: block; margin: 0; }
+    .section-aside > .section-intro .section-title { margin-bottom: 14px; }
+    .section-aside > :not(.section-intro) { grid-column: 2; }
+    .section-aside > .faq-inline-grid,
+    .section-aside > .download-cards { grid-row: 1 / span 3; margin-top: 0; max-width: none; }
+    .section-aside > .faq-inline-cta-wrap,
+    .section-aside > .download-companion { grid-column: 1; grid-row: 2; margin-top: 24px; }
+    .faq-inline-section { max-width: var(--max-w); }
+
+    .features-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .apocalypse-banner-section { max-width: var(--max-w); padding-inline: 24px; }
+
+    /* Share banner: the words on the left, the buttons on the right. */
+    .oss-banner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 48px;
+    }
+    .oss-banner h3, .oss-banner p { grid-column: 1; }
+    .oss-banner p { margin-bottom: 0; }
+    .oss-banner .share-row { grid-column: 2; grid-row: 1 / span 2; }
+
+    /* Carousel tabs: name each scene, like webbrain.cloud's CLI / Python
+       / REST tabs. The rotation script keeps driving .is-active. */
+    .path-browser .hero-visual { display: flex; flex-direction: column; padding-top: 14px; }
+    .path-browser .scene-nav {
+      order: -1;
+      justify-content: flex-start;
+      gap: 4px;
+      margin: 0 0 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .path-browser .scene-nav::-webkit-scrollbar { display: none; }
+    .path-browser .scene-dot,
+    .path-browser .scene-dot.is-active {
+      width: auto;
+      height: auto;
+      flex: 0 0 auto;
+      padding: 6px 11px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-dim);
+      font: 600 13px/1.2 inherit;
+      font-family: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: none;
+    }
+    .path-browser .scene-dot:hover { background: var(--tint-soft); color: var(--text); }
+    .path-browser .scene-dot.is-active { border-color: var(--border); background: var(--bg); color: var(--text); }
+
+    @media (max-width: 960px) {
+      .section-intro { grid-template-columns: 1fr; }
+      .section-aside { grid-template-columns: 1fr; }
+      .section-aside > * { grid-column: 1 !important; grid-row: auto !important; }
+      .section-aside > .section-intro { margin-bottom: 32px; }
+      .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .oss-banner { grid-template-columns: 1fr; }
+      .oss-banner .share-row { grid-column: 1; grid-row: auto; margin-top: 24px; }
+    }
+    @media (max-width: 640px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
   </style>
 
   <!-- Theme bootstrap — runs synchronously before first paint so the page
@@ -4499,11 +4591,11 @@
     </div>
 
     <div class="scene-nav" role="tablist" aria-label="Chuyển đổi kịch bản demo">
-      <button class="scene-dot is-active" type="button" data-scene="0" role="tab" aria-selected="true" aria-label="Bản demo câu hỏi tiếp theo"></button>
-      <button class="scene-dot" type="button" data-scene="1" role="tab" aria-selected="false" aria-label="Bản demo điền biểu mẫu"></button>
-      <button class="scene-dot" type="button" data-scene="2" role="tab" aria-selected="false" aria-label="Bản trình diễn khoảng cách CSS"></button>
-      <button class="scene-dot" type="button" data-scene="3" role="tab" aria-selected="false" aria-label="Bản demo tải xuống video"></button>
-      <button class="scene-dot" type="button" data-scene="4" role="tab" aria-selected="false" aria-label="Demo trích xuất sản phẩm"></button>
+      <button class="scene-dot is-active" type="button" data-scene="0" role="tab" aria-selected="true" title="Bản demo câu hỏi tiếp theo">Tóm tắt</button>
+      <button class="scene-dot" type="button" data-scene="1" role="tab" aria-selected="false" title="Bản demo điền biểu mẫu">Điền biểu mẫu</button>
+      <button class="scene-dot" type="button" data-scene="2" role="tab" aria-selected="false" title="Bản trình diễn khoảng cách CSS">Sửa khoảng cách</button>
+      <button class="scene-dot" type="button" data-scene="3" role="tab" aria-selected="false" title="Bản demo tải xuống video">Lưu video</button>
+      <button class="scene-dot" type="button" data-scene="4" role="tab" aria-selected="false" title="Demo trích xuất sản phẩm">Lấy sản phẩm</button>
     </div>
   </div>
 
@@ -4610,9 +4702,13 @@
 
 <!-- 4. BRING YOUR OWN AI -->
 <section class="section" id="providers" style="padding-top: 40px;">
-  <div class="section-label">Nhà cung cấp LLM</div>
-  <h2 class="section-title">Mang theo AI của riêng bạn</h2>
-  <p class="section-subtitle">Kết nối với mọi API tương thích OpenAI hoặc chạy mô hình cục bộ bằng Ollama, LM Studio hay llama.cpp. Giữ các trang, câu lệnh và dữ liệu duyệt web hoàn toàn trên máy của bạn.</p>
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Nhà cung cấp LLM</div>
+      <h2 class="section-title">Mang theo AI của riêng bạn</h2>
+    </div>
+    <p class="section-subtitle">Kết nối với mọi API tương thích OpenAI hoặc chạy mô hình cục bộ bằng Ollama, LM Studio hay llama.cpp. Giữ các trang, câu lệnh và dữ liệu duyệt web hoàn toàn trên máy của bạn.</p>
+  </header>
 
   <!-- Constellation: central WebBrain core, 11 provider nodes orbiting on
        two arcs (5 above, 6 below). Connection lines drawn in SVG (viewBox
@@ -4694,9 +4790,13 @@
 
 <!-- 5. FEATURES (Core cards first, trimmed) -->
 <section class="section" id="features">
-  <div class="section-label">Tính năng</div>
-  <h2 class="section-title">Mọi thứ bạn cần trong một trình duyệt AI</h2>
-  <p class="section-subtitle">Một tác nhân AI đầy đủ tính năng nằm trong thanh bên trình duyệt của bạn và hiểu bất kỳ trang web nào.</p>
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Tính năng</div>
+      <h2 class="section-title">Mọi thứ bạn cần trong một trình duyệt AI</h2>
+    </div>
+    <p class="section-subtitle">Một tác nhân AI đầy đủ tính năng nằm trong thanh bên trình duyệt của bạn và hiểu bất kỳ trang web nào.</p>
+  </header>
 
   <div class="features-grid" id="features-grid">
     <!-- 6 core cards shown first -->
@@ -4771,9 +4871,13 @@
 
 <!-- 6. COMPARE: VS CLAUDE IN CHROME (Table only) -->
 <section class="section" id="compare">
-  <div class="section-label">Tại sao WebBrain?</div>
-  <h2 class="section-title">WebBrain so sánh như thế nào?</h2>
-  <p class="section-subtitle">WebBrain nằm ở điểm giao thoa giữa các plugin AI gốc của trình duyệt và khung tác nhân đầy đủ. Đây là cách nó xếp chồng lên nhau.</p>
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Tại sao WebBrain?</div>
+      <h2 class="section-title">WebBrain so sánh như thế nào?</h2>
+    </div>
+    <p class="section-subtitle">WebBrain nằm ở điểm giao thoa giữa các plugin AI gốc của trình duyệt và khung tác nhân đầy đủ. Đây là cách nó xếp chồng lên nhau.</p>
+  </header>
 
   <!-- vs Browser Plugins -->
   <h3 class="compare-heading">so với Plugin AI của trình duyệt</h3>
@@ -4804,10 +4908,14 @@
 </section>
 
 <!-- 7. INLINE FAQ -->
-<section class="section faq-inline-section" id="faq">
-  <div class="section-label">Câu hỏi thường gặp</div>
-  <h2 class="section-title">Câu hỏi thường gặp</h2>
-  <p class="section-subtitle">Câu trả lời nhanh về thiết lập, mô hình, thanh toán, an toàn và cách WebBrain hoạt động trong trình duyệt của bạn.</p>
+<section class="section faq-inline-section section-aside" id="faq">
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Câu hỏi thường gặp</div>
+      <h2 class="section-title">Câu hỏi thường gặp</h2>
+    </div>
+    <p class="section-subtitle">Câu trả lời nhanh về thiết lập, mô hình, thanh toán, an toàn và cách WebBrain hoạt động trong trình duyệt của bạn.</p>
+  </header>
 
   <div class="faq-inline-grid">
     <details class="faq-inline-item">
@@ -4881,10 +4989,14 @@
 </section>
 
 <!-- 8. DOWNLOAD -->
-<section class="section download-section" id="download">
-  <div class="section-label">Bắt đầu</div>
-  <h2 class="section-title">Cài đặt WebBrain</h2>
-  <p class="section-subtitle">Có sẵn cho Chrome, Edge và Firefox. Miễn phí, mã nguồn mở, không cần tài khoản.</p>
+<section class="section download-section section-aside" id="download">
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Bắt đầu</div>
+      <h2 class="section-title">Cài đặt WebBrain</h2>
+    </div>
+    <p class="section-subtitle">Có sẵn cho Chrome, Edge và Firefox. Miễn phí, mã nguồn mở, không cần tài khoản.</p>
+  </header>
 
   <div class="download-cards" data-download-cards>
     <div class="download-row download-row-current" data-download-current>
@@ -4940,9 +5052,13 @@
 
 <!-- 9. FOR DEVELOPERS (MCP & Frameworks) -->
 <section class="section developer-section" id="mcp">
-  <div class="section-label">Mới · máy chủ MCP</div>
-  <h2 class="section-title">Tác nhân lập trình của bạn, ngay trong trình duyệt bạn đang dùng.</h2>
-  <p class="section-subtitle">Kết nối Claude Code, Codex, Cursor, OpenCode hoặc bất kỳ máy khách MCP qua stdio nào với các thẻ Chromium đã đăng nhập. WebBrain giữ cổng cấp quyền theo tác vụ trong trình duyệt và giờ còn trả về JSON có cấu trúc.</p>
+  <header class="section-intro">
+    <div class="section-intro-head">
+      <div class="section-label">Mới · máy chủ MCP</div>
+      <h2 class="section-title">Tác nhân lập trình của bạn, ngay trong trình duyệt bạn đang dùng.</h2>
+    </div>
+    <p class="section-subtitle">Kết nối Claude Code, Codex, Cursor, OpenCode hoặc bất kỳ máy khách MCP qua stdio nào với các thẻ Chromium đã đăng nhập. WebBrain giữ cổng cấp quyền theo tác vụ trong trình duyệt và giờ còn trả về JSON có cấu trúc.</p>
+  </header>
 
   <div class="mcp-showcase">
     <div class="mcp-copy">
