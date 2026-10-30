@@ -44294,222 +44294,38 @@ test('homepage does not promote the unmerged Ollama launch handoff', () => {
   );
 });
 
-test('demo proof cards carry the security safeguards beside the comparison', () => {
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const english = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
-  const turkish = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/tr.json'), 'utf8'));
-  const demoSectionIndex = template.indexOf('<section class="section" id="demo"');
-  const demoVideoIndex = template.indexOf('<video id="demo-video"');
-  const duoCardsIndex = template.indexOf('<div class="demo-duo-cards">');
-  const securityCardIndex = template.indexOf('<div class="demo-duo-card demo-duo-security">');
-  const compareCardIndex = template.indexOf('<div class="demo-duo-card demo-duo-compare">');
-  const voicesIndex = template.indexOf('<section class="section voices-section" id="voices"');
-
-  assert.ok(demoSectionIndex >= 0, 'web: demo section should exist');
-  // Objection handling belongs after the visitor has seen what the agent does,
-  // so the safeguards now ride the demo proof cards instead of the hero.
-  assert.ok(
-    demoVideoIndex > demoSectionIndex && duoCardsIndex > demoVideoIndex
-      && securityCardIndex > duoCardsIndex && compareCardIndex > securityCardIndex
-      && voicesIndex > compareCardIndex,
-    'web: security and comparison proof cards should follow the demo video inside the demo section',
-  );
-  assert.match(
-    template,
-    /<ul class="demo-duo-list">\s*<li>\{\{t:hero\.trust\.b1\}\}<\/li>\s*<li>\{\{t:hero\.trust\.b2\}\}<\/li>\s*<li>\{\{t:hero\.trust\.b3\}\}<\/li>\s*<li>\{\{t:hero\.trust\.b4\}\}<\/li>\s*<\/ul>/,
-    'web: security card should contain all four safeguards',
-  );
-  assert.match(
-    template,
-    /<div class="demo-duo-card demo-duo-security">[\s\S]*?<h3 class="demo-duo-title" id="hero-trust-title">\{\{t:security\.title\}\}<\/h3>/,
-    'web: security card should keep its titled safeguard list',
-  );
-  assert.match(
-    template,
-    /<button[\s\S]*?class="demo-duo-trigger"[\s\S]*?id="security-video-open"[\s\S]*?aria-haspopup="dialog"[\s\S]*?aria-controls="security-video-dialog"/,
-    'web: the security card should be one accessible security-video trigger',
-  );
-  assert.match(
-    template,
-    /class="demo-duo-media"[\s\S]*?<img class="demo-duo-thumbnail" src="\/assets\/security-speaker-thumbnail\.jpg"[\s\S]*?<span class="demo-duo-play">/,
-    'web: the security card should use the real speaker thumbnail with explicit play treatment',
-  );
-  assert.ok(
-    fs.existsSync(path.join(ROOT, 'web/assets/security-speaker-thumbnail.jpg')),
-    'web assets: the security speaker thumbnail should be bundled',
-  );
-  assert.match(
-    template,
-    /\.demo-duo-cards \{[\s\S]*?grid-template-columns: repeat\(2, 1fr\);[\s\S]*?max-width: 1100px;/,
-    'web: the two proof cards should share one desktop row',
-  );
-
-  assert.equal(english['security.title'], 'How WebBrain keeps you in control');
-  assert.equal(english['hero.trust.b1'], 'Read-only Ask Mode by default');
-  assert.equal(english['hero.trust.b2'], 'Asks before consequential actions');
-  assert.equal(english['hero.trust.b3'], 'Open-source & auditable');
-  assert.equal(english['hero.trust.b4'], 'Choose local or cloud models');
-  assert.equal(english['security.video.open_aria'], 'Watch the security video');
-  assert.equal(english['security.video.close_aria'], 'Close the security video');
-  assert.equal(turkish['security.title'], 'WebBrain kontrolü sende nasıl tutar');
-  assert.equal(turkish['hero.trust.b1'], 'Varsayılan olarak salt okunur Sor kipi');
-  assert.equal(turkish['hero.trust.b2'], 'Önemli eylemlerden önce sorar');
-  assert.equal(turkish['hero.trust.b3'], 'Açık kaynak ve denetlenebilir');
-  assert.equal(turkish['hero.trust.b4'], 'Yerel veya bulut modellerini seç');
-  assert.equal(turkish['security.video.open_aria'], 'Güvenlik videosunu izle');
-  assert.equal(turkish['security.video.close_aria'], 'Güvenlik videosunu kapat');
-});
-
 test('web footer includes the Discord invite beside its other social icons', () => {
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const footerModule = fs.readFileSync(path.join(ROOT, 'web/build/site-footer.mjs'), 'utf8');
   const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
   const generated = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
   const english = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
 
   assert.match(
-    build,
-    /const DISCORD_INVITE_URL = 'https:\/\/discord\.gg\/cgC325ssfw';[\s\S]*?'social\.discord_url': DISCORD_INVITE_URL/,
-    'web build: Discord invite should be a shared generated-page URL',
+    footerModule,
+    /export const DISCORD_INVITE_URL = 'https:\/\/discord\.gg\/cgC325ssfw';/,
+    'site footer: Discord invite should be one shared URL',
+  );
+  assert.match(build, /from '\.\/site-footer\.mjs'/, 'web build: pages should render the shared site footer');
+  assert.match(
+    footerModule,
+    /socialLink\(MASTODON_PROFILE_URL[\s\S]*?socialLink\(BLUESKY_PROFILE_URL[\s\S]*?socialLink\(DISCORD_INVITE_URL[\s\S]*?socialLink\(HUGGINGFACE_PROFILE_URL/,
+    'site footer: Discord should sit beside Mastodon and Bluesky',
   );
   assert.match(
-    template,
-    /social\.mastodon_url[\s\S]*?social\.bluesky_url[\s\S]*?social\.discord_url/,
-    'web footer: Discord should sit beside Mastodon and Bluesky',
+    footerModule,
+    /\.wb-footer-links \{[^}]*align-items: center;[^}]*\}/,
+    'site footer: social icons and text links should share one vertical center',
   );
   assert.match(
-    template,
-    /\.footer-links \{[\s\S]*?align-items: center;[\s\S]*?\}/,
-    'web footer: social icons and text links should share one vertical center',
-  );
-  assert.match(
-    template,
-    /href="\{\{t:social\.discord_url\}\}"[^>]*rel="noopener"[^>]*aria-label="\{\{t:social\.discord_label\}\}"[^>]*class="footer-icon"[\s\S]*?<svg viewBox="0 0 16 16"/,
-    'web footer: Discord invite should use the established accessible icon-link pattern',
+    footerModule,
+    /discord: '<svg viewBox="0 0 16 16"/,
+    'site footer: Discord invite should use the established icon',
   );
   assert.equal(english['social.discord_label'], 'WebBrain on Discord');
   assert.match(
     generated,
-    /href="https:\/\/discord\.gg\/cgC325ssfw"[^>]*aria-label="WebBrain on Discord"[^>]*class="footer-icon"/,
-    'web build: generated English footer should include the Discord invite icon',
-  );
-});
-
-test('landing demo uses the new captioned videos and keeps the old comparison in a modal', () => {
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const english = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
-  const turkish = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/tr.json'), 'utf8'));
-  const demoSectionIndex = template.indexOf('<section class="section" id="demo"');
-  const demoVideoIndex = template.indexOf('<video id="demo-video"');
-  const compareTriggerIndex = template.indexOf('id="comparison-video-open"');
-  const compareSectionIndex = template.indexOf('<section class="section" id="compare">');
-  const frameworkComparisonIndex = template.indexOf('class="developer-frameworks-heading"');
-  const comparisonDialogIndex = template.indexOf('id="comparison-video-dialog"');
-
-  for (const asset of [
-    'web/assets/webbrain-home-demo.mp4',
-    'web/assets/webbrain-home-demo-vertical.mp4',
-    'web/assets/webbrain-home-demo-poster.jpg',
-    'web/assets/webbrain-home-demo-poster-vertical.jpg',
-    'web/assets/demo-desktop.mp4',
-    'web/assets/demo-mobile.mp4',
-  ]) {
-    assert.ok(fs.existsSync(path.join(ROOT, asset)), `${asset}: video asset should exist`);
-    assert.ok(fs.statSync(path.join(ROOT, asset)).size > 100_000, `${asset}: media asset should not be empty`);
-  }
-
-  // The hero demo is a homepage asset on the critical path — keep it honest
-  // about weight so a future re-export cannot quietly ship an 80MB file.
-  for (const asset of ['web/assets/webbrain-home-demo.mp4', 'web/assets/webbrain-home-demo-vertical.mp4']) {
-    const mb = fs.statSync(path.join(ROOT, asset)).size / 1_000_000;
-    assert.ok(mb < 16, `${asset}: hero demo should stay under 16MB (is ${mb.toFixed(1)}MB)`);
-  }
-
-  assert.match(
-    template,
-    /<video id="demo-video"[^>]*data-desktop-src="\/assets\/webbrain-home-demo\.mp4"[^>]*data-mobile-src="\/assets\/webbrain-home-demo-vertical\.mp4"[^>]*data-desktop-poster="\/assets\/webbrain-home-demo-poster\.jpg"[^>]*data-mobile-poster="\/assets\/webbrain-home-demo-poster-vertical\.jpg"/,
-    'web demo: main action video should use the preroll desktop and vertical assets',
-  );
-  assert.match(
-    template,
-    /const nextPoster = isMobile \? video\.dataset\.mobilePoster : video\.dataset\.desktopPoster;[\s\S]*?video\.poster = nextPoster;/,
-    'web demo: responsive video selection should switch the poster with the source',
-  );
-  assert.match(
-    template,
-    /\.video-frame \{[\s\S]*?padding-bottom: 56\.25%;[\s\S]*?\}[\s\S]*?@media \(max-width: 768px\) \{[\s\S]*?\.video-frame \{ padding-bottom: 177\.78%; \}/,
-    'web demo: desktop and mobile frames should preserve the new assets’ native aspect ratios',
-  );
-  assert.ok(
-    demoVideoIndex > demoSectionIndex && compareTriggerIndex > demoVideoIndex
-      && compareSectionIndex > compareTriggerIndex && comparisonDialogIndex > compareSectionIndex
-      && frameworkComparisonIndex > compareSectionIndex,
-    'web comparison: speed proof card should follow the demo video with the frameworks table and dialog outside the plugin-table flow',
-  );
-  assert.ok(
-    comparisonDialogIndex > frameworkComparisonIndex,
-    'web comparison: video dialog should remain outside the table flow',
-  );
-  assert.match(
-    template,
-    /<button[\s\S]*?class="demo-duo-trigger"[\s\S]*?id="comparison-video-open"[\s\S]*?aria-haspopup="dialog"[\s\S]*?aria-controls="comparison-video-dialog"/,
-    'web comparison: speed proof should be an accessible whole-card modal trigger',
-  );
-  assert.match(
-    template,
-    /<dialog[\s\S]*?id="comparison-video-dialog"[\s\S]*?<video id="comparison-video"[^>]*data-desktop-src="\/assets\/demo-desktop\.mp4"[^>]*data-mobile-src="\/assets\/demo-mobile\.mp4"/,
-    'web comparison: the prior Claude-vs-WebBrain pair should live in the responsive modal',
-  );
-  assert.match(
-    template,
-    /function openComparisonVideo\(\)[\s\S]*?dialog\.showModal\(\)[\s\S]*?video\.play\(\)[\s\S]*?dialog\.addEventListener\('close'[\s\S]*?video\.pause\(\)/,
-    'web comparison: opening should play while closing pauses and restores the page',
-  );
-  // The test is favorable, so the copy states the result instead of hedging.
-  assert.equal(
-    english['compare.speed_video.title'],
-    'Local WebBrain beats Claude in Chrome, side by side',
-  );
-  assert.equal(
-    english['compare.speed_video.description'],
-    'Same task, same browser. WebBrain runs Gemma 4 31B on-device and finishes first.',
-  );
-  assert.equal(english['compare.speed_video.cta'], 'Watch the comparison');
-  assert.equal(
-    turkish['compare.speed_video.title'],
-    "Yerel WebBrain, Chrome'daki Claude'u yan yana testte geçiyor",
-  );
-  assert.equal(turkish['compare.speed_video.cta'], 'Karşılaştırmayı izle');
-});
-
-test('security explainer opens in a responsive modal without a duplicate page section', () => {
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const videoIds = template.match(/id="security-video"/g) || [];
-
-  assert.doesNotMatch(
-    template,
-    /<section[^>]*\bid="security"/,
-    'web: the old full-height security section should be removed',
-  );
-  assert.equal(videoIds.length, 1, 'web: the security video should render exactly once');
-  assert.match(
-    template,
-    /<dialog[\s\S]*?id="security-video-dialog"[\s\S]*?aria-labelledby="security-video-dialog-title"[\s\S]*?aria-describedby="security-video-dialog-description"[\s\S]*?<video id="security-video"[^>]*data-desktop-src="\/assets\/security-desktop\.mp4"[^>]*data-mobile-src="\/assets\/security-mobile\.mp4"/,
-    'web: security video should live in a labelled native dialog with responsive sources',
-  );
-  assert.match(
-    template,
-    /\.security-video-dialog::backdrop \{[\s\S]*?backdrop-filter: blur\(10px\);[\s\S]*?\.security-video-dialog-frame \{[\s\S]*?aspect-ratio: 16 \/ 9;/,
-    'web: desktop security modal should have a polished backdrop and widescreen frame',
-  );
-  assert.match(
-    template,
-    /@media \(max-width: 768px\) \{[\s\S]*?\.security-video-dialog-frame \{[\s\S]*?aspect-ratio: 9 \/ 16;/,
-    'web: mobile security modal should use the portrait video frame',
-  );
-  assert.match(
-    template,
-    /function openSecurityVideo\(\)[\s\S]*?dialog\.showModal\(\)[\s\S]*?video\.play\(\)[\s\S]*?event\.target === dialog[\s\S]*?dialog\.addEventListener\('close'[\s\S]*?video\.pause\(\)/,
-    'web: rail click should open and play the modal, while backdrop, Escape, or close pauses it',
+    /href="https:\/\/discord\.gg\/cgC325ssfw"[^>]*rel="noopener"[^>]*aria-label="WebBrain on Discord"[^>]*class="wb-footer-icon"/,
+    'web build: generated English footer should include the accessible Discord invite icon',
   );
 });
 
@@ -45095,39 +44911,332 @@ test('web landing builder preserves template markers and HTML entity escaping', 
 });
 
 test('generated landing pages stay in sync with the web build template', () => {
-  // web/index.html and web/<locale>/index.html are build artifacts of
-  // web/build/template.html. Hand-editing one silently loses the edit on the
-  // next `npm run build:web`, so every literal chunk of the template (the text
-  // between {{...}} placeholders) must still appear, in order, in each page.
-  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
-  const literals = template.split(/\{\{[^}]*\}\}/).filter((chunk) => chunk.trim().length > 0);
-  assert.ok(literals.length > 50, 'web build: template should split into literal chunks around placeholders');
-
+  // The homepage and the websites page are build artifacts of
+  // web/build/template.html and web/build/websites-template.html. Hand-editing one silently loses the edit
+  // on the next `npm run build:web`, so every literal chunk of a template (the
+  // text between {{...}} placeholders) must still appear, in order, in each page.
   const locales = fs
     .readdirSync(path.join(ROOT, 'web/build/locales'))
     .filter((name) => name.endsWith('.json'))
     .map((name) => name.replace(/\.json$/, ''));
-  const pages = locales.map((code) => (code === 'en' ? 'web/index.html' : `web/${code}/index.html`));
+  const localized = (suffix) => locales.map((code) => (code === 'en' ? `web/${suffix}` : `web/${code}/${suffix}`));
 
-  for (const page of pages) {
-    const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
-    let cursor = 0;
-    for (const chunk of literals) {
-      const at = html.indexOf(chunk, cursor);
-      if (at === -1) {
-        // Chunks span many lines; report the first template line the page lost.
-        const lost = chunk
-          .split('\n')
-          .map((line) => line.trim())
-          .find((line) => line.length > 8 && html.indexOf(line, cursor) === -1);
-        assert.fail(
-          `${page}: drifted from web/build/template.html — missing ${JSON.stringify(lost || chunk.trim().slice(0, 120))}. `
-          + 'Edit the template (and web/build/locales/*.json), then run `npm run build:web`.',
-        );
+  for (const [templateRel, pages, minimumChunks] of [
+    ['web/build/template.html', localized('index.html'), 50],
+    ['web/build/websites-template.html', ['web/websites/index.html'], 10],
+  ]) {
+    // Keep the side of each <!-- if websites --> block the build keeps
+    // (WEBSITES_LAUNCHED in web/build/site-footer.mjs; off until launch).
+    const launched = process.env.WEBBRAIN_WEBSITES_LAUNCHED === '1';
+    const template = fs.readFileSync(path.join(ROOT, templateRel), 'utf8').replace(
+      /<!-- if websites -->([\s\S]*?)(?:<!-- else websites -->([\s\S]*?))?<!-- end websites -->/g,
+      (_, on, off = '') => (launched ? on : off),
+    );
+    const literals = template.split(/\{\{[^}]*\}\}/).filter((chunk) => chunk.trim().length > 0);
+    assert.ok(literals.length > minimumChunks, `${templateRel}: template should split into literal chunks around placeholders`);
+
+    for (const page of pages) {
+      const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+      let cursor = 0;
+      for (const chunk of literals) {
+        const at = html.indexOf(chunk, cursor);
+        if (at === -1) {
+          // Chunks span many lines; report the first template line the page lost.
+          const lost = chunk
+            .split('\n')
+            .map((line) => line.trim())
+            .find((line) => line.length > 8 && html.indexOf(line, cursor) === -1);
+          assert.fail(
+            `${page}: drifted from ${templateRel} — missing ${JSON.stringify(lost || chunk.trim().slice(0, 120))}. `
+            + 'Edit the template (and web/build/locales/*.json), then run `npm run build:web`.',
+          );
+        }
+        cursor = at + chunk.length;
       }
-      cursor = at + chunk.length;
     }
   }
+});
+
+test('homepage leads with the browser extension and offers WebBrain for websites below it', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
+  const strings = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
+
+  assert.ok(!fs.existsSync(path.join(ROOT, 'web/build/home-template.html')), 'web home: one template builds the homepage');
+  assert.ok(!fs.existsSync(path.join(ROOT, 'web/browser/index.html')), 'web home: the browser extension has no separate page');
+  assert.match(build, /\{ page: 'home', source: template, outPath: path\.join\(localeDir, 'index\.html'\) \}/);
+
+  // Order: headline, the browser extension with the scene carousel, then
+  // WebBrain for websites, word on the web, and the extension's sections.
+  const order = [
+    '<section class="home-hero"',
+    '<section class="path path-browser"',
+    'id="mockup-stack"',
+    '<section class="path path-websites"',
+    'id="voices"',
+    '<section class="section" id="providers"',
+    '<section class="section" id="features"',
+    'id="faq"',
+    'id="download"',
+    'id="mcp"',
+    'id="apocalypse"',
+  ].map((marker) => template.indexOf(marker));
+  assert.ok(order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])), `web home: sections out of order (${order.join(', ')})`);
+  assert.doesNotMatch(template, /<section class="section" id="demo"|<section class="hero">/, 'web home: the old hero and demo sections are gone');
+
+  // Like webbrain.cloud: the pitch beside the extension, intros beside their
+  // titles, and the FAQ and install cards beside their intros.
+  assert.match(template, /<div class="hero-split">\s*<div class="hero-copy"[\s\S]*?id="hero-install-cta"[\s\S]*?<section class="path path-browser"/);
+  assert.equal((template.match(/<header class="section-intro">/g) || []).length, 6, 'web home: every section intro is split');
+  assert.match(template, /class="section faq-inline-section section-aside" id="faq"/);
+  assert.match(template, /class="section download-section section-aside" id="download"/);
+  // The carousel names its scenes as tabs.
+  for (const key of ['followup', 'form', 'spacing', 'video', 'products']) {
+    assert.match(template, new RegExp(`role="tab"[^>]*title="\\{\\{t:hero\\.mockup\\.scene_label\\.${key}\\}\\}">\\{\\{t:hero\\.mockup\\.tab\\.${key}\\}\\}</button>`));
+  }
+  assert.match(english, /role="tab" aria-selected="true" title="Follow-up question demo">Summarize<\/button>/);
+  for (const file of fs.readdirSync(path.join(ROOT, 'web/build/locales')).filter((name) => name.endsWith('.json'))) {
+    const dict = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales', file), 'utf8'));
+    assert.ok(String(dict['hero.mockup.tab.video'] || '').trim(), `${file}: carousel tab labels missing`);
+  }
+
+  assert.match(template, /id="hero-install-cta"[\s\S]*?\{\{t:hero\.cta\.install\}\}/, 'web home: the browser card installs the extension');
+  assert.match(template, /href="\{\{websites_path\}\}" class="path-btn path-btn-ink" id="hero-websites-cta"/, 'web home: the website card adds WebBrain to a website');
+  // WebBrain for websites is on hold until its dashboard launches: the card
+  // stays in the template, switched off, and the built pages leave it out.
+  assert.match(template, /<!-- if websites -->\s*<!-- WebBrain for websites:[\s\S]*?<section class="path path-websites"[\s\S]*?<\/section>\s*<!-- end websites -->/, 'web home: the website card is behind the launch switch');
+  assert.match(build, /WEBSITES_LAUNCHED,/, 'web home: the build reads the launch switch');
+  assert.doesNotMatch(english, /class="path path-websites"|id="hero-websites-cta"|id="home-demo-open"/, 'web home: no website card before launch');
+  assert.match(template, /<section class="path path-browser" aria-label="\{\{t:home\.browser\.title\}\}">\s*<!-- Browser mockup/, 'web home: the browser card opens straight on the carousel tabs');
+  assert.doesNotMatch(template, /home\.browser\.features|View on GitHub|hero\.cta\.github/, 'web home: no Features link and no GitHub hero action');
+  assert.match(english, /Chris Messina[\s\S]*?Robert Scoble[\s\S]*?Asif Razzaq/, 'web home: word on the web stays on the homepage');
+  const nav = english.match(/<div class="nav-links">([\s\S]*?)<div class="language-picker"/);
+  assert.ok(nav, 'web home: nav links missing');
+  assert.deepEqual(
+    [...nav[1].matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1]),
+    ['Research', 'Docs', 'Blog', 'Download'],
+    'web home: the nav keeps research, docs, blog and the install shortcut (For websites returns at launch)',
+  );
+  assert.match(template, /<!-- if websites --><a href="\{\{websites_path\}\}">\{\{t:nav\.for_websites\}\}<\/a><!-- end websites -->/, 'web home: the For websites link waits for the launch');
+  assert.doesNotMatch(turkish, /href="\/websites\/"/, 'web home: no page links to the websites page before launch');
+  assert.match(english, /<link rel="canonical" href="https:\/\/webbrain\.one\/">/);
+  assert.match(turkish, /<link rel="canonical" href="https:\/\/webbrain\.one\/tr\/">/);
+  assert.match(build, /SITES_DASHBOARD_URL = 'https:\/\/sites\.webbrain\.one'/);
+});
+
+test('homepage plays the product video in a dialog and loads a live websites demo', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const build = fs.readFileSync(path.join(ROOT, 'web/build/build.mjs'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const strings = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/locales/en.json'), 'utf8'));
+
+  // The website card shows the script tag a site owner pastes.
+  const siteIllustration = template.match(/<div class="illo illo-site"[\s\S]*?<div class="path-copy">/);
+  assert.ok(siteIllustration, 'web home: website card illustration missing');
+  assert.match(siteIllustration[0], /&lt;script<\/span> <span class="tk-attr">src<\/span>=<span class="tk-str">"…\/embed\.js"/, 'web home: website card shows the embed script tag');
+
+  // Watch it in action: the product video in a dialog; without JS the link
+  // opens the file.
+  assert.match(template, /<a href="\/assets\/webbrain-home-demo\.mp4" class="path-action" id="home-video-open" aria-haspopup="dialog">/);
+  assert.match(template, /<dialog class="video-dialog" id="home-video-dialog"[\s\S]*?<video id="home-video" data-desktop-src="\/assets\/webbrain-home-demo\.mp4" data-mobile-src="\/assets\/webbrain-home-demo-vertical\.mp4"/);
+  for (const asset of ['webbrain-home-demo.mp4', 'webbrain-home-demo-vertical.mp4', 'webbrain-home-demo-poster.jpg', 'webbrain-home-demo-poster-vertical.jpg']) {
+    const file = path.join(ROOT, 'web/assets', asset);
+    assert.ok(fs.existsSync(file) && fs.statSync(file).size > 100_000, `web home: ${asset} missing or empty`);
+  }
+  // Keep the product video light enough for the homepage.
+  for (const asset of ['webbrain-home-demo.mp4', 'webbrain-home-demo-vertical.mp4']) {
+    const mb = fs.statSync(path.join(ROOT, 'web/assets', asset)).size / 1_000_000;
+    assert.ok(mb < 16, `${asset}: product video should stay under 16MB (is ${mb.toFixed(1)}MB)`);
+  }
+  assert.equal(strings['home.browser.watch'], 'Watch it in action');
+
+  // Demo: loads WebBrain for websites on the homepage, only when asked (once
+  // the website card is back after launch).
+  assert.match(build, /const SITES_DEMO_SITE_ID = 'site_webbrain_one';/);
+  assert.match(template, /id="home-demo-open" data-embed-src="\{\{sites_dashboard_url\}\}\/embed\.js" data-site-id="\{\{sites_demo_site_id\}\}"/);
+  assert.doesNotMatch(english, /<script[^>]+src="https:\/\/sites\.webbrain\.one\/embed\.js"/, 'web home: the demo script must not load until the visitor asks');
+  assert.match(template, /<p class="path-status" id="home-demo-status" role="status"><\/p>/);
+  assert.match(template, /if \(!trigger \|\| !status\) return;/, 'web home: the demo script does nothing while the card is left out');
+  assert.equal(strings['home.websites.demo'], 'Demo');
+  assert.doesNotMatch(template, /home\.websites\.info/, 'web home: the website card has no Info link');
+});
+
+test('websites page promises free forever and holds the dashboard actions until launch', () => {
+  const page = fs.readFileSync(path.join(ROOT, 'web/websites/index.html'), 'utf8');
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/websites-template.html'), 'utf8');
+  const runtimeAttributes = ['data-webbrain-ask', 'data-webbrain-act'];
+  assert.match(page, /Free now\. <span>Free forever\.<\/span>/);
+  // The launched page stays in the template: the form hands the address to
+  // the dashboard as ?url=.
+  assert.match(template, /<!-- if websites -->\s*<form class="get-script" id="get-script" action="\{\{sites_dashboard_url\}\}\/dashboard" method="get">[\s\S]*?name="url"[\s\S]*?<!-- else websites -->/);
+  // Until then nothing on the page leads to the dashboard.
+  assert.doesNotMatch(page, /<a [^>]*href="https:\/\/sites\.webbrain\.one|action="https:\/\/sites\.webbrain\.one/, 'websites: no link or form leads to the dashboard before launch');
+  assert.match(page, /<input id="get-script-url" type="text" placeholder="yourwebsite\.com" disabled>\s*<button class="btn" type="button" disabled>Coming soon<\/button>/);
+  assert.match(page, /<span class="nav-cta is-disabled" aria-disabled="true">Dashboard coming soon<\/span>/);
+  assert.equal((page.match(/<span class="btn is-disabled" aria-disabled="true">Coming soon<\/span>/g) || []).length, 2, 'websites: both closing calls to action are switched off');
+  assert.match(page, /<meta name="robots" content="noindex, follow">/, 'websites: kept out of search until launch');
+  assert.match(page, /https:\/\/sites\.webbrain\.one\/embed\.js/);
+  for (const attribute of runtimeAttributes) {
+    assert.ok(page.includes(attribute), `websites: documents ${attribute}`);
+  }
+  assert.doesNotMatch(page, /hreflang=/, 'websites: English-only page announces no alternates');
+});
+
+test('homepage MCP section gives a prompt to paste into the coding agent', () => {
+  const template = fs.readFileSync(path.join(ROOT, 'web/build/template.html'), 'utf8');
+  const english = fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8');
+  const turkish = fs.readFileSync(path.join(ROOT, 'web/tr/index.html'), 'utf8');
+  const mcp = english.slice(english.indexOf('id="mcp"'), english.indexOf('class="developer-frameworks-wrap"'));
+  assert.ok(mcp.length > 0, 'web home: MCP section missing');
+  assert.match(mcp, /<code id="mcp-prompt-text">Read https:\/\/webbrain\.one\/docs\/mcp\/ and set up the WebBrain MCP server for me\.<\/code>/);
+  assert.match(mcp, /<button class="mcp-copy-btn" type="button" id="mcp-copy" data-copied="Copied"/);
+  assert.match(mcp, /class="mcp-example">Use WebBrain to summarize the CI dashboard open in my browser\.<\/p>/);
+  assert.match(mcp, /href="\/docs\/mcp\/" class="btn btn-primary">Open the complete MCP guide<\/a>/);
+  assert.doesNotMatch(template, /mcp-showcase|mcp-tool|mcp-rail/, 'web home: the architecture diagram and tool chips are gone');
+  assert.match(turkish, /<code id="mcp-prompt-text">https:\/\/webbrain\.one\/docs\/mcp\/ adresini oku/, 'web home: the prompt is localized and keeps the guide URL');
+  assert.match(template, /navigator\.clipboard\.writeText\(value\)\.then\(copied, fallback\)/, 'web home: copy uses the clipboard with a selection fallback');
+});
+
+test('research section renders a mosaic and one page per research line', () => {
+  const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/research.json'), 'utf8'));
+  const index = fs.readFileSync(path.join(ROOT, 'web/research/index.html'), 'utf8');
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/vercel.json'), 'utf8'));
+  const sitemap = fs.readFileSync(path.join(ROOT, 'web/sitemap.xml'), 'utf8');
+  const sources = vercel.rewrites.map((rule) => rule.source);
+
+  assert.ok(data.projects.length >= 8, 'research: several research lines');
+  assert.match(index, /<link rel="canonical" href="https:\/\/webbrain\.one\/research\/">/);
+  assert.match(index, /<a href="\/research\/" aria-current="page">Research<\/a>/);
+  for (const source of ['/research', '/research/', '/research/:slug', '/research/:slug/']) {
+    assert.ok(sources.includes(source), `vercel: ${source} rewrite missing`);
+  }
+  assert.ok(sitemap.includes('<loc>https://webbrain.one/research/</loc>'));
+
+  const slugs = new Set();
+  for (const project of data.projects) {
+    assert.match(project.slug, /^[a-z0-9-]+$/);
+    assert.ok(!slugs.has(project.slug), `research: duplicate slug ${project.slug}`);
+    slugs.add(project.slug);
+    assert.ok(index.includes(`href="/research/${project.slug}/"`), `research: ${project.slug} tile missing`);
+    assert.ok(sitemap.includes(`<loc>https://webbrain.one/research/${project.slug}/</loc>`), `sitemap: ${project.slug} missing`);
+    const page = fs.readFileSync(path.join(ROOT, `web/research/${project.slug}/index.html`), 'utf8');
+    assert.match(page, new RegExp(`<link rel="canonical" href="https://webbrain\\.one/research/${project.slug}/">`));
+    assert.ok(page.includes('<!-- Site footer: start -->'), `${project.slug}: shared footer`);
+    for (const repo of [...(project.models || []), ...(project.datasets || [])]) {
+      assert.match(repo.id, /^webbrain-one\//, `${project.slug}: ${repo.id} is a WebBrain repo`);
+      assert.ok(Number.isInteger(repo.downloads) && Number.isInteger(repo.likes), `${repo.id}: stats are numbers`);
+    }
+    for (const post of project.posts || []) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'web/blog/posts', `${post.slug}.md`)), `${project.slug}: blog post ${post.slug} exists`);
+    }
+  }
+  // Every page links to Research.
+  for (const rel of ['web/index.html', 'web/tr/index.html', 'web/websites/index.html', 'web/blog/index.html']) {
+    assert.ok(fs.readFileSync(path.join(ROOT, rel), 'utf8').includes('href="/research/"'), `${rel}: links to Research`);
+  }
+  assert.ok(!fs.readFileSync(path.join(ROOT, 'web/research/index.html'), 'utf8').includes('href="/websites/"'), 'research: no For websites link before launch');
+});
+
+test('new website routes are rewritten on Vercel and listed in the sitemap', () => {
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/vercel.json'), 'utf8'));
+  const sitemap = fs.readFileSync(path.join(ROOT, 'web/sitemap.xml'), 'utf8');
+  const sources = vercel.rewrites.map((rule) => rule.source);
+  for (const source of ['/websites', '/websites/']) {
+    assert.ok(sources.includes(source), `vercel: ${source} rewrite missing`);
+  }
+  const catchAll = sources.indexOf('/(.*)');
+  assert.ok(sources.indexOf('/websites/') < catchAll, 'vercel: new routes precede the catch-all');
+  // The browser extension page folded back into the homepage.
+  const redirects = Object.fromEntries(vercel.redirects.map((rule) => [rule.source, rule.destination]));
+  assert.equal(redirects['/browser'], '/');
+  assert.equal(redirects['/browser/'], '/');
+  const localized = vercel.redirects.find((rule) => /^\/:locale\(.*\btr\b.*\)\/browser\/$/.test(rule.source));
+  assert.ok(localized && localized.destination === '/:locale/', 'vercel: localized browser pages redirect to their homepage');
+  assert.ok(!sources.some((source) => source.includes('/browser')), 'vercel: no rewrites to the retired browser page');
+  // The page is still served, but stays out of the sitemap until launch.
+  assert.ok(!sitemap.includes('<loc>https://webbrain.one/websites/</loc>'), 'sitemap: websites page is listed before launch');
+  assert.ok(!sitemap.includes('/browser/'), 'sitemap: the retired browser page is not listed');
+});
+
+test('site footers carry the mission line in every language', () => {
+  const localesDir = path.join(ROOT, 'web/build/locales');
+  const english = JSON.parse(fs.readFileSync(path.join(localesDir, 'en.json'), 'utf8'));
+  assert.equal(english['footer.tagline'], 'On a mission to make the web smarter.');
+  for (const file of fs.readdirSync(localesDir).filter((name) => name.endsWith('.json'))) {
+    const dict = JSON.parse(fs.readFileSync(path.join(localesDir, file), 'utf8'));
+    assert.ok(String(dict['footer.tagline'] || '').trim(), `${file}: footer.tagline missing`);
+    if (file !== 'en.json') assert.notEqual(dict['footer.tagline'], english['footer.tagline'], `${file}: footer.tagline is untranslated`);
+  }
+  const footerModule = fs.readFileSync(path.join(ROOT, 'web/build/site-footer.mjs'), 'utf8');
+  assert.match(
+    footerModule,
+    /<div class="wb-footer-brand">\s*<p class="wb-footer-tagline">\$\{t\('footer\.tagline'\)\}<\/p>\s*<p class="wb-footer-copy">/,
+    'site footer: the mission line should sit above the copyright',
+  );
+  const turkish = JSON.parse(fs.readFileSync(path.join(localesDir, 'tr.json'), 'utf8'));
+  const chinese = JSON.parse(fs.readFileSync(path.join(localesDir, 'zh.json'), 'utf8'));
+  for (const [page, line] of [
+    ['web/index.html', english['footer.tagline']],
+    ['web/websites/index.html', english['footer.tagline']],
+    ['web/tr/index.html', turkish['footer.tagline']],
+    ['web/docs/tr/faq/index.html', turkish['footer.tagline']],
+    ['web/docs/zh/index.html', chinese['footer.tagline']],
+    ['web/blog/index.html', english['footer.tagline']],
+    ['web/privacy.html', english['footer.tagline']],
+  ]) {
+    const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+    assert.ok(html.includes(`<p class="wb-footer-tagline">${line}</p>`), `${page}: footer mission line missing`);
+  }
+});
+
+test('every webbrain.one page shares one footer', () => {
+  const footerOf = (rel) => {
+    const html = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    assert.equal((html.match(/<footer\b/g) || []).length, 1, `${rel}: should have exactly one footer`);
+    assert.match(html, /<!-- Site footer styles: start -->[\s\S]*?<\/head>/, `${rel}: footer styles belong in <head>`);
+    const block = html.match(/<!-- Site footer: start -->[\s\S]*?<!-- Site footer: end -->/);
+    assert.ok(block, `${rel}: should render the shared site footer`);
+    // The homepage adds a no-JavaScript language list.
+    return block[0].replace(/\n\s*<div class="wb-footer-languages">[\s\S]*?<\/div>/, '');
+  };
+  const blogPosts = fs.readdirSync(path.join(ROOT, 'web/blog'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(ROOT, 'web/blog', entry.name, 'index.html')))
+    .map((entry) => `web/blog/${entry.name}/index.html`);
+  const docsPages = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+      const rel = `${dir}/${entry.name}`;
+      if (entry.isDirectory() && entry.name !== 'assets') walk(rel);
+      else if (entry.name === 'index.html' && !rel.startsWith('web/docs/zh/') && !/\/faq\/index\.html$/.test(rel)) docsPages.push(rel);
+    }
+  };
+  walk('web/docs');
+  assert.ok(blogPosts.length > 10 && docsPages.length > 5, 'blog posts and docs pages should be found');
+
+  const reference = footerOf('web/index.html');
+  for (const rel of [
+    'web/websites/index.html',
+    'web/docs/faq/index.html',
+    'web/privacy.html',
+    'web/blog/index.html',
+    ...blogPosts,
+    ...docsPages,
+  ]) {
+    assert.equal(footerOf(rel), reference, `${rel}: footer differs from the homepage footer`);
+  }
+  assert.match(footerOf('web/tr/index.html'), /<a href="\/tr\/">/, 'localized footers link to their own homepage for the extension');
+  assert.match(reference, /<a href="\/companion\/">Desktop Companion<\/a>/, 'the footer links the desktop Companion');
+  assert.doesNotMatch(reference, /href="\/websites\/"/, 'the footer leaves out For websites until launch');
+  assert.match(footerOf('web/tr/index.html'), /<a href="\/companion\/tr\/">Masaüstü Companion<\/a>/, 'localized footers link the Companion page in their language');
+  assert.match(footerOf('web/docs/zh/index.html'), /<a href="\/companion\/zh\/">/, 'Chinese docs link the Chinese Companion page');
+  assert.match(footerOf('web/docs/zh/index.html'), /href="\/docs\/zh\/faq\/"/, 'Chinese docs link to the Chinese FAQ');
+  assert.match(
+    fs.readFileSync(path.join(ROOT, 'web/index.html'), 'utf8'),
+    /<div class="wb-footer-languages">[\s\S]*?href="\/tr\/" hreflang="tr"/,
+    'homepage: the no-JavaScript language list points at the homepage in each language',
+  );
 });
 
 test('download FAQ bridge is a single block-level link', () => {

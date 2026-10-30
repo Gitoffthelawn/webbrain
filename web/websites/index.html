@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebBrain for websites — Add an AI guide to your website, free forever</title>
+  <meta name="description" content="Paste one script tag and every visitor gets an AI guide that explains your pages, answers questions, and fills in forms when you allow it. Free now, free forever.">
+  <meta property="og:title" content="WebBrain for websites — Add an AI guide to your website">
+  <meta property="og:description" content="One script tag gives every visitor an AI guide that explains your pages, answers questions, and fills in forms when you allow it. Free forever.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://webbrain.one/websites/">
+  <meta property="og:site_name" content="WebBrain">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://webbrain.one/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WebBrain for websites — Add an AI guide to your website">
+  <meta name="twitter:description" content="One script tag gives every visitor an AI guide that explains your pages, answers questions, and fills in forms when you allow it. Free forever.">
+  <meta name="twitter:image" content="https://webbrain.one/twitter-image.png">
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="canonical" href="https://webbrain.one/websites/">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "WebBrain for websites",
+  "url": "https://webbrain.one/websites/",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "description": "An embeddable AI guide that explains web pages, answers visitor questions, and fills in forms when the site owner allows it.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "isAccessibleForFree": true,
+  "publisher": { "@type": "Organization", "name": "WebBrain", "url": "https://webbrain.one/" }
+}
+  </script>
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('webbrain-theme');
+        var theme = (saved === 'light' || saved === 'dark')
+          ? saved
+          : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0b0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #1a2233;
+      --surface: #161d2e;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.16);
+      --text: #e4e4ec;
+      --text-dim: #8b8fa4;
+      --accent: #6c63ff;
+      --accent-hover: #5a52d5;
+      --accent-text: #9d97ff;
+      --accent2: #a78bfa;
+      --accent-glow: rgba(108,99,255,0.22);
+      --success: #34d399;
+      --success-bg: rgba(52,211,153,0.10);
+      --amber: #f4cc7d;
+      --warning: #fbbf24;
+      --tint-soft-2: rgba(255,255,255,0.04);
+      --tint-medium: rgba(255,255,255,0.08);
+      --shadow-card: rgba(0,0,0,0.32);
+      --nav-bg: rgba(11,14,23,0.80);
+      --grid-line: rgba(255,255,255,0.035);
+      --code-bg: #0f1420;
+      --code-text: #e4e4ec;
+      --site-width: min(calc(100% - 48px), 1100px);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+    :root[data-theme="light"] {
+      --bg: #f7f1e6;
+      --bg-card: #fffdf8;
+      --bg-card-hover: #f2e9d4;
+      --surface: #ede2cb;
+      --border: rgba(89,55,25,0.15);
+      --border-strong: rgba(89,55,25,0.28);
+      --text: #2c1810;
+      --text-dim: #6b5b47;
+      --accent: #5b52e8;
+      --accent-hover: #4940ce;
+      --accent-text: #5b52e8;
+      --accent2: #7c6ce6;
+      --accent-glow: rgba(91,82,232,0.12);
+      --success: #247554;
+      --success-bg: rgba(36,117,84,0.09);
+      --amber: #946000;
+      --warning: #b97a00;
+      --tint-soft-2: rgba(89,55,25,0.07);
+      --tint-medium: rgba(89,55,25,0.10);
+      --shadow-card: rgba(89,55,25,0.10);
+      --nav-bg: rgba(247,241,230,0.85);
+      --grid-line: rgba(89,55,25,0.05);
+      --code-bg: #fffdf8;
+      --code-text: #2c1810;
+      color-scheme: light;
+    }
+
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font);
+      background: radial-gradient(circle at 76% 10%, var(--accent-glow), transparent 30%), var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 820px;
+      z-index: -1;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: linear-gradient(to bottom, black, transparent 88%);
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+      pointer-events: none;
+    }
+    a { color: var(--accent-text); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    code { font-family: var(--mono); font-size: 0.92em; }
+
+    /* ----- Nav (same as the homepage) ----- */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner { width: var(--site-width); min-height: 66px; margin: 0 auto; display: flex; align-items: center; gap: 24px; }
+    .nav-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+    .brand-word { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-brand:hover { text-decoration: none; }
+    .brand-tile { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 8px; background: #060d32; box-shadow: 0 6px 16px var(--accent-glow); }
+    .brand-tile img { width: 22px; height: 22px; display: block; }
+    .brand-domain { margin-inline-start: 3px; font-weight: 400; opacity: 0.55; }
+    .nav-links { display: flex; align-items: center; gap: 22px; margin-inline-start: auto; }
+    .nav-links a { color: var(--text-dim); font-size: 14px; font-weight: 550; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--text); text-decoration: none; }
+    .nav-tools { display: flex; align-items: center; gap: 10px; }
+    .nav-cta {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--accent-hover); text-decoration: none; }
+    .theme-toggle {
+      appearance: none; -webkit-appearance: none;
+      width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0;
+      background: var(--tint-soft-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+    .theme-toggle:hover { background: var(--tint-medium); border-color: var(--accent); color: var(--text); }
+    .theme-toggle svg { width: 16px; height: 16px; display: block; }
+    .theme-toggle .icon-sun { display: block; }
+    .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+    /* ----- Hero: copy left, the one line of code right ----- */
+    main { flex: 1; width: var(--site-width); margin: 0 auto; padding: 72px 0 40px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); align-items: center; gap: clamp(36px, 5vw, 72px); }
+    .kicker { margin: 0 0 20px; color: var(--accent-text); font: 730 11px/1.2 var(--mono); letter-spacing: 0.15em; text-transform: uppercase; }
+    h1 { font-size: clamp(46px, 5.6vw, 76px); font-weight: 770; line-height: 0.95; letter-spacing: -0.06em; text-wrap: balance; }
+    h1 .accent-line { display: block; color: var(--accent-text); }
+    .lede { max-width: 560px; margin-top: 26px; color: var(--text-dim); font-size: clamp(16px, 1.5vw, 18.5px); line-height: 1.65; }
+
+    .get-script { display: flex; gap: 8px; max-width: 520px; margin-top: 30px; }
+    .get-script label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .get-script input {
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      background: var(--bg-card);
+      color: var(--text);
+      font: 500 15px/1.2 var(--font);
+    }
+    .get-script input::placeholder { color: var(--text-dim); opacity: 0.8; }
+    .get-script input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+    .btn {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font: 700 15px/1.2 var(--font);
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 10px 26px var(--accent-glow);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .btn:hover { background: var(--accent-hover); color: #fff; text-decoration: none; transform: translateY(-1px); }
+    .btn-quiet { background: transparent; color: var(--text); border-color: var(--border-strong); box-shadow: none; }
+    .btn-quiet:hover { background: var(--bg-card-hover); color: var(--text); }
+    /* Until the dashboard launches every action that leads to it is shown
+       but switched off (WEBSITES_LAUNCHED in site-footer.mjs). */
+    .btn:disabled, .btn.is-disabled, .nav-cta.is-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn:disabled:hover, .btn.is-disabled:hover { background: var(--accent); }
+    .nav-cta.is-disabled:hover { background: var(--accent); }
+    .get-script input:disabled { opacity: 0.6; cursor: not-allowed; }
+    .hero-note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; color: var(--text-dim); font-size: 14px; }
+    .free-dot { display: inline-flex; align-items: center; gap: 7px; color: var(--success); font-weight: 700; }
+    .free-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px var(--success-bg); }
+    .hero-note a { color: var(--text); font-weight: 650; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 4px; }
+
+    .code-console { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); box-shadow: 0 28px 80px var(--shadow-card); }
+    .console-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+    .console-heading p { margin: 0 0 4px; color: var(--success); font: 720 10px/1.2 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; }
+    .console-heading h2 { font-size: 18px; letter-spacing: -0.02em; }
+    .console-route { color: var(--text-dim); font: 610 11px/1.4 var(--mono); white-space: nowrap; }
+    .code-titlebar { min-height: 45px; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .window-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); opacity: 0.45; }
+    .window-dot.live { background: var(--success); opacity: 1; box-shadow: 0 0 0 4px var(--success-bg); }
+    .file-name { margin-left: 5px; color: var(--text-dim); font: 620 11px/1 var(--mono); }
+    .code-tabs { margin-left: auto; display: flex; gap: 3px; }
+    .code-tab { min-height: 27px; padding: 5px 9px; border: 0; border-radius: 5px; background: transparent; color: var(--text-dim); font: 680 11px/1 var(--mono); cursor: pointer; }
+    .code-tab[aria-selected="true"] { background: var(--bg-card); color: var(--accent-text); }
+    .code-tab:hover:not([aria-selected="true"]) { color: var(--text); }
+    .code-panel { min-height: 250px; margin: 0; overflow: auto; padding: 24px 22px 26px; background: var(--code-bg); color: var(--code-text); font: 12.5px/1.75 var(--mono); tab-size: 2; white-space: pre; }
+    .code-panel[hidden] { display: none; }
+    .tok-tag { color: var(--accent-text); }
+    .tok-attr { color: var(--success); }
+    .tok-string { color: var(--amber); }
+    .tok-comment { color: var(--text-dim); font-style: italic; }
+    .code-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 20px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 12px; }
+    .copy-btn { min-height: 30px; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 7px; background: transparent; color: var(--text); font: 700 12px/1 var(--font); cursor: pointer; }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+
+    /* ----- Sections ----- */
+    .section { margin-top: 104px; padding-top: 60px; border-top: 1px solid var(--border); scroll-margin-top: 84px; }
+    .section-intro { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); align-items: end; gap: 56px; margin-bottom: 40px; }
+    .section-title { font-size: clamp(32px, 3.6vw, 50px); font-weight: 750; line-height: 1.06; letter-spacing: -0.045em; text-wrap: balance; }
+    .section-description { max-width: 470px; color: var(--text-dim); font-size: 16px; line-height: 1.75; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; counter-reset: step; list-style: none; }
+    .step { position: relative; padding: 24px 24px 26px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card); counter-increment: step; }
+    .step::before {
+      content: counter(step);
+      width: 34px; height: 34px;
+      display: grid; place-items: center;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      color: var(--accent-text);
+      font: 800 15px/1 var(--font);
+    }
+    .step h3 { font-size: 19px; font-weight: 720; letter-spacing: -0.025em; }
+    .step p { margin-top: 10px; color: var(--text-dim); font-size: 14.5px; line-height: 1.7; }
+    .step code { color: var(--text); }
+
+    .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 38px 44px; }
+    .control h3 { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 720; letter-spacing: -0.025em; }
+    .control h3 svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--accent-text); }
+    .control p { max-width: 340px; margin-top: 10px; color: var(--text-dim); font-size: 14.5px; line-height: 1.75; }
+    .control code { color: var(--text); }
+
+    /* The one bold statement on the page. */
+    .free-band {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      align-items: end;
+      gap: 40px;
+      margin-top: 104px;
+      padding: 52px 52px 48px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--bg-card);
+      box-shadow: 0 28px 80px var(--shadow-card);
+    }
+    .free-band::after {
+      content: '';
+      position: absolute;
+      width: 460px; height: 460px;
+      right: -160px; top: -240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--success-bg), transparent 68%);
+      pointer-events: none;
+    }
+    .free-band h2 { font-size: clamp(44px, 6vw, 84px); font-weight: 780; line-height: 0.92; letter-spacing: -0.065em; }
+    .free-band h2 span { display: block; color: var(--success); }
+    .free-band p { position: relative; z-index: 1; color: var(--text-dim); font-size: 16.5px; line-height: 1.75; }
+    .free-band .btn { position: relative; z-index: 1; margin-top: 22px; }
+
+    .faq { display: grid; grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); gap: 80px; }
+    .faq-intro p { margin-top: 18px; color: var(--text-dim); font-size: 15px; line-height: 1.7; }
+    .faq-list { min-width: 0; border-top: 1px solid var(--border); }
+    .faq-list details { border-bottom: 1px solid var(--border); }
+    .faq-list summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 21px 0; font-size: 16px; font-weight: 650; line-height: 1.5; list-style: none; cursor: pointer; }
+    .faq-list summary::-webkit-details-marker { display: none; }
+    .faq-list summary::after { content: '+'; flex: 0 0 20px; color: var(--accent-text); font-size: 24px; font-weight: 400; text-align: center; }
+    .faq-list details[open] summary::after { content: '−'; }
+    .faq-list summary:hover { color: var(--accent-text); }
+    .faq-answer { padding: 0 36px 22px 0; color: var(--text-dim); font-size: 14.5px; line-height: 1.8; }
+    .faq-answer strong { color: var(--text); font-weight: 650; }
+
+    .closing { display: flex; align-items: center; justify-content: space-between; gap: 40px; margin-top: 96px; padding: 38px 0 64px; border-top: 1px solid var(--border); }
+    .closing h2 { max-width: 640px; font-size: clamp(26px, 2.8vw, 38px); line-height: 1.12; letter-spacing: -0.04em; text-wrap: balance; }
+    .closing-actions { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+
+
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .hero-copy, .code-console { animation: rise 0.5s ease-out both; }
+    .code-console { animation-delay: 0.08s; }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+      .hero-copy { max-width: 700px; }
+      .section-intro { grid-template-columns: 1fr; gap: 18px; }
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .free-band { grid-template-columns: 1fr; gap: 20px; padding: 40px 34px; }
+      .faq { grid-template-columns: 1fr; gap: 28px; }
+      .closing { flex-direction: column; align-items: flex-start; gap: 22px; }
+    }
+    @media (max-width: 860px) {
+      :root { --site-width: calc(100% - 32px); }
+      main { padding-top: 52px; }
+      .steps { grid-template-columns: 1fr; }
+      .nav-links .nav-secondary { display: none; }
+    }
+    @media (max-width: 640px) {
+      .nav-inner { gap: 12px; min-height: 60px; }
+      .nav-links { display: none; }
+      .nav-tools { margin-inline-start: auto; }
+      .theme-toggle { display: none; }
+      .get-script { flex-direction: column; }
+      .btn { width: 100%; }
+      .controls { grid-template-columns: 1fr; gap: 28px; }
+      .console-heading { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .file-name { display: none; }
+      .code-titlebar { padding-left: 14px; }
+      .code-panel { min-height: 260px; padding: 18px 14px 20px; font-size: 11.5px; }
+      .free-band { padding: 32px 22px; border-radius: 18px; }
+      .faq-answer { padding-right: 0; }
+      .section { margin-top: 72px; padding-top: 44px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+
+  <!-- Site footer styles: start -->
+  <style>
+    .wb-footer {
+      --wb-footer-text: var(--text, var(--ink, #2c1810));
+      --wb-footer-dim: var(--text-dim, var(--muted, #6b5b47));
+      --wb-footer-line: var(--border, var(--line, rgba(89, 55, 25, 0.15)));
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--wb-footer-line);
+      background: var(--wb-footer-bg, none);
+      color: var(--wb-footer-dim);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: start;
+    }
+    .wb-footer-inner {
+      width: var(--wb-footer-width, min(calc(100% - 48px), 1100px));
+      margin: 0 auto;
+      padding: 26px 0 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    /* Page links start on the brand's left edge; the social icons sit at
+       the far end of the same row. */
+    .wb-footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 32px; }
+    .wb-footer-brand { display: flex; flex-direction: column; gap: 5px; }
+    .wb-footer-tagline { margin: 0; color: var(--wb-footer-text); font-size: 15px; font-weight: 700; line-height: 1.4; }
+    .wb-footer-copy { margin: 0; }
+    .wb-footer-copy a { color: var(--wb-footer-text); font-weight: 650; text-decoration: none; }
+    .wb-footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+    .wb-footer-social { display: flex; align-items: center; gap: 8px; }
+    .wb-footer-links a { color: var(--wb-footer-dim); font-weight: 600; text-decoration: none; }
+    .wb-footer a:hover { color: var(--wb-footer-text); text-decoration: none; }
+    .wb-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
+    .wb-footer-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin: -4px 0; border-radius: 6px; }
+    .wb-footer-icon:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+    .wb-footer-icon svg { display: block; width: 15px; height: 15px; }
+    /* Only shown without JavaScript, when the language picker can't run. */
+    .wb-footer-languages { display: none; flex-wrap: wrap; gap: 6px 12px; width: 100%; direction: ltr; }
+    .wb-footer-languages span { color: var(--wb-footer-text); font-weight: 700; }
+    @media (max-width: 860px) {
+      .wb-footer-inner { width: var(--wb-footer-width, calc(100% - 32px)); }
+    }
+  </style>
+  <!-- Site footer styles: end -->
+  <!-- Plausible analytics: start -->
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://157.230.3.9.sslip.io/js/pa-omp0F7DsOXM4sGKR50l7S.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+  <!-- Plausible analytics: end -->
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand" aria-label="WebBrain">
+      <span class="brand-tile"><img src="/favicon.png" alt="" width="22" height="22"></span>
+      <span class="brand-word">WebBrain<span class="brand-domain">.one</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/">Browser extension</a>
+      <a href="/research/" class="nav-secondary">Research</a>
+      <a href="/docs/" class="nav-secondary">Docs</a>
+      <a href="/blog/" class="nav-secondary">Blog</a>
+    </nav>
+    <div class="nav-tools">
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle light / dark theme" title="Toggle light / dark theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <span class="nav-cta is-disabled" aria-disabled="true">Dashboard coming soon</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero-grid" aria-labelledby="websites-title">
+    <div class="hero-copy">
+      <p class="kicker">WebBrain for websites</p>
+      <h1 id="websites-title">Add an AI guide <span class="accent-line">to your website.</span></h1>
+      <p class="lede">Paste one line of code and every visitor can ask about the page they're on. WebBrain reads the page, answers from it, and, if you allow it, fills in forms and clicks through for them.</p>
+      
+      <form class="get-script" aria-describedby="get-script-soon" onsubmit="return false">
+        <label for="get-script-url">Your website address</label>
+        <input id="get-script-url" type="text" placeholder="yourwebsite.com" disabled>
+        <button class="btn" type="button" disabled>Coming soon</button>
+      </form>
+      
+      <p class="hero-note">
+        <span class="free-dot">Free forever</span>
+        <span>No credit card. Nothing for visitors to install.</span>
+        <span id="get-script-soon">The dashboard opens soon.</span>
+      </p>
+    </div>
+
+    <div class="code-console">
+      <div class="console-heading">
+        <div>
+          <p>Embed code</p>
+          <h2>Paste it before &lt;/body&gt;.</h2>
+        </div>
+        <span class="console-route">embed.js · data-site-id</span>
+      </div>
+      <div class="code-titlebar">
+        <span class="window-dot live" aria-hidden="true"></span>
+        <span class="window-dot" aria-hidden="true"></span>
+        <span class="window-dot" aria-hidden="true"></span>
+        <span class="file-name" id="code-file-name">index.html</span>
+        <div class="code-tabs" role="tablist" aria-label="Code examples">
+          <button class="code-tab" type="button" role="tab" id="tab-script" aria-controls="code-script" aria-selected="true" data-code-tab="script" data-file="index.html">Script</button>
+          <button class="code-tab" type="button" role="tab" id="tab-buttons" aria-controls="code-buttons" aria-selected="false" tabindex="-1" data-code-tab="buttons" data-file="pricing.html">Buttons</button>
+          <button class="code-tab" type="button" role="tab" id="tab-js" aria-controls="code-js" aria-selected="false" tabindex="-1" data-code-tab="js" data-file="app.js">JavaScript</button>
+        </div>
+      </div>
+<pre class="code-panel" id="code-script" role="tabpanel" aria-labelledby="tab-script"><span class="tok-comment">&lt;!-- WebBrain for websites --&gt;</span>
+<span class="tok-tag">&lt;script</span> <span class="tok-attr">src</span>=<span class="tok-string">"https://sites.webbrain.one/embed.js"</span>
+        <span class="tok-attr">data-site-id</span>=<span class="tok-string">"site_your_id"</span>
+        <span class="tok-attr">defer</span><span class="tok-tag">&gt;&lt;/script&gt;</span>
+
+<span class="tok-comment">&lt;!-- That's it. The launcher appears in the
+     corner, styled the way you set it up. --&gt;</span></pre>
+<pre class="code-panel" id="code-buttons" role="tabpanel" aria-labelledby="tab-buttons" hidden><span class="tok-comment">&lt;!-- Any element can ask a question --&gt;</span>
+<span class="tok-tag">&lt;button</span> <span class="tok-attr">data-webbrain-ask</span>=<span class="tok-string">"Compare these plans for a team of 5"</span><span class="tok-tag">&gt;</span>
+  Which plan fits me?
+<span class="tok-tag">&lt;/button&gt;</span>
+
+<span class="tok-comment">&lt;!-- Or let WebBrain act, when Ask + Act is on --&gt;</span>
+<span class="tok-tag">&lt;button</span> <span class="tok-attr">data-webbrain-act</span>=<span class="tok-string">"Fill in the demo request form"</span><span class="tok-tag">&gt;</span>
+  Fill it in for me
+<span class="tok-tag">&lt;/button&gt;</span></pre>
+<pre class="code-panel" id="code-js" role="tabpanel" aria-labelledby="tab-js" hidden><span class="tok-comment">// Open the assistant from your own UI</span>
+WebBrain.<span class="tok-attr">open</span>();
+
+<span class="tok-comment">// Ask about the current page</span>
+WebBrain.<span class="tok-attr">ask</span>(<span class="tok-string">'Summarize this page in 3 points'</span>);
+
+<span class="tok-comment">// Let it act (sites with Ask + Act enabled)</span>
+WebBrain.<span class="tok-attr">act</span>(<span class="tok-string">'Add the annual plan to my cart'</span>);
+
+<span class="tok-comment">// Pick up dashboard changes without a reload</span>
+WebBrain.<span class="tok-attr">reloadConfig</span>();</pre>
+      <div class="code-foot">
+        <span>Your real site ID is in the dashboard.</span>
+        <button class="copy-btn" type="button" id="copy-code">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works" aria-labelledby="how-title">
+    <div class="section-intro">
+      <h2 class="section-title" id="how-title">Live on your site in three steps.</h2>
+      <p class="section-description">No SDK to install and no build step. WebBrain loads after your page does and stays out of your styles.</p>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <h3>Add your site</h3>
+        <p>Enter your site's address in the dashboard. You get a site ID and your script tag right away.</p>
+      </li>
+      <li class="step">
+        <h3>Paste one line</h3>
+        <p>Put the script before <code>&lt;/body&gt;</code>. Anything that lets you add a script tag works: static sites, CMS themes, and single-page apps.</p>
+      </li>
+      <li class="step">
+        <h3>Visitors ask</h3>
+        <p>A launcher appears in the corner. Visitors ask about the page they're on, and WebBrain answers from what's actually there.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section" id="features" aria-labelledby="controls-title">
+    <div class="section-intro">
+      <h2 class="section-title" id="controls-title">You decide what it can do.</h2>
+      <p class="section-description">Every setting lives in the dashboard and reaches your site the moment you save. Visitors never see a key, a model picker, or a setup screen.</p>
+    </div>
+    <div class="controls">
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ask, or Ask and Act</h3>
+        <p>Keep WebBrain read-only, or let it type, tick boxes, and click buttons for the visitor, with a visible glow and a Stop button while it works. The server enforces your choice.</p>
+      </div>
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></svg>Your model, your key</h3>
+        <p>Use any OpenAI-compatible endpoint: OpenAI, OpenRouter, Groq, DeepSeek, Gemini, Together AI, xAI, or your own server. Keys stay on the server.</p>
+      </div>
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Starter questions</h3>
+        <p>Put one-click questions in the drawer, like “Summarize this page” or “Compare the plans,” so visitors know what to ask.</p>
+      </div>
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="5"/><path d="M8 12h8"/></svg>Buttons in your page</h3>
+        <p>Turn any element into a question with <code>data-webbrain-ask</code>, or add “Explain this” buttons to every matching section with a CSS selector.</p>
+      </div>
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>Highlight to ask</h3>
+        <p>When a visitor selects text, a small pill offers to explain exactly that passage.</p>
+      </div>
+      <div class="control">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/></svg>Your look</h3>
+        <p>Light, dark, or matching the visitor's system. Choose the launcher style, icon, label, accent color, and corner.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="free-band" aria-labelledby="free-title">
+    <h2 id="free-title">Free now. <span>Free forever.</span></h2>
+    <div>
+      <p>WebBrain for websites is free to use, and the free plan is here to stay. Paid tiers with extra features will come later, for teams that want more.</p>
+      <span class="btn is-disabled" aria-disabled="true">Coming soon</span>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq" aria-labelledby="faq-title">
+    <div class="faq-intro">
+      <h2 class="section-title" id="faq-title">A few things worth knowing.</h2>
+      <p>What WebBrain sees, what it can do, and what it costs.</p>
+    </div>
+    <div class="faq-list">
+      <details open>
+        <summary>Is it really free?</summary>
+        <div class="faq-answer">Yes. The dashboard, the script, and the assistant your visitors use cost nothing, and the free plan is here to stay. Paid tiers with extra features will come later for those who want them.</div>
+      </details>
+      <details>
+        <summary>What does WebBrain see on my site?</summary>
+        <div class="faq-answer">The page the visitor has open, read as an accessibility tree (the same structure screen readers use), plus the visitor's question. That goes to WebBrain's server and on to the model configured for your site. <strong>API keys stay on the server</strong> and never reach the browser.</div>
+      </details>
+      <details>
+        <summary>Can it change anything on my site?</summary>
+        <div class="faq-answer">Only if you allow it. In Ask mode WebBrain reads and answers. In Ask + Act mode it can type into fields, tick boxes, click buttons, and scroll, with a visible glow, cursor, and Stop button. Everything happens in the visitor's own tab, on their behalf; it can't touch your site's code.</div>
+      </details>
+      <details>
+        <summary>Which AI models can I use?</summary>
+        <div class="faq-answer">Any OpenAI-compatible endpoint: OpenAI, OpenRouter, Groq, DeepSeek, Google Gemini, Together AI, xAI, or your own OpenAI-compatible server. Set it once in the dashboard; visitors never see a key or a model picker.</div>
+      </details>
+      <details>
+        <summary>Will it work on my site?</summary>
+        <div class="faq-answer">If you can add a script tag before <code>&lt;/body&gt;</code>, yes: static sites, CMS themes, and single-page apps alike. The assistant draws itself in its own shadow DOM, so your styles and its styles don't collide.</div>
+      </details>
+      <details>
+        <summary>How is this different from the WebBrain extension?</summary>
+        <div class="faq-answer">The <a href="/">browser extension</a> helps you on any site you visit. WebBrain for websites helps your visitors on your site, and they don't need to install anything. Both are built on the same open-source WebBrain engine.</div>
+      </details>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <h2 id="closing-title">Give every visitor a guide to your site.</h2>
+    <div class="closing-actions">
+      
+      <span class="btn is-disabled" aria-disabled="true">Coming soon</span>
+      
+    </div>
+  </section>
+</main>
+
+<!-- Site footer: start -->
+<footer class="wb-footer">
+  <div class="wb-footer-inner">
+    <div class="wb-footer-brand">
+      <p class="wb-footer-tagline">On a mission to make the web smarter.</p>
+      <p class="wb-footer-copy">© 2026 WebBrain. Built by <a href="https://emresokullu.com" target="_blank">Emre Sokullu</a> &amp; <a href="https://github.com/webbrain-one/webbrain/graphs/contributors" target="_blank">contributors</a>.</p>
+    </div>
+    <div class="wb-footer-row">
+      <div class="wb-footer-links">
+        <a href="/">Browser extension</a>
+        <a href="/companion/">Desktop Companion</a>
+        <a href="/research/">Research</a>
+        <a href="/docs/">Docs</a>
+        <a href="/docs/faq/">FAQ</a>
+        <a href="/blog/">Blog</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="https://github.com/webbrain-one/webbrain/issues" target="_blank" rel="noopener">Report Bug</a>
+        <a href="https://github.com/webbrain-one/webbrain/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0 License</a>
+        <a href="https://pressreleases.online/org/webbrain.one" target="_blank" rel="noopener">Press</a>
+        <a href="https://api.webbrain.one/account" target="_blank" rel="noopener">Compass Subscription</a>
+      </div>
+      <div class="wb-footer-social">
+        <a href="https://mastoturk.org/@webbrain" target="_blank" rel="me noopener" aria-label="WebBrain on Mastodon" title="WebBrain on Mastodon" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.327 8.566c0-5.035-3.298-6.511-3.298-6.511C16.366 1.292 13.508.971 12.04.947h-.036c-1.468.024-4.326.345-5.989 1.108 0 0-3.298 1.476-3.298 6.511 0 1.153-.022 2.535.014 4.001.12 4.935.907 9.799 5.478 11.007 2.106.557 3.916.674 5.374.594 2.645-.147 4.128-.943 4.128-.943l-.087-1.918s-1.888.595-4.012.523c-2.104-.072-4.326-.227-4.668-2.809a5.289 5.289 0 0 1-.047-.724s2.066.505 4.686.625c1.603.073 3.107-.094 4.632-.276 2.925-.349 5.474-2.149 5.794-3.793.503-2.591.462-6.287.462-6.287ZM8.545 15.023H6.09V8.996c0-2.534 1.627-3.829 3.424-3.829 1.963 0 2.909 1.268 3.35 2.257.44-.989 1.386-2.257 3.349-2.257 1.797 0 3.424 1.295 3.424 3.829v6.027h-2.454V9.174c0-1.233-.519-1.859-1.557-1.859-1.148 0-1.724.742-1.724 2.207v3.203h-2.454V9.522c0-1.465-.576-2.207-1.724-2.207-1.038 0-1.557.626-1.557 1.859v5.849Z"/></svg></a>
+        <a href="https://bsky.app/profile/webbrain-one.bsky.social" target="_blank" rel="me noopener" aria-label="WebBrain on Bluesky" title="WebBrain on Bluesky" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12 10.8c-1.1-2.1-4-6-6.8-8C2.6.9 1.6 1.3.9 1.6.1 1.9 0 3.1 0 3.8c0 .7.4 5.7.6 6.5.8 2.7 3.7 3.7 5.6 3.4-3.5.6-6.5 2-2.5 6.5 4.3 4.5 5.9-1 6.3-2.8.1-.5.2-.8.3-.8.1 0 .2.3.3.8.4 1.8 2 7.3 6.3 2.8 4-4.5 1-5.9-2.5-6.5 1.9.3 4.8-.7 5.6-3.4.2-.8.6-5.8.6-6.5 0-.7-.1-1.9-.9-2.2-.7-.3-1.7-.6-4.3 1.2-2.8 2-5.7 5.9-6.8 8Z"/></svg></a>
+        <a href="https://discord.gg/cgC325ssfw" target="_blank" rel="noopener" aria-label="WebBrain on Discord" title="WebBrain on Discord" class="wb-footer-icon"><svg viewBox="0 0 16 16" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011c.05.069.098.137.142.207a12.471 12.471 0 0 0-3.616 0c.044-.07.093-.138.143-.207A13.207 13.207 0 0 0 3.7 2.907 13.136 13.136 0 0 0 .931 13.362a13.667 13.667 0 0 0 4.022 2.018c.33-.442.623-.907.87-1.396a8.95 8.95 0 0 1-1.37-.652c.114-.083.225-.171.33-.269a9.6 9.6 0 0 0 8.243 0c.108.09.218.18.33.269a8.923 8.923 0 0 1-1.37.652c.248.489.54.954.87 1.396a13.667 13.667 0 0 0 4.022-2.018 13.136 13.136 0 0 0-2.769-10.455zM5.106 11.275c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608zm5.788 0c-.788 0-1.438-.72-1.438-1.608 0-.889.625-1.608 1.438-1.608.818 0 1.451.726 1.438 1.608 0 .888-.625 1.608-1.438 1.608z"/></svg></a>
+        <a href="https://huggingface.co/webbrain-one" target="_blank" rel="me noopener" aria-label="WebBrain on Hugging Face" title="WebBrain on Hugging Face" class="wb-footer-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12.025 1.13c-5.77 0-10.449 4.647-10.449 10.378 0 1.112.178 2.181.503 3.185.064-.222.203-.444.416-.577a.96.96 0 0 1 .524-.15c.293 0 .584.124.84.284.278.173.48.408.71.694.226.282.458.611.684.951v-.014c.017-.324.106-.622.264-.874s.403-.487.762-.543c.3-.047.596.06.787.203s.31.313.4.467c.15.257.212.468.233.542.01.026.653 1.552 1.657 2.54.616.605 1.01 1.223 1.082 1.912.055.537-.096 1.059-.38 1.572.637.121 1.294.187 1.967.187.657 0 1.298-.063 1.921-.178-.287-.517-.44-1.041-.384-1.581.07-.69.465-1.307 1.081-1.913 1.004-.987 1.647-2.513 1.657-2.539.021-.074.083-.285.233-.542.09-.154.208-.323.4-.467a1.08 1.08 0 0 1 .787-.203c.359.056.604.29.762.543s.247.55.265.874v.015c.225-.34.457-.67.683-.952.23-.286.432-.52.71-.694.257-.16.547-.284.84-.285a.97.97 0 0 1 .524.151c.228.143.373.388.43.625l.006.04a10.3 10.3 0 0 0 .534-3.273c0-5.731-4.678-10.378-10.449-10.378M8.327 6.583a1.5 1.5 0 0 1 .713.174 1.487 1.487 0 0 1 .617 2.013c-.183.343-.762-.214-1.102-.094-.38.134-.532.914-.917.71a1.487 1.487 0 0 1 .69-2.803m7.486 0a1.487 1.487 0 0 1 .689 2.803c-.385.204-.536-.576-.916-.71-.34-.12-.92.437-1.103.094a1.487 1.487 0 0 1 .617-2.013 1.5 1.5 0 0 1 .713-.174m-10.68 1.55a.96.96 0 1 1 0 1.921.96.96 0 0 1 0-1.92m13.838 0a.96.96 0 1 1 0 1.92.96.96 0 0 1 0-1.92M8.489 11.458c.588.01 1.965 1.157 3.572 1.164 1.607-.007 2.984-1.155 3.572-1.164.196-.003.305.12.305.454 0 .886-.424 2.328-1.563 3.202-.22-.756-1.396-1.366-1.63-1.32q-.011.001-.02.006l-.044.026-.01.008-.03.024q-.018.017-.035.036l-.032.04a1 1 0 0 0-.058.09l-.014.025q-.049.088-.11.19a1 1 0 0 1-.083.116 1.2 1.2 0 0 1-.173.18q-.035.029-.075.058a1.3 1.3 0 0 1-.251-.243 1 1 0 0 1-.076-.107c-.124-.193-.177-.363-.337-.444-.034-.016-.104-.008-.2.022q-.094.03-.216.087-.06.028-.125.063l-.13.074q-.067.04-.136.086a3 3 0 0 0-.135.096 3 3 0 0 0-.26.219 2 2 0 0 0-.12.121 2 2 0 0 0-.106.128l-.002.002a2 2 0 0 0-.09.132l-.001.001a1.2 1.2 0 0 0-.105.212q-.013.036-.024.073c-1.139-.875-1.563-2.317-1.563-3.203 0-.334.109-.457.305-.454m.836 10.354c.824-1.19.766-2.082-.365-3.194-1.13-1.112-1.789-2.738-1.789-2.738s-.246-.945-.806-.858-.97 1.499.202 2.362c1.173.864-.233 1.45-.685.64-.45-.812-1.683-2.896-2.322-3.295s-1.089-.175-.938.647 2.822 2.813 2.562 3.244-1.176-.506-1.176-.506-2.866-2.567-3.49-1.898.473 1.23 2.037 2.16c1.564.932 1.686 1.178 1.464 1.53s-3.675-2.511-4-1.297c-.323 1.214 3.524 1.567 3.287 2.405-.238.839-2.71-1.587-3.216-.642-.506.946 3.49 2.056 3.522 2.064 1.29.33 4.568 1.028 5.713-.624m5.349 0c-.824-1.19-.766-2.082.365-3.194 1.13-1.112 1.789-2.738 1.789-2.738s.246-.945.806-.858.97 1.499-.202 2.362c-1.173.864.233 1.45.685.64.451-.812 1.683-2.896 2.322-3.295s1.089-.175.938.647-2.822 2.813-2.562 3.244 1.176-.506 1.176-.506 2.866-2.567 3.49-1.898-.473 1.23-2.037 2.16c-1.564.932-1.686 1.178-1.464 1.53s3.675-2.511 4-1.297c.323 1.214-3.524 1.567-3.287 2.405.238.839 2.71-1.587 3.216-.642.506.946-3.49 2.056-3.522 2.064-1.29.33-4.568 1.028-5.713-.624"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- Site footer: end -->
+
+<!-- "Get your script": hand the address to the dashboard, which pre-fills it. -->
+<script>
+  (function () {
+    var form = document.getElementById('get-script');
+    var input = document.getElementById('get-script-url');
+    if (!form || !input) return;
+    form.addEventListener('submit', function (event) {
+      var value = input.value.trim();
+      if (!value) {
+        event.preventDefault();
+        window.location.href = form.action;
+      }
+    });
+  })();
+</script>
+
+<!-- Code tabs, keyboard-navigable like the ones on webbrain.cloud. -->
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-code-tab]'));
+    var fileName = document.getElementById('code-file-name');
+    var copyBtn = document.getElementById('copy-code');
+    if (!tabs.length) return;
+    function select(tab) {
+      tabs.forEach(function (candidate) {
+        var on = candidate === tab;
+        candidate.setAttribute('aria-selected', on ? 'true' : 'false');
+        candidate.tabIndex = on ? 0 : -1;
+        document.getElementById(candidate.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (fileName) fileName.textContent = tab.dataset.file || '';
+    }
+    tabs.forEach(function (tab, index) {
+      tab.addEventListener('click', function () { select(tab); });
+      tab.addEventListener('keydown', function (event) {
+        var next = event.key === 'ArrowRight' ? (index + 1) % tabs.length
+          : event.key === 'ArrowLeft' ? (index - 1 + tabs.length) % tabs.length
+          : event.key === 'Home' ? 0
+          : event.key === 'End' ? tabs.length - 1
+          : -1;
+        if (next === -1) return;
+        event.preventDefault();
+        tabs[next].focus();
+        select(tabs[next]);
+      });
+    });
+    if (copyBtn && navigator.clipboard) {
+      copyBtn.addEventListener('click', function () {
+        var active = tabs.find(function (tab) { return tab.getAttribute('aria-selected') === 'true'; });
+        var panel = active && document.getElementById(active.getAttribute('aria-controls'));
+        if (!panel) return;
+        navigator.clipboard.writeText(panel.textContent).then(function () {
+          copyBtn.textContent = 'Copied';
+          setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1600);
+        }).catch(function () {});
+      });
+    } else if (copyBtn) {
+      copyBtn.hidden = true;
+    }
+  })();
+</script>
+
+<script>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var root = document.documentElement;
+    function setTheme(theme, persist) {
+      root.setAttribute('data-theme', theme);
+      if (persist) {
+        try { localStorage.setItem('webbrain-theme', theme); } catch (_) {}
+      }
+    }
+    btn.addEventListener('click', function () {
+      setTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
+    });
+    var mq = window.matchMedia('(prefers-color-scheme: light)');
+    function onMQ(e) {
+      try { if (localStorage.getItem('webbrain-theme')) return; } catch (_) {}
+      setTheme(e.matches ? 'light' : 'dark', false);
+    }
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onMQ);
+    else if (typeof mq.addListener === 'function') mq.addListener(onMQ);
+  })();
+</script>
+
+</body>
+</html>

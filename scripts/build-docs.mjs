@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Ensures every documentation page includes the shared site analytics partial
- * and the shared links that belong in its guide navigation.
+ * Ensures every documentation page includes the shared site analytics partial,
+ * the shared links that belong in its guide navigation, and the footer every
+ * webbrain.one page shares.
  *
  * This idempotent pass recursively covers new HTML pages added under web/docs,
  * so authors do not have to copy the analytics block page by page.
@@ -11,10 +12,12 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PLAUSIBLE_SCRIPT_URL, withPlausibleAnalytics } from '../web/build/plausible.mjs';
+import { withSiteFooter } from '../web/build/site-footer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DOCS_DIR = path.join(REPO_ROOT, 'web', 'docs');
+const LOCALES_DIR = path.join(REPO_ROOT, 'web', 'build', 'locales');
 
 async function listHtmlFiles(dir) {
   const files = [];
@@ -83,11 +86,33 @@ function withGuideNavigation(html, file) {
   return generated;
 }
 
+function withDocsFooter(html, file, dictionaries) {
+  const normalized = file.replace(/\\/g, '/');
+  // The FAQ pages are built from web/build/faq-template.html, which already
+  // renders the footer in each FAQ's own language.
+  if (normalized.endsWith('/faq/index.html')) return html;
+  if (normalized.includes('/web/docs/zh/')) {
+    return withSiteFooter(html, dictionaries.zh, {
+      browserPath: '/zh/',
+      companionPath: '/companion/zh/',
+      docsPath: '/docs/zh/',
+      faqPath: '/docs/zh/faq/',
+    });
+  }
+  return withSiteFooter(html, dictionaries.en);
+}
+
 async function main() {
+  const en = JSON.parse(await readFile(path.join(LOCALES_DIR, 'en.json'), 'utf8'));
+  const zh = { ...en, ...JSON.parse(await readFile(path.join(LOCALES_DIR, 'zh.json'), 'utf8')) };
   const files = await listHtmlFiles(DOCS_DIR);
   for (const file of files) {
     const original = await readFile(file, 'utf8');
-    const generated = withGuideNavigation(withPlausibleAnalytics(original), file);
+    const generated = withDocsFooter(
+      withGuideNavigation(withPlausibleAnalytics(original), file),
+      file,
+      { en, zh },
+    );
     const occurrences = generated.split(PLAUSIBLE_SCRIPT_URL).length - 1;
     if (occurrences !== 1) {
       throw new Error(`${path.relative(REPO_ROOT, file)} contains ${occurrences} Plausible scripts`);

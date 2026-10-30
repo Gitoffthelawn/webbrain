@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url';
 const runFile = promisify(execFile);
 const locale = { code: 'en', bcp47: 'en-US', dir: 'ltr', isDefault: true };
 const exportNames = [
-  'applyTemplate', 'buildFaqJsonLd', 'buildFaqLanguageRoutes',
+  'applyLaunchBlocks', 'applyTemplate', 'buildFaqJsonLd', 'buildFaqLanguageRoutes',
   'buildSoftwareJsonLd', 'escJson', 'htmlToPlain', 'serializeScriptJson',
 ].sort();
 const scriptTemplate = [
@@ -28,6 +28,8 @@ before(async () => {
   sandbox = await mkdtemp(path.join(os.tmpdir(), 'webbrain-build-import-'));
   await copyFile(new URL('./build.mjs', import.meta.url), path.join(sandbox, 'build.mjs'));
   await copyFile(new URL('./plausible.mjs', import.meta.url), path.join(sandbox, 'plausible.mjs'));
+  await copyFile(new URL('./site-footer.mjs', import.meta.url), path.join(sandbox, 'site-footer.mjs'));
+  await copyFile(new URL('./research.mjs', import.meta.url), path.join(sandbox, 'research.mjs'));
   await copyFile(new URL('./languages.json', import.meta.url), path.join(sandbox, 'languages.json'));
   const script = 'const module = await import(' +
     JSON.stringify(pathToFileURL(path.join(sandbox, 'build.mjs')).href) +
@@ -38,7 +40,7 @@ before(async () => {
   assert.equal(result.stderr, '');
   isolatedExports = JSON.parse(result.stdout);
   assert.deepEqual(isolatedExports, exportNames);
-  assert.deepEqual((await readdir(sandbox)).sort(), ['build.mjs', 'languages.json', 'plausible.mjs']);
+  assert.deepEqual((await readdir(sandbox)).sort(), ['build.mjs', 'languages.json', 'plausible.mjs', 'research.mjs', 'site-footer.mjs']);
   builder = await import('./build.mjs');
 });
 
@@ -157,4 +159,12 @@ test('route-map placeholders remain parseable with their existing locale paths',
   assert.equal(parsed.routes.zh, '/docs/zh/faq/');
   assert.equal(parsed.flags.en, 'us');
   assert.equal(parsed.flags.tr, 'tr');
+});
+
+test('websites launch blocks keep one side of the switch', () => {
+  const source = 'a<!-- if websites -->ON<!-- else websites -->OFF<!-- end websites -->b<!-- if websites -->X<!-- end websites -->c';
+  assert.equal(builder.applyLaunchBlocks(source, true), 'aONbXc');
+  assert.equal(builder.applyLaunchBlocks(source, false), 'aOFFbc');
+  // Until the dashboard launches, templates render the "off" side.
+  assert.equal(builder.applyTemplate(source, {}, locale).html, 'aOFFbc');
 });
