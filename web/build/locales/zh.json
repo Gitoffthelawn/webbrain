@@ -24,6 +24,7 @@
   "nav.theme_toggle_aria": "切换浅色 / 深色主题",
   "nav.browser_extension": "浏览器扩展",
   "nav.for_websites": "面向网站",
+  "nav.research": "研究",
   "home.nav_aria": "主导航",
   "home.meta.title": "WebBrain — 适用于浏览器和网站的 AI 代理",
   "home.meta.description": "WebBrain 是一款免费的 AI 代理，可以阅读、解释网页并在网页上执行操作。将开源扩展添加到 Chrome、Edge 或 Firefox，或将 WebBrain 添加到您的网站，为访客服务。",

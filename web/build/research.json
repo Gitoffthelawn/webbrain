@@ -1,0 +1,1308 @@
+{
+  "statsAsOf": "October 30, 2026",
+  "index": {
+    "metaTitle": "WebBrain Research — small, open models for browser agents",
+    "metaDescription": "WebBrain’s open research: tiny models that see, decide and act in the browser, open-source ternary compression with OpenBonsai, and frozen public benchmarks.",
+    "kicker": "WebBrain Research",
+    "title": "Small models that see, decide and act in your browser.",
+    "lede": [
+      "A browser agent shouldn’t need a datacenter. We build small, specialized models that run where the page is, shrink strong ones until they fit, and test every model we can find on the same frozen browser tasks.",
+      "Everything here is open: the weights and datasets on Hugging Face, the OpenBonsai pipeline, and the benchmark results, failures included."
+    ],
+    "principlesTitle": "Three ideas run through all of it",
+    "principles": [
+      {
+        "title": "Specialize, then shrink",
+        "body": "A 2B model trained for one job can match a model ten times its size at that job. Compass Tiny v2 sits one strict match behind Qwen3.8-27B at routing; WebBrain VL 2 beats Gemma 4 E4B on strict screenshot reading at 450M."
+      },
+      {
+        "title": "Run where the page is",
+        "body": "Vision, decisions and routing run inside the browser through WebGPU and ONNX, so screenshots and page content stay on your computer and the agent keeps working offline."
+      },
+      {
+        "title": "Measure in public",
+        "body": "Every model faces the same frozen prompts and screenshots, and we publish what didn’t work alongside what did, so the next model is comparable with the last."
+      }
+    ]
+  },
+  "projects": [
+    {
+      "slug": "openbonsai",
+      "name": "OpenBonsai",
+      "kind": "Compression method",
+      "summary": "Open-source ternary quantization: any BF16 model or fine-tune becomes weights of only −1, 0 and +1. **Qwen3.5-9B shrinks from ~18 GB to ~2 GB.**",
+      "tile": {
+        "size": "xl",
+        "visual": "ternary",
+        "stats": [
+          {
+            "value": "~18 → ~2 GB",
+            "label": "Qwen3.5-9B, BF16 to ternary"
+          },
+          {
+            "value": "~5 h",
+            "label": "to compress on one RTX 5090"
+          }
+        ]
+      },
+      "page": {
+        "lede": "An Apache-2.0 pipeline that compresses dense language models to ternary weights {−1, 0, +1} in the Bonsai (PTQ1_0) format, so a capable model fits on the device that runs the browser. Compatible with Prism ML’s Ternary Bonsai runtime, whose own compression pipeline is closed.",
+        "why": "There are two ways to get a capable model inside the browser: train a tiny one, or shrink a strong one. OpenBonsai is the second route, done in the open, so anyone can compress their own fine-tune instead of waiting for someone else’s release.",
+        "stats": [
+          {
+            "value": "~18 → ~2 GB",
+            "label": "Qwen3.5-9B, BF16 to ternary"
+          },
+          {
+            "value": "~5 h",
+            "label": "to compress on one RTX 5090"
+          },
+          {
+            "value": "3.48 → 2.89",
+            "label": "dev NLL after distillation (original: 2.42)"
+          },
+          {
+            "value": "Apache-2.0",
+            "label": "code, method and failure logs"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "How it works",
+            "paragraphs": [
+              "`openbonsai run` turns a BF16 model into a PTQ1_0 GGUF in four stages: **Rotate**, **Round** (sequential GPTQ), **Refine** (ScaleQ/CAT-Q, research only and skipped by default) and **Distill**. Calibration uses the model’s own answers to math and code prompts, following ScaleQ-1.58 (Wang et al., Intel Labs China).",
+              "The same pipeline compressed Qwen3-8B with no architecture-specific code, and the output drops into Prism ML’s llama.cpp fork. Your own merged fine-tune can be compressed the same way, using its answers as calibration and distillation data."
+            ]
+          },
+          {
+            "heading": "Ternary inside the browser",
+            "paragraphs": [
+              "WebBrain also converted Prism ML’s Ternary Bonsai 2 vision models to ONNX for WebGPU. The first graph took minutes per prompt because prefill ran token by token on the CPU (about 0.13 s per prompt token for 2B on an RTX 5090); the rewritten graph handles 1k prompt tokens in 1.3 s and 4k in 3.3 s.",
+              "Ternary models are disabled as WebBrain’s decision provider for now, because they gave confident false answers."
+            ]
+          }
+        ],
+        "results": {
+          "title": "Results so far (Qwen3.5-9B)",
+          "columns": [
+            "Model",
+            "GSM8K subset, thinking off",
+            "HumanEval, thinking off"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "OpenBonsai Qwen3.5-9B",
+                "65/100",
+                "34/50"
+              ],
+              "highlight": true
+            },
+            {
+              "cells": [
+                "Prism ML Ternary Bonsai 2 9B",
+                "77/100",
+                "45/50"
+              ]
+            }
+          ],
+          "note": "From OpenBonsai’s PyTorch harness, not Prism’s runtime. The HumanEval figure is probably optimistic: the setting was chosen from four runs on the same 50 problems. With thinking on: 32/50 and 14/25 for OpenBonsai, 46/50 and 24/25 for Prism’s model."
+        },
+        "caveats": [
+          "A research preview, not a finished product, with a measurable quality gap to the uncompressed base and to Prism ML’s releases.",
+          "Code and non-English output are still the main weakness.",
+          "Independent project, not affiliated with or endorsed by Prism ML. Bonsai is Prism ML’s product."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/openbonsai-qwen-3.5-9b",
+          "downloads": 202,
+          "likes": 4,
+          "note": "Qwen3.5-9B compressed to ternary with OpenBonsai"
+        },
+        {
+          "id": "webbrain-one/Ternary-Bonsai-2-2B-ONNX-WebGPU-Vision",
+          "downloads": 373,
+          "likes": 1,
+          "note": "Prism ML’s Ternary Bonsai 2 2B, rewritten for WebGPU with vision"
+        },
+        {
+          "id": "webbrain-one/Ternary-Bonsai-2-4B-ONNX-WebGPU-Vision",
+          "downloads": 109,
+          "likes": 2,
+          "note": "Prism ML’s Ternary Bonsai 2 4B, rewritten for WebGPU with vision"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "openbonsai-open-source-ternary-quantization",
+          "title": "Introducing OpenBonsai: open-source ternary quantization for tiny on-device models",
+          "date": "2026-10-29"
+        }
+      ],
+      "links": [
+        {
+          "label": "openbonsai.org",
+          "url": "https://openbonsai.org/"
+        },
+        {
+          "label": "Code on GitHub",
+          "url": "https://github.com/esokullu/openbonsai"
+        },
+        {
+          "label": "Model on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/openbonsai-qwen-3.5-9b"
+        }
+      ]
+    },
+    {
+      "slug": "compass-vld",
+      "name": "Compass VLD",
+      "kind": "On-device model",
+      "summary": "One small model that sees the screenshot, reads the request and decides: vision, language and decision together, so the browser needs no separate captioner, planner and judge.",
+      "tile": {
+        "size": "l",
+        "visual": "vld",
+        "stats": [
+          {
+            "value": "120/126",
+            "label": "page-state decisions, zero false completions"
+          },
+          {
+            "value": "0.94 s",
+            "label": "per decision, in the browser"
+          }
+        ]
+      },
+      "page": {
+        "lede": "A single checkpoint that reads screenshots and points at elements, writes text and tool calls, and answers decision questions such as “is the task done?”. Running all three in one on-device model replaces a captioner, a planner and a judge.",
+        "why": "Every extra model is another download, another wait and another place for an agent to go wrong. One small model that can see, talk and decide is what makes a capable agent practical on an ordinary computer.",
+        "stats": [
+          {
+            "value": "1.55B",
+            "label": "parameters, Compass VLD Tiny v5"
+          },
+          {
+            "value": "120/126",
+            "label": "d1 page-state test, zero false completions"
+          },
+          {
+            "value": "0.94 s",
+            "label": "per decision in the browser (RTX 5090)"
+          },
+          {
+            "value": "32/89",
+            "label": "compact routing, loose: top among newly tested"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "Two models",
+            "paragraphs": [
+              "**Compass VLD Tiny v5** is a fine-tune of OpenBMB MiniCPM-V-4.7-1B: 1.55B parameters in total (498M language layers, 508M embeddings and head, 522M vision encoder, 26M projector). Round 1 used 344,139 samples with LoRA rank 64 on every language layer; round 2 added d1 page-state decision data in 51,811 samples. It trained on one RTX 5090 in about 20 hours.",
+              "**LFM3-VLD-2B** applies the same idea to Liquid’s LFM3-VL-2B (1.92B parameters), where Liquid itself splits the roles between LFM3-VL-2B for chat and d1-2B for decisions."
+            ]
+          },
+          {
+            "heading": "How they compare",
+            "paragraphs": [
+              "On general benchmarks (BenchKit, 4,857 tasks per model) the larger LFM3-VL-2B base wins 6 of 9 suites against Compass v5, and Compass wins none, while decoding faster: 157 tokens/s against 91. On WebBrain’s own compact routing test, both VLDs tie for the best loose score among the newly tested models at 32/89."
+            ]
+          }
+        ],
+        "results": {
+          "title": "BenchKit: LFM3-VL-2B vs Compass VLD v5",
+          "columns": [
+            "Suite",
+            "LFM3-VL-2B",
+            "Compass VLD v5"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "V*",
+                "79.6",
+                "65.4"
+              ]
+            },
+            {
+              "cells": [
+                "OCRBench",
+                "81.5",
+                "72.6"
+              ]
+            },
+            {
+              "cells": [
+                "ChartQA",
+                "82.0",
+                "65.6"
+              ]
+            },
+            {
+              "cells": [
+                "MMLU-Pro",
+                "46.7",
+                "23.0"
+              ]
+            },
+            {
+              "cells": [
+                "GSM8K",
+                "68.2",
+                "70.6"
+              ],
+              "highlight": true
+            },
+            {
+              "cells": [
+                "Decode speed",
+                "91 tok/s",
+                "157 tok/s"
+              ],
+              "highlight": true
+            }
+          ],
+          "note": "General benchmarks, not WebBrain’s tasks, on an RTX A4000. GSM8K is a tie within noise. LFM3 ran thinking-off on a pre-release llama.cpp and had 52 MMLU-Pro timeouts; Compass hit repetition loops (60 on IFEval, 24 on GSM8K)."
+        },
+        "caveats": [
+          "LFM3 has not yet been run on WebBrain’s decision and grounding tests.",
+          "An LFM3-based VLD becomes WebBrain’s default on-device model only if it holds up."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/webbrain-compass-vld-tiny-v5",
+          "downloads": 7,
+          "likes": 0,
+          "note": "Compass VLD Tiny v5, from MiniCPM-V-4.7-1B"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-vld-tiny-v5-gguf",
+          "downloads": 327,
+          "likes": 0,
+          "note": "GGUF for llama.cpp"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-vld-tiny-v5-onnx",
+          "downloads": 28,
+          "likes": 0,
+          "note": "ONNX for WebGPU in the browser"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b",
+          "downloads": 53,
+          "likes": 15,
+          "note": "LFM3-VLD-2B, from Liquid LFM3-VL-2B"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b-gguf",
+          "downloads": 605,
+          "likes": 1,
+          "note": "GGUF for llama.cpp"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b-onnx",
+          "downloads": 28,
+          "likes": 1,
+          "note": "ONNX for WebGPU"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b-multipass",
+          "downloads": 29,
+          "likes": 16,
+          "note": "Multipass variant"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b-multipass-gguf",
+          "downloads": 243,
+          "likes": 4,
+          "note": "Multipass variant, GGUF"
+        },
+        {
+          "id": "webbrain-one/lfm3-vld-2b-multipass-onnx",
+          "downloads": 11,
+          "likes": 2,
+          "note": "Multipass variant, ONNX"
+        },
+        {
+          "id": "webbrain-one/minicpmv47-webbrain-v1",
+          "downloads": 18,
+          "likes": 0,
+          "note": "Earlier MiniCPM-V 4.7 fine-tune"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "lfm3-vl-2b-vs-webbrain-compass-vld",
+          "title": "Liquid LFM3-VL-2B vs WebBrain Compass VLD: a launch-day benchmark",
+          "date": "2026-10-28"
+        },
+        {
+          "slug": "spark-x26-lfm3-minicpm-v47-tool-routing",
+          "title": "Spark-X2.6, LFM3, MiniCPM-V 4.7, and WebBrain VLD Models: Compact Agent Routing on NVIDIA RTX 5060",
+          "date": "2026-10-29"
+        },
+        {
+          "slug": "tiny-vision-models-compared-iii",
+          "title": "Tiny Vision Models Compared III: LFM3-VLD and MiniCPM-V 4.7 Under WebBrain’s Strict Browser Rubric",
+          "date": "2026-10-29"
+        }
+      ],
+      "links": [
+        {
+          "label": "Models on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/webbrain-compass-vld-tiny-v5"
+        }
+      ]
+    },
+    {
+      "slug": "compass",
+      "name": "WebBrain Compass",
+      "kind": "Tool-routing models",
+      "summary": "Small fine-tunes that pick the next browser tool and its arguments, so routine steps don’t need a large planner.",
+      "tile": {
+        "size": "m",
+        "visual": "routing",
+        "stats": [
+          {
+            "value": "9 → 16",
+            "label": "strict routing matches /89, Tiny v2 vs its base"
+          }
+        ]
+      },
+      "page": {
+        "lede": "Models of about 2–4B parameters trained to choose WebBrain’s next browser tool and its arguments in Compact mode: answer, ask for clarification, make a grounded tool call, or escalate. Plus a free hosted route, WebBrain Compass 1.0.",
+        "why": "Most steps in a browser task are routine: read the page, click the right button. A small router that gets those right lets the big model do only the hard parts, and lets routing run on the edge or the device.",
+        "stats": [
+          {
+            "value": "9 → 16",
+            "label": "strict matches /89, Tiny v2 vs MiniCPM5-2B"
+          },
+          {
+            "value": "21 → 41",
+            "label": "loose matches /89, Tiny v2 vs its base"
+          },
+          {
+            "value": "~1/10",
+            "label": "the size of Qwen3.8-27B, one strict match behind it"
+          },
+          {
+            "value": "73.0%",
+            "label": "Sonnet match for hosted Compass 1.0, $0.12 per run"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "The models",
+            "paragraphs": [
+              "**Compass Tiny v1** (2.6B, from LiquidAI LFM2.5-2.6B) matched Qwen3.6-35B-A3B on expected tool names: 42/89, against 34 for its base and 12 for Qwen3.5-9B.",
+              "**Compass Tiny v2** is a LoRA fine-tune of OpenBMB MiniCPM5-2B, trained for one epoch on 7,311 reviewed examples. It doubled its base on strict routing (9 → 16 of 89) and loose routing (21 → 41), one strict match behind Qwen3.8-27B (17/89) at roughly one-tenth the parameters.",
+              "**Compass Tiny XS v3** moves to the 1.7B Spark-X2.5 base, with ONNX builds for the browser."
+            ]
+          },
+          {
+            "heading": "WebBrain Compass 1.0 (hosted)",
+            "paragraphs": [
+              "Launched on June 19, 2026 as a free, request-limited route so anyone can try WebBrain without a local model or an API key. On the frozen 100-case planner benchmark it reaches a 73.0% Sonnet match for $0.12 a run; MiniMax M3 scores 75.0% for $1.06."
+            ]
+          }
+        ],
+        "results": {
+          "title": "Compact routing, 89 scored scenarios",
+          "columns": [
+            "Model",
+            "Strict",
+            "Loose",
+            "Structured calls /100"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Qwen3.8-27B",
+                "17",
+                "39",
+                "99"
+              ]
+            },
+            {
+              "cells": [
+                "**Compass Tiny v2** (2B)",
+                "16",
+                "41",
+                "94"
+              ],
+              "highlight": true
+            },
+            {
+              "cells": [
+                "MiniCPM5-2B (base)",
+                "9",
+                "21",
+                "96"
+              ]
+            },
+            {
+              "cells": [
+                "Gemma 4 E2B",
+                "8",
+                "45",
+                "—"
+              ]
+            }
+          ],
+          "note": "Strict: reference tool and arguments match. Loose: tool family or name. These are routing metrics, not end-to-end success, and the Sonnet-authored reference is “a regression target, not an oracle.”"
+        },
+        "caveats": [
+          "Tiny v2 kept one malformed-XML response and missed its loose target (41 against 43), so it remains experimental.",
+          "Backends, precision and concurrency differ between rows, so speeds are not controlled."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/webbrain-compass-tiny-v2",
+          "downloads": 18,
+          "likes": 0,
+          "note": "Compass Tiny v2, from MiniCPM5-2B"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-tiny-v2.1",
+          "downloads": 331,
+          "likes": 1,
+          "note": "Compass Tiny v2.1"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-tiny-xs-v3",
+          "downloads": 208,
+          "likes": 2,
+          "note": "Compass Tiny XS v3, from Spark-X2.5-1.7B"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-tiny-xs-v3-onnx",
+          "downloads": 10,
+          "likes": 1,
+          "note": "ONNX for WebGPU"
+        },
+        {
+          "id": "webbrain-one/webbrain-compass-tiny-xs-v3.1-onnx",
+          "downloads": 15,
+          "likes": 1,
+          "note": "v3.1, ONNX for WebGPU"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "webbrain-compass-tiny-v1",
+          "title": "Introducing WebBrain Compass Tiny: edge-sized Compact tool routing for WebBrain",
+          "date": "2026-09-05"
+        },
+        {
+          "slug": "compact-tool-routing-models-compared",
+          "title": "Compact tool routing compared: 10 models, from 2B to 35B",
+          "date": "2026-09-07"
+        },
+        {
+          "slug": "webbrain-compass-v2",
+          "title": "WebBrain Compass Tiny v2: small model, sharper tool routing",
+          "date": "2026-09-10"
+        },
+        {
+          "slug": "spark-minicpm-compact-tool-routing",
+          "title": "Spark X2.5 vs MiniCPM5: three compact browser-tool models tested",
+          "date": "2026-09-26"
+        },
+        {
+          "slug": "webbrain-cloud-local-model-benchmarks",
+          "title": "WebBrain Compass is live, and these are the local models we are benchmarking next",
+          "date": "2026-06-19"
+        }
+      ],
+      "links": [
+        {
+          "label": "Models on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/webbrain-compass-tiny-v2.1"
+        }
+      ]
+    },
+    {
+      "slug": "webbrain-vl",
+      "name": "WebBrain VL",
+      "kind": "On-device vision",
+      "summary": "A 450M vision model that turns a screenshot into what a planner needs: text, inputs, state, blockers. Screenshots stay on your computer.",
+      "tile": {
+        "size": "m",
+        "visual": "bars",
+        "barMax": 100,
+        "bars": [
+          {
+            "label": "WebBrain VL 2",
+            "value": 44,
+            "display": "44",
+            "highlight": true
+          },
+          {
+            "label": "Gemma 4 E4B",
+            "value": 41,
+            "display": "41"
+          },
+          {
+            "label": "Qwen 3.5 2B",
+            "value": 39,
+            "display": "39"
+          },
+          {
+            "label": "Base 450M",
+            "value": 1,
+            "display": "1"
+          }
+        ],
+        "stats": [
+          {
+            "value": "0.81 GB",
+            "label": "in-browser package"
+          }
+        ]
+      },
+      "page": {
+        "lede": "Liquid’s LFM2.5-VL-450M, fine-tuned to turn a 1280×720 viewport into WebBrain’s six-section observation: purpose, exact visible text, inputs, state signals, blockers and unknowns. It runs inside the extension through ONNX and WebGPU.",
+        "why": "A cheap text-only planner can’t see a page. WebBrain VL gives it local eyes without sending screenshots anywhere, and it is now WebBrain’s default local vision model.",
+        "stats": [
+          {
+            "value": "44/100",
+            "label": "strict, deployed ONNX build"
+          },
+          {
+            "value": "0/100 → 36/100",
+            "label": "base to fine-tune (PyTorch)"
+          },
+          {
+            "value": "50,000",
+            "label": "browser screenshots in the dataset"
+          },
+          {
+            "value": "0.81 GB",
+            "label": "package that runs in the browser"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "Training",
+            "paragraphs": [
+              "LoRA rank 16 on a 452,847,616-parameter base, training about 0.91% of the weights, for one epoch on a single RTX 4090. Round 1 used 16,646 screenshots from WebSight, MiniWoB++ and ScreenParse; round 2 grew to exactly **50,000** by adding 33,354 synthetic HTML/CSS screens rendered in a real browser. Teacher labels came mainly from Qwen3.6-35B-A3B."
+            ]
+          }
+        ],
+        "results": {
+          "title": "100 held-out browser screenshots",
+          "columns": [
+            "Model",
+            "Strict",
+            "Mean score"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Qwen 3.8 27B NVFP4 (reference)",
+                "74/100",
+                "93.2%"
+              ]
+            },
+            {
+              "cells": [
+                "Qwen 3.5 4B",
+                "55/100",
+                "83.4%"
+              ]
+            },
+            {
+              "cells": [
+                "**WebBrain VL 2 450M** (ONNX)",
+                "44/100",
+                "76.24%"
+              ],
+              "highlight": true
+            },
+            {
+              "cells": [
+                "Gemma 4 E4B",
+                "41/100",
+                "81.3%"
+              ]
+            },
+            {
+              "cells": [
+                "Qwen 3.5 2B",
+                "39/100",
+                "79.1%"
+              ]
+            },
+            {
+              "cells": [
+                "LFM2.5-VL-450M (base)",
+                "0/100",
+                "4.17%"
+              ]
+            }
+          ],
+          "note": "Task-specific parity, not universal superiority: Qwen and Gemma keep higher mean scores. The ONNX build’s gain over PyTorch (44 vs 36) is a runtime effect."
+        },
+        "caveats": [
+          "Teacher labels may contain OCR errors or hallucinations; high-impact visual claims should be corroborated."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/webbrain-vl-2-450M",
+          "downloads": 168,
+          "likes": 5,
+          "note": "WebBrain VL 2, from LFM2.5-VL-450M"
+        },
+        {
+          "id": "webbrain-one/webbrain-vl-2-450M-onnx",
+          "downloads": 387,
+          "likes": 0,
+          "note": "ONNX build that ships in the extension"
+        }
+      ],
+      "datasets": [
+        {
+          "id": "webbrain-one/webbrain-vl-2-450M-dataset",
+          "downloads": 587,
+          "likes": 2,
+          "note": "50,000 browser screenshots with six-section observations",
+          "dataset": true
+        }
+      ],
+      "posts": [
+        {
+          "slug": "fine-tuning-lfm25-vl-450m-for-browser-tasks",
+          "title": "From 16K to 50K Browser Screenshots: Fine-Tuning LFM2.5-VL-450M",
+          "date": "2026-08-22"
+        },
+        {
+          "slug": "tiny-vision-models-compared-ii",
+          "title": "Tiny Vision Models Compared II: WebBrain, Gemma 4, and Larger Qwen 3.5 Models Join the Race",
+          "date": "2026-08-22"
+        },
+        {
+          "slug": "tiny-vision-models-qwen38-reference",
+          "title": "Tiny Vision Models Compared: LFM 2.5 VL vs Qwen 3.5 0.8B",
+          "date": "2026-08-21"
+        },
+        {
+          "slug": "webbrain-31-offline-webgpu-vision",
+          "title": "WebBrain 31 brings offline WebGPU vision to text-only models",
+          "date": "2026-08-14"
+        }
+      ],
+      "links": [
+        {
+          "label": "Model on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/webbrain-vl-2-450M"
+        },
+        {
+          "label": "Dataset",
+          "url": "https://huggingface.co/datasets/webbrain-one/webbrain-vl-2-450M-dataset"
+        }
+      ]
+    },
+    {
+      "slug": "d1",
+      "name": "d1 decisions",
+      "kind": "On-device model",
+      "summary": "A model that doesn’t write text at all: it answers yes/no and multiple-choice questions about the page, like “is the cart ready?”, in one pass on WebGPU.",
+      "tile": {
+        "size": "m",
+        "visual": "decision",
+        "stats": [
+          {
+            "value": "144/144",
+            "label": "decisions agree, FP16 vs FP32"
+          }
+        ]
+      },
+      "page": {
+        "lede": "An on-device decision provider built from LiquidAI’s d1-omni-600M. It generates no tokens: given bounded page state and screenshots, it returns a choice, a probability of yes, or an ordinal score.",
+        "why": "Many agent steps are really questions with a few possible answers. Answering them with probabilities instead of generated text is faster, and a calibrated “I’m not sure” is safer than a confident guess.",
+        "stats": [
+          {
+            "value": "~0.95 GB",
+            "label": "download for the browser"
+          },
+          {
+            "value": "144/144",
+            "label": "decisions match FP32, max probability gap 0.010"
+          },
+          {
+            "value": "6",
+            "label": "full-attention encoder layers"
+          },
+          {
+            "value": "0 tokens",
+            "label": "generated per decision"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "How it runs",
+            "paragraphs": [
+              "A bidirectional encoder with six full-attention layers, served in the browser through WebGPU (hardware WebGPU with buffer limits of at least 128 MiB). The browser build stores FP16 weights and computes in FP32; against the FP32 release it agrees on all 144 test decisions, with a largest probability difference of 0.010.",
+              "d1 page-state data also trains Compass VLD, which now takes priority for automatic decisions once it is downloaded."
+            ]
+          }
+        ],
+        "caveats": [
+          "Experimental, and optional in WebBrain’s settings.",
+          "No blog post covers d1 yet; these details come from WebBrain’s model documentation."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/d1-browser-decision-fp32",
+          "downloads": 42,
+          "likes": 0,
+          "note": "FP32 release, from LiquidAI d1-omni-600M"
+        },
+        {
+          "id": "webbrain-one/d1-browser-decision-fp16",
+          "downloads": 191,
+          "likes": 0,
+          "note": "FP16 weights for WebGPU in the browser"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "lfm3-vl-2b-vs-webbrain-compass-vld",
+          "title": "Liquid LFM3-VL-2B vs WebBrain Compass VLD: a launch-day benchmark",
+          "date": "2026-10-28"
+        }
+      ],
+      "links": [
+        {
+          "label": "Model on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/d1-browser-decision-fp16"
+        }
+      ]
+    },
+    {
+      "slug": "benchmarks",
+      "name": "Open benchmarks",
+      "kind": "Evaluation",
+      "summary": "Frozen, public tests of which models can actually drive a browser: 100 planner prompts, 100 vision screenshots, compact routing, all with failures published.",
+      "tile": {
+        "size": "w",
+        "visual": "bars",
+        "barMax": 100,
+        "bars": [
+          {
+            "label": "Gemma 4 31B QAT",
+            "value": 77.0,
+            "display": "77.0%"
+          },
+          {
+            "label": "MiniMax M3",
+            "value": 75.0,
+            "display": "75.0%"
+          },
+          {
+            "label": "WebBrain Compass 1.0",
+            "value": 73.0,
+            "display": "73.0%",
+            "highlight": true
+          },
+          {
+            "label": "Ling 3.0 Flash VL",
+            "value": 72.0,
+            "display": "72.0%"
+          }
+        ],
+        "stats": [
+          {
+            "value": "100",
+            "label": "prompts, frozen since May 23, 2026"
+          }
+        ]
+      },
+      "page": {
+        "lede": "Benchmarks built from WebBrain’s real work: the same 100 browser-agent prompts, frozen to one system prompt and tool schema, run against every new model, plus a 100-screenshot vision suite and a compact routing test.",
+        "why": "Model launches come with general benchmarks, but a browser agent needs to know one thing: will this model pick the right action on a real page? Freezing the test makes every new model comparable with every old one.",
+        "stats": [
+          {
+            "value": "100",
+            "label": "frozen planner prompts"
+          },
+          {
+            "value": "100",
+            "label": "held-out browser screenshots"
+          },
+          {
+            "value": "77.0%",
+            "label": "best Sonnet match so far"
+          },
+          {
+            "value": "$0.00977",
+            "label": "per 100 calls, cheapest strong row (Ling 3.0 Flash VL)"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "The frozen planner test",
+            "paragraphs": [
+              "100 single-turn Chrome browser-agent prompts, frozen to the May 23, 2026 Claude Sonnet 4.6 system prompt and its 41-tool schema. The runner captures the first response only and does not execute it. Scores: parsed tool calls, strict exact first call, ideal tool name, and agreement with Sonnet’s choice.",
+              "A peer-consensus variant scores each model against all the others, with no single judge: DeepSeek V4 Flash 0731 leads at 51.8% for $0.050 a replay."
+            ]
+          },
+          {
+            "heading": "Vision",
+            "paragraphs": [
+              "Each model gets 100 browser screenshots and WebBrain’s six-section vision prompt. MiMo-V2.6-Flash leads the hosted models at 81/100; among tiny models Qwen 3.5 4B scores 55 and WebBrain VL 2 450M scores 44."
+            ]
+          }
+        ],
+        "results": {
+          "title": "Frozen planner test: current leaders",
+          "columns": [
+            "Model",
+            "Sonnet match",
+            "Notes"
+          ],
+          "rows": [
+            {
+              "cells": [
+                "Gemma 4 31B QAT",
+                "77.0%",
+                "0.55 s median"
+              ]
+            },
+            {
+              "cells": [
+                "Qwen 3.6 27B",
+                "77.0%",
+                ""
+              ]
+            },
+            {
+              "cells": [
+                "MiniMax M2.7",
+                "77.0%",
+                "23% exact"
+              ]
+            },
+            {
+              "cells": [
+                "MiniMax M3",
+                "75.0%",
+                "$1.06 a run"
+              ]
+            },
+            {
+              "cells": [
+                "**WebBrain Compass 1.0**",
+                "73.0%",
+                "$0.12 a run"
+              ],
+              "highlight": true
+            },
+            {
+              "cells": [
+                "Ling 3.0 Flash VL",
+                "72.0%",
+                "$0.00977 per 100 calls"
+              ]
+            }
+          ],
+          "note": "Reference-based and consensus scores are not ground truth. First action only: no multi-turn recovery and no executed actions. Results are dated snapshots."
+        },
+        "caveats": [
+          "Frozen-table and consensus percentages should not be mixed.",
+          "Latencies from different hosts are not controlled."
+        ]
+      },
+      "models": [],
+      "posts": [
+        {
+          "slug": "llm-tool-calling-benchmark",
+          "title": "13 LLMs, 100 browser tasks, two baselines: which model actually picks the right tool?",
+          "date": "2026-05-23"
+        },
+        {
+          "slug": "gemma-4-31b-qat-planner-benchmark",
+          "title": "Gemma 4 31B QAT quietly becomes the best local Gemma planner we have tested",
+          "date": "2026-06-20"
+        },
+        {
+          "slug": "american-chinese-open-model-frontier-gap-benchmark",
+          "title": "Two AI gaps are narrowing: American open weights and Chinese frontier models",
+          "date": "2026-08-02"
+        },
+        {
+          "slug": "hy4-mimo-v26-lfm25-browser-agent-benchmark",
+          "title": "HY4, MiMo V2.6, and Liquid LFM2.5: 600 browser-agent tests",
+          "date": "2026-10-14"
+        },
+        {
+          "slug": "ling30-flash-vl-vs-nex-n25-minimax-m3",
+          "title": "Ling 3.0 Flash VL vs Nex-N2.5 and MiniMax M3: a cheaper frozen planner",
+          "date": "2026-10-05"
+        }
+      ],
+      "links": [
+        {
+          "label": "All benchmark posts",
+          "url": "/blog/"
+        }
+      ]
+    },
+    {
+      "slug": "vision-grafts",
+      "name": "Giving open models eyes",
+      "kind": "Model surgery",
+      "summary": "Strong text-only models can’t see a page. We attach a frozen vision tower with a small trained projector: **30.68M** new parameters give a 33B model sight.",
+      "tile": {
+        "size": "w",
+        "visual": "eye",
+        "stats": [
+          {
+            "value": "30.68M",
+            "label": "parameters trained to add vision to Laguna XS 2.1"
+          },
+          {
+            "value": "$0.073",
+            "label": "per replay, against $0.670 for Qwen 3.6 27B"
+          }
+        ]
+      },
+      "page": {
+        "lede": "Freeze the text backbone, freeze an existing vision tower (Kimi K2.6’s MoonViT), and train only a small projector between them. WebBrain did this for Poolside’s Laguna XS 2.1 and for DeepSeek V4 Flash, and published the results.",
+        "why": "The cheapest strong planners are often text-only, and text can’t show a canvas, a chart or an overlay covering a button. A graft adds sight for a tiny fraction of the cost of training a multimodal model.",
+        "stats": [
+          {
+            "value": "30.68M",
+            "label": "new parameters, Laguna XS 2.1 Vision projector"
+          },
+          {
+            "value": "416.9M",
+            "label": "frozen MoonViT vision tower"
+          },
+          {
+            "value": "100,000",
+            "label": "training examples"
+          },
+          {
+            "value": "41.3%",
+            "label": "exact-action consensus, Laguna XS 2.1 (text-only)"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "Laguna XS 2.1 Vision",
+            "paragraphs": [
+              "Poolside’s 33B-total, 3B-active mixture-of-experts gets a frozen 416.9M-parameter MoonViT and a newly trained 30.68M-parameter projector, trained on 100,000 examples with up to 512 image tokens. In text-only planning it edges Qwen 3.6 27B on exact-action consensus (41.3% vs 38.1%), twice as fast (1.15 s vs 2.23 s median) at about a ninth of the cost per replay ($0.073 vs $0.670). Qwen still leads on exact ideal actions, 17 to 5."
+            ]
+          },
+          {
+            "heading": "DeepSeek V4 Flash Vision",
+            "paragraphs": [
+              "The same approach adds vision to the previously text-only DeepSeek V4 Flash, released in NVFP4 and BF16, including the 0731 revision."
+            ]
+          }
+        ],
+        "caveats": [
+          "Laguna XS 2.1 Vision is experimental, not yet a drop-in serving release; serving integration, NVFP4 equivalence and final image-inference validation are pending. Its benchmarked rows are text-only.",
+          "Adding vision to DeepSeek V4 Flash does not change its text-only results."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/Laguna-XS-2.1-Vision-NVFP4",
+          "downloads": 104,
+          "likes": 3,
+          "note": "Poolside Laguna XS 2.1 with MoonViT vision, NVFP4"
+        },
+        {
+          "id": "webbrain-one/Laguna-XS-2.1-Vision-BF16",
+          "downloads": 18,
+          "likes": 0,
+          "note": "BF16"
+        },
+        {
+          "id": "webbrain-one/DeepSeek-V4-Flash-Vision-NVFP4",
+          "downloads": 208,
+          "likes": 20,
+          "note": "DeepSeek V4 Flash with vision, NVFP4"
+        },
+        {
+          "id": "webbrain-one/DeepSeek-V4-Flash-Vision-BF16",
+          "downloads": 0,
+          "likes": 0,
+          "note": "BF16"
+        },
+        {
+          "id": "webbrain-one/DeepSeek-V4-Flash-0731-Vision-NVFP4",
+          "downloads": 106,
+          "likes": 33,
+          "note": "The 0731 revision with vision, NVFP4"
+        },
+        {
+          "id": "webbrain-one/DeepSeek-V4-Flash-0731-Vision-BF16",
+          "downloads": 160,
+          "likes": 6,
+          "note": "The 0731 revision with vision, BF16"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "qwen36-27b-vs-laguna-xs-21-vision",
+          "title": "Qwen 3.6 27B vs Laguna XS 2.1 Vision: which local LLM is better?",
+          "date": "2026-08-05"
+        },
+        {
+          "slug": "deepseek-v4-flash-vision-support",
+          "title": "DeepSeek V4 Flash now has vision support",
+          "date": "2026-08-04"
+        },
+        {
+          "slug": "inkling-small-glm-5-2-vision-benchmark",
+          "title": "Two ways to give an open model eyes: Inkling Small vs GLM-5.2 Vision",
+          "date": "2026-08-02"
+        }
+      ],
+      "links": [
+        {
+          "label": "Models on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/Laguna-XS-2.1-Vision-NVFP4"
+        }
+      ]
+    },
+    {
+      "slug": "efficient-serving",
+      "name": "Fast local serving",
+      "kind": "Quantization",
+      "summary": "Which formats and engines make strong models fast enough for an agent loop on your own GPU: NVFP4, EXL3, ONNX.",
+      "tile": {
+        "size": "m",
+        "visual": "bits",
+        "stats": [
+          {
+            "value": "10.2 → 1.76 s",
+            "label": "median step, Qwen 3.6 27B in NVFP4"
+          }
+        ]
+      },
+      "page": {
+        "lede": "WebBrain measures which quantization formats and serving engines make strong models fast enough for an interactive agent loop on consumer and workstation Blackwell GPUs, and publishes the quantized models.",
+        "why": "An agent takes many steps per task, so seconds per step add up to minutes. Running locally only works if the model answers fast on hardware people own.",
+        "stats": [
+          {
+            "value": "~5.8×",
+            "label": "faster median step, Qwen 3.6 27B NVFP4"
+          },
+          {
+            "value": "~3×",
+            "label": "throughput, EXL3 on SparkInfer vs ExLlamaV3"
+          },
+          {
+            "value": "121 tok/s",
+            "label": "GLM-5.2 EXL3, single stream on 4× RTX PRO 6000"
+          },
+          {
+            "value": "96/100",
+            "label": "parsed calls, NVFP4 (vs 92)"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "What we found",
+            "paragraphs": [
+              "**NVFP4**: Qwen 3.6 27B in NVFP4 cut the median planner step from 10.2 s to 1.76 s and parsed more calls (96 vs 92 of 100), with the same 77.2% Sonnet match on tool-using cases. It is not a clean upgrade: it over-uses tools on ambiguous prompts (0/8).",
+              "**EXL3**: on SparkInfer, a vLLM fork, EXL3 files run roughly 3× faster than on ExLlamaV3. GLM-5.2 at 3.0–3.5 bits per weight on four RTX PRO 6000 cards reaches 121 tokens/s for one stream, 436 tokens/s aggregate at 8 streams, with 251K context.",
+              "GGUF stays the default for portability; EXL3 is best on owned NVIDIA hardware, and NVFP4 has its place on datacenter Blackwell."
+            ]
+          }
+        ],
+        "caveats": [
+          "Speeds come from different hosts and engines and are not directly comparable across posts."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/Nanbeige4.3-33B-NVFP4",
+          "downloads": 613,
+          "likes": 21,
+          "note": "Nanbeige 4.3 33B in NVFP4"
+        },
+        {
+          "id": "webbrain-one/Ling-3.0-tiny-ONNX",
+          "downloads": 40,
+          "likes": 2,
+          "note": "inclusionAI Ling-3.0-tiny for ONNX runtimes"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "exl3-sparkinfer-blackwell-lite",
+          "title": "EXL3 is the best quantization format for local AI right now — especially on Blackwell lite",
+          "date": "2026-08-11"
+        },
+        {
+          "slug": "qwen36-27b-nvfp4-planner-benchmark",
+          "title": "Qwen 3.6 27B NVFP4 is much faster, but not a clean planner upgrade",
+          "date": "2026-07-02"
+        },
+        {
+          "slug": "local-planner-q4-june-2026",
+          "title": "DiffusionGemma hits 0.35s median in the WebBrain local planner bench",
+          "date": "2026-06-19"
+        }
+      ],
+      "links": [
+        {
+          "label": "Models on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/Nanbeige4.3-33B-NVFP4"
+        }
+      ]
+    },
+    {
+      "slug": "safesocial",
+      "name": "SafeSocial",
+      "kind": "Tiny classifier",
+      "summary": "A 13.6 MB image classifier that runs on the device and blurs social-comparison triggers on Instagram, without waking an LLM for every image.",
+      "tile": {
+        "size": "m",
+        "visual": "shield",
+        "stats": [
+          {
+            "value": "13.6 MB",
+            "label": "EfficientNet-Lite0, runs locally"
+          }
+        ]
+      },
+      "page": {
+        "lede": "A multilabel image classifier that flags social-comparison triggers in Instagram images and video covers, so WebBrain can blur, hide, dim or warn. You can always reveal the image. Also available as an Android app.",
+        "why": "Not every decision needs a large model. A narrow job like this belongs to a tiny model that runs instantly, offline and privately.",
+        "stats": [
+          {
+            "value": "13.6 MB",
+            "label": "EfficientNet-Lite0 model"
+          },
+          {
+            "value": "8",
+            "label": "trigger categories"
+          },
+          {
+            "value": "0",
+            "label": "servers: everything runs on the device"
+          },
+          {
+            "value": "Off",
+            "label": "by default; you choose threshold and action"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "What it looks for",
+            "paragraphs": [
+              "Eight categories: romance and jealousy, social FOMO, luxury and status, travel and lifestyle, body and beauty, achievement and success, popularity, exclusivity and access. The threshold and what happens on a match are yours to set.",
+              "On Android (Google Play: com.esokullu.safesocial) it samples video frames and offers Light, Aggressive and Custom modes, with no classification server."
+            ]
+          }
+        ],
+        "caveats": [
+          "Not a safety guarantee and not a clinical or moderation tool: a personal filtering aid, intentionally experimental.",
+          "No accuracy numbers have been published yet."
+        ]
+      },
+      "models": [
+        {
+          "id": "webbrain-one/safesocial-trigger-classifier",
+          "downloads": 0,
+          "likes": 0,
+          "note": "EfficientNet-Lite0 trigger classifier"
+        }
+      ],
+      "posts": [
+        {
+          "slug": "webbrain-36-8-jev-safesocial",
+          "title": "Jev and SafeSocial arrive in WebBrain 36.8.0",
+          "date": "2026-09-20"
+        },
+        {
+          "slug": "safesocial-google-play",
+          "title": "SafeSocial is now on Google Play",
+          "date": "2026-10-05"
+        }
+      ],
+      "links": [
+        {
+          "label": "Model on Hugging Face",
+          "url": "https://huggingface.co/webbrain-one/safesocial-trigger-classifier"
+        }
+      ]
+    },
+    {
+      "slug": "vision-mode",
+      "name": "Vision mode",
+      "kind": "Agent method",
+      "summary": "Driving the browser from screenshots alone, clicking by coordinates like a person, for pages whose structure is missing or misleading.",
+      "tile": {
+        "size": "m",
+        "visual": "crosshair",
+        "stats": [
+          {
+            "value": "Auto",
+            "label": "default for Act runs with image-capable models"
+          }
+        ]
+      },
+      "page": {
+        "lede": "In Vision mode (“Tesla” mode), an Act run sees the tab only as screenshots, with no accessibility tree, element references or selectors, and acts by clicking, typing, scrolling and dragging at screen coordinates.",
+        "why": "Canvases, maps, charts and custom widgets have little usable structure, and a cookie banner can cover the button the page structure says is there. Seeing what the user sees handles both.",
+        "stats": [
+          {
+            "value": "1",
+            "label": "full screenshot to start, then only what changed"
+          },
+          {
+            "value": "3",
+            "label": "screenshot sizes: Economy, Balanced, Sharp"
+          },
+          {
+            "value": "0–1000",
+            "label": "coordinate systems mapped back to the page"
+          },
+          {
+            "value": "Auto",
+            "label": "default for Act runs with image-capable models"
+          }
+        ],
+        "sections": [
+          {
+            "heading": "How it stays cheap and precise",
+            "paragraphs": [
+              "A run starts with one full screenshot. After that it sends only the changed region, a new full frame when most of the screen changed, or “no visible change”, and the model can zoom in. Coordinates are mapped back across retina displays, browser zoom and models that answer in 0–1000 space.",
+              "WebBrain falls back to the accessibility tree around file uploads, for workflows whose completion must be proved, when reading a whole conversation, on WhatsApp Web and Telegram, and when the model can’t take images."
+            ]
+          }
+        ],
+        "caveats": [
+          "Vision alone is not always enough: small local models often read text better than pixels, and long forms need precise targeting."
+        ]
+      },
+      "models": [],
+      "posts": [
+        {
+          "slug": "tesla-mode",
+          "title": "Introducing Vision mode (aka “Tesla” mode): WebBrain on vision alone",
+          "date": "2026-10-28"
+        }
+      ],
+      "links": [
+        {
+          "label": "Vision mode guide",
+          "url": "/docs/settings/"
+        }
+      ]
+    }
+  ]
+}

@@ -577,6 +577,39 @@
     <loc>https://webbrain.one/websites/</loc>
   </url>
   <url>
+    <loc>https://webbrain.one/research/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/openbonsai/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/compass-vld/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/compass/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/webbrain-vl/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/d1/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/benchmarks/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/vision-grafts/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/efficient-serving/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/safesocial/</loc>
+  </url>
+  <url>
+    <loc>https://webbrain.one/research/vision-mode/</loc>
+  </url>
+  <url>
     <loc>https://webbrain.one/docs/faq/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://webbrain.one/docs/faq/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://webbrain.one/docs/es/faq/"/>

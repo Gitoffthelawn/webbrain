@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{research_title}}</title>
+  <meta name="description" content="{{research_description}}">
+  <meta property="og:title" content="{{research_title}}">
+  <meta property="og:description" content="{{research_description}}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{page_url}}">
+  <meta property="og:site_name" content="WebBrain">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://webbrain.one/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{research_title}}">
+  <meta name="twitter:description" content="{{research_description}}">
+  <meta name="twitter:image" content="https://webbrain.one/twitter-image.png">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="canonical" href="{{page_url}}">
+  <script type="application/ld+json">
+{{research_jsonld}}
+  </script>
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('webbrain-theme');
+        var theme = (saved === 'light' || saved === 'dark')
+          ? saved
+          : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0b0e17;
+      --bg-card: #111827;
+      --bg-card-hover: #1a2233;
+      --surface: #161d2e;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.16);
+      --text: #e4e4ec;
+      --text-dim: #8b8fa4;
+      --accent: #6c63ff;
+      --accent-hover: #5a52d5;
+      --accent-text: #9d97ff;
+      --accent2: #a78bfa;
+      --accent-glow: rgba(108,99,255,0.22);
+      --success: #34d399;
+      --success-bg: rgba(52,211,153,0.10);
+      --amber: #f4cc7d;
+      --warning: #fbbf24;
+      --tint-soft-2: rgba(255,255,255,0.04);
+      --tint-medium: rgba(255,255,255,0.08);
+      --shadow-card: rgba(0,0,0,0.32);
+      --nav-bg: rgba(11,14,23,0.80);
+      --grid-line: rgba(255,255,255,0.035);
+      --code-bg: #0f1420;
+      --code-text: #e4e4ec;
+      --site-width: min(calc(100% - 48px), 1320px);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+    :root[data-theme="light"] {
+      --bg: #f7f1e6;
+      --bg-card: #fffdf8;
+      --bg-card-hover: #f2e9d4;
+      --surface: #ede2cb;
+      --border: rgba(89,55,25,0.15);
+      --border-strong: rgba(89,55,25,0.28);
+      --text: #2c1810;
+      --text-dim: #6b5b47;
+      --accent: #5b52e8;
+      --accent-hover: #4940ce;
+      --accent-text: #5b52e8;
+      --accent2: #7c6ce6;
+      --accent-glow: rgba(91,82,232,0.12);
+      --success: #247554;
+      --success-bg: rgba(36,117,84,0.09);
+      --amber: #946000;
+      --warning: #b97a00;
+      --tint-soft-2: rgba(89,55,25,0.07);
+      --tint-medium: rgba(89,55,25,0.10);
+      --shadow-card: rgba(89,55,25,0.10);
+      --nav-bg: rgba(247,241,230,0.85);
+      --grid-line: rgba(89,55,25,0.05);
+      --code-bg: #fffdf8;
+      --code-text: #2c1810;
+      color-scheme: light;
+    }
+
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font);
+      background: radial-gradient(circle at 76% 10%, var(--accent-glow), transparent 30%), var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto;
+      height: 820px;
+      z-index: -1;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: linear-gradient(to bottom, black, transparent 88%);
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+      pointer-events: none;
+    }
+    a { color: var(--accent-text); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    code { font-family: var(--mono); font-size: 0.92em; }
+
+    /* ----- Nav (same as the homepage) ----- */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner { width: var(--site-width); min-height: 66px; margin: 0 auto; display: flex; align-items: center; gap: 24px; }
+    .nav-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+    .brand-word { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-brand:hover { text-decoration: none; }
+    .brand-tile { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 8px; background: #060d32; box-shadow: 0 6px 16px var(--accent-glow); }
+    .brand-tile img { width: 22px; height: 22px; display: block; }
+    .brand-domain { margin-inline-start: 3px; font-weight: 400; opacity: 0.55; }
+    .nav-links { display: flex; align-items: center; gap: 22px; margin-inline-start: auto; }
+    .nav-links a { color: var(--text-dim); font-size: 14px; font-weight: 550; white-space: nowrap; }
+    .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--text); text-decoration: none; }
+    .nav-tools { display: flex; align-items: center; gap: 10px; }
+    .nav-cta {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--accent-hover); text-decoration: none; }
+    .theme-toggle {
+      appearance: none; -webkit-appearance: none;
+      width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0;
+      background: var(--tint-soft-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+    .theme-toggle:hover { background: var(--tint-medium); border-color: var(--accent); color: var(--text); }
+    .theme-toggle svg { width: 16px; height: 16px; display: block; }
+    .theme-toggle .icon-sun { display: block; }
+    .theme-toggle .icon-moon { display: none; }
+    :root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+    :root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+
+{{research_styles}}
+  </style>
+
+{{site_footer_styles}}
+{{plausible_analytics}}
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand" aria-label="WebBrain">
+      <span class="brand-tile"><img src="/favicon.png" alt="" width="22" height="22"></span>
+      <span class="brand-word">WebBrain<span class="brand-domain">.one</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="/">{{t:nav.browser_extension}}</a>
+      <a href="/websites/">{{t:nav.for_websites}}</a>
+      <a href="/research/"{{research_nav_current}}>{{t:nav.research}}</a>
+      <a href="/docs/" class="nav-secondary">{{t:nav.docs}}</a>
+      <a href="/blog/" class="nav-secondary">{{t:nav.blog}}</a>
+    </nav>
+    <div class="nav-tools">
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="{{t:nav.theme_toggle_aria}}" title="{{t:nav.theme_toggle_aria}}">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a class="nav-cta" href="/#download">{{t:nav.download}}</a>
+    </div>
+  </div>
+</header>
+
+<main>
+{{research_main}}
+</main>
+
+{{site_footer}}
+
+<script>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var root = document.documentElement;
+    function setTheme(theme, persist) {
+      root.setAttribute('data-theme', theme);
+      if (persist) {
+        try { localStorage.setItem('webbrain-theme', theme); } catch (_) {}
+      }
+    }
+    btn.addEventListener('click', function () {
+      setTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
+    });
+    var mq = window.matchMedia('(prefers-color-scheme: light)');
+    function onMQ(e) {
+      try { if (localStorage.getItem('webbrain-theme')) return; } catch (_) {}
+      setTheme(e.matches ? 'light' : 'dark', false);
+    }
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onMQ);
+    else if (typeof mq.addListener === 'function') mq.addListener(onMQ);
+  })();
+</script>
+
+</body>
+</html>

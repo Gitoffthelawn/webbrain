@@ -24,6 +24,7 @@
   "nav.theme_toggle_aria": "라이트 / 다크 테마 전환",
   "nav.browser_extension": "브라우저 확장 프로그램",
   "nav.for_websites": "웹사이트용",
+  "nav.research": "연구",
   "home.nav_aria": "주 메뉴",
   "home.meta.title": "WebBrain — 브라우저와 웹사이트를 위한 AI 에이전트",
   "home.meta.description": "WebBrain은 웹페이지를 읽고, 설명하고, 직접 작업까지 하는 무료 AI 에이전트입니다. 오픈소스 확장 프로그램을 Chrome, Edge, Firefox에 추가하거나 방문자를 위해 웹사이트에 WebBrain을 추가하세요.",

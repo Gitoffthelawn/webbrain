@@ -44986,8 +44986,8 @@ test('homepage leads with the browser extension and offers WebBrain for websites
   assert.ok(nav, 'web home: nav links missing');
   assert.deepEqual(
     [...nav[1].matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1]),
-    ['For websites', 'Docs', 'Blog', 'Download'],
-    'web home: the nav keeps only the other product, docs, blog and the install shortcut',
+    ['For websites', 'Research', 'Docs', 'Blog', 'Download'],
+    'web home: the nav keeps only the other product, research, docs, blog and the install shortcut',
   );
   assert.match(turkish, /href="\/websites\/"/, 'web home: localized homepages link to the English websites page');
   assert.match(english, /<link rel="canonical" href="https:\/\/webbrain\.one\/">/);
@@ -45056,6 +45056,45 @@ test('homepage MCP section gives a prompt to paste into the coding agent', () =>
   assert.doesNotMatch(template, /mcp-showcase|mcp-tool|mcp-rail/, 'web home: the architecture diagram and tool chips are gone');
   assert.match(turkish, /<code id="mcp-prompt-text">https:\/\/webbrain\.one\/docs\/mcp\/ adresini oku/, 'web home: the prompt is localized and keeps the guide URL');
   assert.match(template, /navigator\.clipboard\.writeText\(value\)\.then\(copied, fallback\)/, 'web home: copy uses the clipboard with a selection fallback');
+});
+
+test('research section renders a mosaic and one page per research line', () => {
+  const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/build/research.json'), 'utf8'));
+  const index = fs.readFileSync(path.join(ROOT, 'web/research/index.html'), 'utf8');
+  const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'web/vercel.json'), 'utf8'));
+  const sitemap = fs.readFileSync(path.join(ROOT, 'web/sitemap.xml'), 'utf8');
+  const sources = vercel.rewrites.map((rule) => rule.source);
+
+  assert.ok(data.projects.length >= 8, 'research: several research lines');
+  assert.match(index, /<link rel="canonical" href="https:\/\/webbrain\.one\/research\/">/);
+  assert.match(index, /<a href="\/research\/" aria-current="page">Research<\/a>/);
+  for (const source of ['/research', '/research/', '/research/:slug', '/research/:slug/']) {
+    assert.ok(sources.includes(source), `vercel: ${source} rewrite missing`);
+  }
+  assert.ok(sitemap.includes('<loc>https://webbrain.one/research/</loc>'));
+
+  const slugs = new Set();
+  for (const project of data.projects) {
+    assert.match(project.slug, /^[a-z0-9-]+$/);
+    assert.ok(!slugs.has(project.slug), `research: duplicate slug ${project.slug}`);
+    slugs.add(project.slug);
+    assert.ok(index.includes(`href="/research/${project.slug}/"`), `research: ${project.slug} tile missing`);
+    assert.ok(sitemap.includes(`<loc>https://webbrain.one/research/${project.slug}/</loc>`), `sitemap: ${project.slug} missing`);
+    const page = fs.readFileSync(path.join(ROOT, `web/research/${project.slug}/index.html`), 'utf8');
+    assert.match(page, new RegExp(`<link rel="canonical" href="https://webbrain\\.one/research/${project.slug}/">`));
+    assert.ok(page.includes('<!-- Site footer: start -->'), `${project.slug}: shared footer`);
+    for (const repo of [...(project.models || []), ...(project.datasets || [])]) {
+      assert.match(repo.id, /^webbrain-one\//, `${project.slug}: ${repo.id} is a WebBrain repo`);
+      assert.ok(Number.isInteger(repo.downloads) && Number.isInteger(repo.likes), `${repo.id}: stats are numbers`);
+    }
+    for (const post of project.posts || []) {
+      assert.ok(fs.existsSync(path.join(ROOT, 'web/blog/posts', `${post.slug}.md`)), `${project.slug}: blog post ${post.slug} exists`);
+    }
+  }
+  // Every page links to Research.
+  for (const rel of ['web/index.html', 'web/tr/index.html', 'web/websites/index.html', 'web/blog/index.html']) {
+    assert.ok(fs.readFileSync(path.join(ROOT, rel), 'utf8').includes('href="/research/"'), `${rel}: links to Research`);
+  }
 });
 
 test('new website routes are rewritten on Vercel and listed in the sitemap', () => {

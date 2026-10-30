@@ -94,6 +94,7 @@ export function siteFooter(dict, {
   browserPath = '/',
   websitesPath = '/websites/',
   companionPath = '/companion/',
+  researchPath = '/research/',
   docsPath = '/docs/',
   faqPath = '/docs/faq/',
   blogPath = '/blog/',
@@ -124,6 +125,7 @@ ${languages.map((l) => `      <a href="${esc(l.href)}" hreflang="${esc(l.code)}"
         <a href="${esc(browserPath)}">${t('nav.browser_extension')}</a>
         <a href="${esc(websitesPath)}">${t('nav.for_websites')}</a>
         <a href="${esc(companionPath)}">${t('footer.link_companion')}</a>
+        <a href="${esc(researchPath)}">${t('nav.research')}</a>
         <a href="${esc(docsPath)}">${t('nav.docs')}</a>
         <a href="${esc(faqPath)}">${t('nav.faq')}</a>
         <a href="${esc(blogPath)}">${t('nav.blog')}</a>

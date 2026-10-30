@@ -24,6 +24,7 @@
   "nav.theme_toggle_aria": "ライト / ダークテーマを切り替え",
   "nav.browser_extension": "ブラウザ拡張機能",
   "nav.for_websites": "ウェブサイト向け",
+  "nav.research": "研究",
   "home.nav_aria": "メインナビゲーション",
   "home.meta.title": "WebBrain — ブラウザとウェブサイトのための AI エージェント",
   "home.meta.description": "WebBrain は、ウェブページを読み、説明し、操作までこなす無料の AI エージェントです。オープンソースの拡張機能を Chrome、Edge、Firefox に追加するか、訪問者のために WebBrain をウェブサイトに導入しましょう。",
