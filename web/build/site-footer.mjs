@@ -47,16 +47,18 @@ export const SITE_FOOTER_STYLES = `  <!-- Site footer styles: start -->
       margin: 0 auto;
       padding: 26px 0 30px;
       display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px 32px;
+      flex-direction: column;
+      gap: 18px;
     }
+    /* Page links start on the brand's left edge; the social icons sit at
+       the far end of the same row. */
+    .wb-footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 32px; }
     .wb-footer-brand { display: flex; flex-direction: column; gap: 5px; }
     .wb-footer-tagline { margin: 0; color: var(--wb-footer-text); font-size: 15px; font-weight: 700; line-height: 1.4; }
     .wb-footer-copy { margin: 0; }
     .wb-footer-copy a { color: var(--wb-footer-text); font-weight: 650; text-decoration: none; }
     .wb-footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+    .wb-footer-social { display: flex; align-items: center; gap: 8px; }
     .wb-footer-links a { color: var(--wb-footer-dim); font-weight: 600; text-decoration: none; }
     .wb-footer a:hover { color: var(--wb-footer-text); text-decoration: none; }
     .wb-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
@@ -116,21 +118,25 @@ ${languages.map((l) => `      <a href="${esc(l.href)}" hreflang="${esc(l.code)}"
       <p class="wb-footer-tagline">${t('footer.tagline')}</p>
       <p class="wb-footer-copy">${dict['footer.copyright_html']}</p>
     </div>
-    <div class="wb-footer-links">
-      ${socialLink(MASTODON_PROFILE_URL, t('social.mastodon_label'), ICONS.mastodon)}
-      ${socialLink(BLUESKY_PROFILE_URL, t('social.bluesky_label'), ICONS.bluesky)}
-      ${socialLink(DISCORD_INVITE_URL, t('social.discord_label'), ICONS.discord, 'noopener')}
-      ${socialLink(HUGGINGFACE_PROFILE_URL, t('social.huggingface_label'), ICONS.huggingface)}
-      <a href="${esc(browserPath)}">${t('nav.browser_extension')}</a>
-      <a href="${esc(websitesPath)}">${t('nav.for_websites')}</a>
-      <a href="${esc(docsPath)}">${t('nav.docs')}</a>
-      <a href="${esc(faqPath)}">${t('nav.faq')}</a>
-      <a href="${esc(blogPath)}">${t('nav.blog')}</a>
-      <a href="${esc(privacyPath)}">${t('footer.link_privacy')}</a>
-      <a href="https://github.com/webbrain-one/webbrain/issues" target="_blank" rel="noopener">${t('footer.link_report_bug')}</a>
-      <a href="https://github.com/webbrain-one/webbrain/blob/main/LICENSE" target="_blank" rel="noopener">${t('footer.link_license')}</a>
-      <a href="https://pressreleases.online/org/webbrain.one" target="_blank" rel="noopener">${t('footer.link_press_releases')}</a>
-      <a href="https://api.webbrain.one/account" target="_blank" rel="noopener">${t('footer.link_compass_subscription')}</a>
+    <div class="wb-footer-row">
+      <div class="wb-footer-links">
+        <a href="${esc(browserPath)}">${t('nav.browser_extension')}</a>
+        <a href="${esc(websitesPath)}">${t('nav.for_websites')}</a>
+        <a href="${esc(docsPath)}">${t('nav.docs')}</a>
+        <a href="${esc(faqPath)}">${t('nav.faq')}</a>
+        <a href="${esc(blogPath)}">${t('nav.blog')}</a>
+        <a href="${esc(privacyPath)}">${t('footer.link_privacy')}</a>
+        <a href="https://github.com/webbrain-one/webbrain/issues" target="_blank" rel="noopener">${t('footer.link_report_bug')}</a>
+        <a href="https://github.com/webbrain-one/webbrain/blob/main/LICENSE" target="_blank" rel="noopener">${t('footer.link_license')}</a>
+        <a href="https://pressreleases.online/org/webbrain.one" target="_blank" rel="noopener">${t('footer.link_press_releases')}</a>
+        <a href="https://api.webbrain.one/account" target="_blank" rel="noopener">${t('footer.link_compass_subscription')}</a>
+      </div>
+      <div class="wb-footer-social">
+        ${socialLink(MASTODON_PROFILE_URL, t('social.mastodon_label'), ICONS.mastodon)}
+        ${socialLink(BLUESKY_PROFILE_URL, t('social.bluesky_label'), ICONS.bluesky)}
+        ${socialLink(DISCORD_INVITE_URL, t('social.discord_label'), ICONS.discord, 'noopener')}
+        ${socialLink(HUGGINGFACE_PROFILE_URL, t('social.huggingface_label'), ICONS.huggingface)}
+      </div>
     </div>${languageList}
   </div>
 </footer>
